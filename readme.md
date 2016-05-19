@@ -5,7 +5,7 @@ various c libraries written in [sc](http://sph.mn/content/3d3).
 the directory "c-versions" contains transcompiled c versions of the sc code from under sources/. commentary unfortunately is only to be found in the sc versions.
 
 # included files
-* imht-set: a minimalistic fixed size hash table based data structure for sets of integers. "imht-set" stands for integer modulo hashtable set
+* imht-set: a minimalistic fixed size hash table based data structure for sets of integers
 * sph: a small file with mostly type aliases and utilities for using the local-error and local-memory pattern as described on http://sph.mn/content/3827
 * one: this library contains more experimental definitions
 * scm: helpers for working with guile
@@ -19,6 +19,8 @@ the code is implicitly under gpl3, the documentation under cc-by-nc.
 can easily deal with millions of values. a benchmark on an amd phenom 2 with 3ghz wrote and read 100 million entries in 4 seconds.
 insert/delete/search should all be o(1). space usage is roughly double the size of elements. the maximum set size is defined on creation and does not automatically increase.
 this implementation sets on maximum read and write speed and small code size and trades a higher memory usage for it. if lower memory usage is important, there is an option to reduce memory for a potential performance loss. otherwise you might want to look for a set implementation based on a red/black tree.
+
+"imht-set" is an abbreviation for "integer modulo hash table set".
 
 ## configuration options
 ### integer size
