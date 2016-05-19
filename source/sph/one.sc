@@ -1,4 +1,5 @@
-(includep "string.h")
+;this library contains more experimental bindings
+(pre-include "string.h")
 
 (define-macro string-length strlen
   string-length-n strnlen
@@ -43,3 +44,15 @@
     (if* (bit-and a 128) 1 0) (if* (bit-and a 64) 1 0)
     (if* (bit-and a 32) 1 0) (if* (bit-and a 16) 1 0)
     (if* (bit-and a 8) 1 0) (if* (bit-and a 4) 1 0) (if* (bit-and a 2) 1 0) (if* (bit-and a 1) 1 0)))
+
+(enum sph-errors (sph-error-number-memory sph-error-number-input))
+
+(define (error-description n) (char* b32-s)
+  (return
+    (cond* ((= sph-error-number-memory n) "memory") ((= sph-error-number-input n) "input")
+      (else "unknown"))))
+
+(define-macro (local-define-malloc variable-name type)
+  ;uses local-error to signal a potential malloc error
+  (define variable-name type* (malloc (sizeof type)))
+  (if (not variable-name) (local-error sph sph-error-number-memory)))

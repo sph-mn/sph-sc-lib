@@ -15,6 +15,8 @@
 (define-macro imht-set-key-t uint64_t)
 ;commenting out the following leads to slightly faster set operations but a stored zero will not be found
 (define-macro imht-set-can-contain-zero?)
+;the minimum memory usage is size times imht-set-size-factor
+(define-macro imht-set-size-factor 2)
 
 (define-array imht-set-primes uint16_t
   #f 3
@@ -53,7 +55,7 @@
 (define-type imht-set-t (struct (size size-t) (content imht-set-key-t*)))
 
 (define (imht-set-calculate-hash-table-size min-size) (size-t size-t)
-  (set min-size (* 2 min-size)) (define primes uint16_t* imht-set-primes)
+  (set min-size (* imht-set-size-factor min-size)) (define primes uint16_t* imht-set-primes)
   (while (<= primes imht-set-primes-end)
     (if (<= min-size (deref primes)) (return (deref primes)) (set primes (+ 1 primes))))
   ;if no prime has been found, use double the size made odd as a best guess
