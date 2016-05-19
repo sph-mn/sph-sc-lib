@@ -1,20 +1,25 @@
+;based on the optimised c implementation by darel rex finley from http://alienryderflex.com/quicksort/
+;the following code depends on sph.sc because of the types used
+
 (define-macro (define-quicksort name type-array type-index max-levels)
-  (define (name arr elements) (b8 type-array type-index)
+  (define (name a element-count) (b8 type-array type-index)
+    ;element-count limits a range that is used for sorting in the given array
     (define i type-index 0)
-    (define piv type-index
-      beg[max-levels] type-index end[max-levels] type-index L type-index R type-index)
-    (set (deref beg 0) 0) (set (deref end 0) elements)
-    (while (>= i 0) (set L (deref beg i))
-      (set R (- (deref end i) 1))
-      (if (< L R)
-        (begin (set piv (deref arr L)) (if (= i (- max-levels 1)) (return 1))
-          (while (< L R)
-            (while (and (>= (deref arr R) piv) (< L R)) (set R (- R 1))
-              (if (< L R) (begin (set L (+ L 1)) (set (deref arr L) (deref arr R)))))
-            (while (and (<= (deref arr L) piv) (< L R)) (set L (+ L 1))
-              (if (< L R) (begin (set R (- R 1)) (set (deref arr R) (deref arr L))))))
-          (set (deref arr L) piv) (set (deref beg (+ i 1)) (+ L 1))
-          (set (deref end (+ i 1)) (deref end i)) (set i (+ i 1)) (set (deref end i) L))
+    (define pivot type-index
+      start[max-levels] type-index end[max-levels] type-index left type-index right type-index)
+    (set (deref start 0) 0) (set (deref end 0) element-count)
+    (while (>= i 0) (set left (deref start i))
+      (set right (- (deref end i) 1))
+      (if (< left right)
+        (begin (set pivot (deref a left)) (if (= i (- max-levels 1)) (return 1))
+          (while (< left right)
+            (while (and (>= (deref a right) pivot) (< left right)) (set right (- right 1))
+              (if (< left right) (begin (set left (+ left 1)) (set (deref a left) (deref a right)))))
+            (while (and (<= (deref a left) pivot) (< left right)) (set left (+ left 1))
+              (if (< left right)
+                (begin (set right (- right 1)) (set (deref a right) (deref a left))))))
+          (set (deref a left) pivot) (set (deref start (+ i 1)) (+ left 1))
+          (set (deref end (+ i 1)) (deref end i)) (set i (+ i 1)) (set (deref end i) left))
         (set i (- i 1))))
     (return 0)))
 
