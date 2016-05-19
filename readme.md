@@ -12,14 +12,14 @@ the directory "c-versions" contains transcompiled c versions of the sc code from
 * quicksort: an untested quicksort array sorting algorithm implementation derived from the c implementation by darel rex finley from http://alienryderflex.com/quicksort/
 
 # license
-the code is implicitly under gpl3, the documentation under cc-by-nc.
+the code is under gpl3, the documentation under cc-by-nc.
 
 # imht-set
 
 a data structure for storing a set of integers.
 can easily deal with millions of values. a benchmark on an "amd phenom 2" with 3ghz wrote and read 100 million entries in 4 seconds.
-insert/delete/search should all be o(1). space usage is roughly double the size of elements. the maximum set size is defined on creation and does not automatically increase.
-this implementation sets on maximum read and write speed and a small code size and trades a higher memory usage for it. if lower memory usage is important, there is an option to reduce memory usage for a potential performance loss; otherwise you might want to look for a set implementation based on a red/black tree.
+insert/delete/search should all be o(1). space usage is roughly double the size of elements. the maximum number of elements a set can store is defined on creation and does not automatically increase.
+this implementation sets on maximum read and write speed and a small code size and trades a higher memory usage for it. if lower memory usage is important, there is an option to reduce memory usage with a potential performance loss; otherwise you might want to look for a set implementation based on a red/black tree.
 
 "imht-set" is an abbreviation for "integer modulo hash table set".
 
@@ -88,10 +88,10 @@ the type is fixed and set before compilation in the imht-set.sc source code file
 
 the default type is unsigned 64 bit.
 
-if you would like to use multiple sets with different integer sizes at the same time, you might have to create a derivative of the imht-set.sc file with adjusted identifiers.
+if you would like to use multiple sets with different integer sizes at the same time, you might have to create a derivative of the imht-set.sc file with modified identifiers.
 
 ### zero support
-by default, the integer 0 is a valid value for the set. but as an optimisation, zero support can be disabled by commenting out the definition of "imht-set-can-contain-zero?"
+by default, the integer 0 is a valid value for a set. but as an optimisation, zero support can be disabled by commenting out the definition of "imht-set-can-contain-zero?"
 
 ```
 (define-macro imht-set-can-contain-zero?)
@@ -111,4 +111,4 @@ the downside is, that the insert/delete/search performance may approach and reac
 ## modularity and implementation
 the "imht-set-t" type is a structure with the two fields "size" and "content".
 "content" is a one-dimensional array that stores values at indices determined by a hash function.
-the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can easily be implemented by adding new -add and -remove routines (i would do it for bitcoin).
+the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can easily be implemented by adding new add and remove routines (i would do it for bitcoin).
