@@ -11,7 +11,9 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program; if not, see <http://www.gnu.org/licenses/>.
 (pre-include "stdlib.h" "inttypes.h")
+;the following definition sets the integer type and size for values
 (define-macro imht-set-key-t uint64_t)
+;commenting out the following leads to slightly faster set operations but a stored zero will not be found
 (define-macro imht-set-can-contain-zero?)
 
 (define-array imht-set-primes uint16_t

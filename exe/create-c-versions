@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find source -type f -name "*.sc" | parallel sc
