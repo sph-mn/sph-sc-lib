@@ -4,6 +4,7 @@
 
 #define imht_set_key_t uint64_t
 #define imht_set_can_contain_zero_p
+#define imht_set_size_factor 2
 uint16_t imht_set_primes[]= {3,7,13,19,29,37,43,53,61,71,79,89,101,107,113,131,139,151,163,173,181,193,199,223,229,239,251,263,271,281,293,311,317,337,349,359,373,383,397,409,421,433,443,457,463,479,491,503,521,541,557,569,577,593,601,613,619,641,647,659,673,683,701,719,733,743,757,769,787,809,821,827,839,857,863,881,887,911,929,941,953,971,983,997};
 uint16_t* imht_set_primes_end=(imht_set_primes+83);
 typedef struct {
@@ -11,7 +12,7 @@ typedef struct {
     imht_set_key_t* content;
 } imht_set_t;
 size_t imht_set_calculate_hash_table_size(size_t min_size) {
-    min_size=(2*min_size);
+    min_size=(imht_set_size_factor*min_size);
     uint16_t* primes=imht_set_primes;
     while((primes<=imht_set_primes_end)) {
         if((min_size<=(*primes))) {

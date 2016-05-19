@@ -27,25 +27,8 @@
 #define _noalias restrict
 #define increment_one(a) a=(1+a)
 #define decrement_one(a) a=(a-1)
-#define local_memory_init(size) b0* _local_memory_addresses[size];b8 _local_memory_index=0
-#define local_memory_add(pointer) *(_local_memory_addresses+_local_memory_index)=pointer;_local_memory_index=(1+_local_memory_index)
-#define local_memory_free while(_local_memory_index){decrement_one(_local_memory_index);free((*(_local_memory_addresses+_local_memory_index)));}
-#define local_error_init b32_s local_error_number;b8 local_error_module
+#define local_memory_init(size) b0* sph_local_memory_addresses[size];b8 sph_local_memory_index=0
+#define local_memory_add(pointer) *(sph_local_memory_addresses+sph_local_memory_index)=pointer;sph_local_memory_index=(1+sph_local_memory_index)
+#define local_memory_free while(sph_local_memory_index){decrement_one(sph_local_memory_index);free((*(sph_local_memory_addresses+sph_local_memory_index)));}
+#define local_error_init b32_s local_error_number;b8* local_error_module
 #define local_error(module_identifier,error_identifier) local_error_module=module_identifier;local_error_number=error_identifier;goto error
-#define local_error_assert_enable 1
-#define sph 1
-#if local_error_assert_enable
-
-#define local_error_assert(module,number,expr) if(!expr){local_error(module,number);}
-
-#else
-
-#define local_error_assert(module,number,expr) null
-
-#endif
-#define error_memory -1
-#define error_input -2
-char* error_description(b32_s n) {
-    return(((error_memory==n)?"memory":((error_input==n)?"input":"unknown")));
-}
-#define local_define_malloc(variable_name,type) type* variable_name=malloc(sizeof(type));if(!variable_name){local_error(sph,error_memory);}

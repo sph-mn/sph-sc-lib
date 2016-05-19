@@ -43,3 +43,7 @@ char* ensure_trailing_slash(char* str) {
 
 #endif
 #define octet_write_string_binary(target,a) sprintf(target,"%d%d%d%d%d%d%d%d",((a&128)?1:0),((a&64)?1:0),((a&32)?1:0),((a&16)?1:0),((a&8)?1:0),((a&4)?1:0),((a&2)?1:0),((a&1)?1:0))
+enum sph_errors {sph_error_number_memory,sph_error_number_input} char* error_description(b32_s n) {
+    return(((sph_error_number_memory==n)?"memory":((sph_error_number_input==n)?"input":"unknown")));
+}
+#define local_define_malloc(variable_name,type) type* variable_name=malloc(sizeof(type));if(!variable_name){local_error(sph,sph_error_number_memory);}
