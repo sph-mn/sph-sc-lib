@@ -24,12 +24,13 @@
 (define-macro (increment-one a) (set a (+ 1 a)))
 (define-macro (decrement-one a) (set a (- a 1)))
 ;following are helpers for using the local-memory pattern. it creates an allocated-heap-memory registry in local variables with a more automated free so that
-;different routine end-points, like at error occurences, can easily free all memory up to point
+;different routine end points, like after error occurences, can easily free all memory up to point
 
-(define-macro (local-memory-init size) (define sph-local-memory-addresses[size] b0*)
-  (define sph-local-memory-index b8 0))
+(define-macro (local-memory-init max-address-count)
+  (define sph-local-memory-addresses[max-address-count] b0*) (define sph-local-memory-index b8 0))
 
 (define-macro (local-memory-add pointer)
+  ;do not add more entries as given by max-address-count or it leads to a buffer overflow
   (set (deref sph-local-memory-addresses sph-local-memory-index) pointer
     sph-local-memory-index (+ 1 sph-local-memory-index)))
 
@@ -37,12 +38,12 @@
   (while sph-local-memory-index (decrement-one sph-local-memory-index)
     (free (deref (+ sph-local-memory-addresses sph-local-memory-index)))))
 
-;local-error is a way to save errors with information at different places inside routines and to use the information in a single cleanup and error return goto-label
-;basically for using one goto label instead of multiple goto labels
+;local-error is a way to save error information at places and go to a single cleanup goto label, "error", to process the error information.
+;it is basically for using one goto label for errors instead of multiple goto labels
 (define-macro local-error-init (define local-error-number b32-s local-error-module b8*))
 
 (define-macro (local-error module-identifier error-identifier)
-  ;needs the goto label "error" to be defined.
-  ;local-error-module should identify the package/library/module that the error-identifier/error-code belongs to.
-  ;for example "glibc", or any custom name
+  ;saves error information and jumps to the label "error".
+  ;local-error-module, is used to identify the package/library/module that the error-identifier/error-code belongs to.
+  ;for example "glibc", or any other custom name. it can be set to zero
   (set local-error-module module-identifier) (set local-error-number error-identifier) (goto error))

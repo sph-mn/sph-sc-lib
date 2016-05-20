@@ -41,7 +41,7 @@ the file needs to be in the load path or the same directory.
 
 returns 1 on success or 0 if the memory allocation failed.
 
-the set size does not automatically grow, so a new set has to be created should the specified size turn out to be insufficient.
+the set size does not automatically grow, so a new set has to be created should the specified size later turn out to be insufficient.
 
 ### insert
 ```
@@ -90,6 +90,15 @@ the default type is unsigned 64 bit.
 
 if you would like to use multiple sets with different integer sizes at the same time, you might have to create a derivative of the imht-set.sc file with modified identifiers.
 
+### memory usage
+```
+(define-macro imht-set-size-factor 2)
+```
+
+by default, the memory allocated for the set is at least double the number of elements it is supposed to store.
+this can be changed in this definition, and a lower set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
+the downside is, that the insert/delete/search performance may approach and reach o(n).
+
 ### zero support
 by default, the integer 0 is a valid value for a set. but as an optimisation, zero support can be disabled by commenting out the definition of "imht-set-can-contain-zero?"
 
@@ -98,15 +107,6 @@ by default, the integer 0 is a valid value for a set. but as an optimisation, ze
 ```
 
 without this definition, a zero in sets can not be found, but the set routines should work a tiny little bit faster.
-
-### memory usage
-```
-(define-macro imht-set-size-factor 2)
-```
-
-by default, the memory allocated for the set is at least double the number of elements it is supposed to store.
-this can be changed in this definition, and a lower set-size-factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
-the downside is, that the insert/delete/search performance may approach and reach o(n).
 
 ## modularity and implementation
 the "imht-set-t" type is a structure with the two fields "size" and "content".

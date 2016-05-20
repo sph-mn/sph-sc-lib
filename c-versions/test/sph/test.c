@@ -5,7 +5,7 @@
 #include <time.h>
 #include <imht-set.c>
 
-#define test_element_count 1000000
+#define test_element_count 10000000
 uint8_t test_zero(imht_set_t* set) {
     assert((0==imht_set_find(set,0)));
     imht_set_add(set,0);
@@ -43,5 +43,6 @@ int main() {
     insert_values(set);
     test_value_existence(set);
     imht_set_destroy(set);
+    printf("success\n");
     return(0);
 }
