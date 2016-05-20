@@ -19,7 +19,7 @@ the code is under gpl3, the documentation under cc-by-nc.
 a data structure for storing a set of integers.
 can easily deal with millions of values. a benchmark on an "amd phenom 2" with 3ghz wrote and read 100 million entries in 4 seconds.
 insert/delete/search should all be o(1). space usage is roughly double the size of elements. the maximum number of elements a set can store is defined on creation and does not automatically increase.
-this implementation sets on maximum read and write speed and a small code size and trades a higher memory usage for it. if lower memory usage is important, there is an option to reduce memory usage with a potential performance loss; otherwise you might want to look for a set implementation based on a red/black tree.
+this implementation sets on maximum read and write speed and a small code size and trades a higher memory usage for it. if lower memory usage is important, there is an option to reduce memory usage with a potential performance loss; otherwise you might want to look for a set implementation similar to google sparse hash.
 
 "imht-set" is an abbreviation for "integer modulo hash table set".
 
