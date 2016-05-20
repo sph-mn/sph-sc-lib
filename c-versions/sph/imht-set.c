@@ -2,9 +2,21 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#ifndef imht_set_key_t
+
 #define imht_set_key_t uint64_t
-#define imht_set_can_contain_zero_p
+
+#endif
+#ifndef imht_set_can_contain_zero_p
+
+#define imht_set_can_contain_zero_p 1
+
+#endif
+#ifndef imht_set_size_factor
+
 #define imht_set_size_factor 2
+
+#endif
 uint16_t imht_set_primes[]= {3,7,13,19,29,37,43,53,61,71,79,89,101,107,113,131,139,151,163,173,181,193,199,223,229,239,251,263,271,281,293,311,317,337,349,359,373,383,397,409,421,433,443,457,463,479,491,503,521,541,557,569,577,593,601,613,619,641,647,659,673,683,701,719,733,743,757,769,787,809,821,827,839,857,863,881,887,911,929,941,953,971,983,997};
 uint16_t* imht_set_primes_end=(imht_set_primes+83);
 typedef struct {
@@ -43,7 +55,7 @@ void imht_set_destroy(imht_set_t* a) {
         free(a);
     }
 }
-#ifdef imht_set_can_contain_zero_p
+#if imht_set_can_contain_zero_p
 
 #define imht_set_hash(value,hash_table) (value?(1+(value%hash_table.size)):0)
 
@@ -55,7 +67,7 @@ void imht_set_destroy(imht_set_t* a) {
 imht_set_key_t* imht_set_find(imht_set_t* a,imht_set_key_t value) {
     imht_set_key_t* h=((*a).content+imht_set_hash(value,(*a)));
     if((*h)) {
-#ifdef imht_set_can_contain_zero_p
+#if imht_set_can_contain_zero_p
         if((((*h)==value)||(0==value))) {
             return(h);
         }
@@ -114,7 +126,7 @@ uint8_t imht_set_remove(imht_set_t* a,imht_set_key_t value) {
 imht_set_key_t* imht_set_add(imht_set_t* a,imht_set_key_t value) {
     imht_set_key_t* h=((*a).content+imht_set_hash(value,(*a)));
     if((*h)) {
-#ifdef imht_set_can_contain_zero_p
+#if imht_set_can_contain_zero_p
         if(((value==(*h))||(0==value))) {
             return(h);
         }
@@ -137,7 +149,7 @@ imht_set_key_t* imht_set_add(imht_set_t* a,imht_set_key_t value) {
                 return(0);
             }
             else {
-#ifdef imht_set_can_contain_zero_p
+#if imht_set_can_contain_zero_p
                 (*h2)=((0==value)?1:value);
 #else
                 (*h2)=value;
@@ -145,7 +157,7 @@ imht_set_key_t* imht_set_add(imht_set_t* a,imht_set_key_t value) {
             }
         }
     } else {
-#ifdef imht_set_can_contain_zero_p
+#if imht_set_can_contain_zero_p
         (*h)=((0==value)?1:value);
 #else
         (*h)=value;

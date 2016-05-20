@@ -12,11 +12,11 @@
 ; along with this program; if not, see <http://www.gnu.org/licenses/>.
 (pre-include "stdlib.h" "inttypes.h")
 ;the following definition sets the integer type and size for values
-(define-macro imht-set-key-t uint64_t)
+(pre-if-not-defined imht-set-key-t (define-macro imht-set-key-t uint64_t))
 ;commenting out the following leads to slightly faster set operations but a stored zero will not be found
-(define-macro imht-set-can-contain-zero?)
+(pre-if-not-defined imht-set-can-contain-zero? (define-macro imht-set-can-contain-zero? 1))
 ;the minimum memory usage is size times imht-set-size-factor
-(define-macro imht-set-size-factor 2)
+(pre-if-not-defined imht-set-size-factor (define-macro imht-set-size-factor 2))
 
 (define-array imht-set-primes uint16_t
   ;performance can be optimised by adding more primes nearer to the desired set size * set-size-factor
@@ -74,7 +74,7 @@
 (define (imht-set-destroy a) (void imht-set-t*)
   (if a (begin (free (struct-deref a content)) (free a))))
 
-(pre-if-defined imht-set-can-contain-zero?
+(pre-if imht-set-can-contain-zero?
   (define-macro (imht-set-hash value hash-table) (if* value (+ 1 (modulo value hash-table.size)) 0))
   (define-macro (imht-set-hash value hash-table) (modulo value hash-table.size)))
 
@@ -84,7 +84,7 @@
   (define h imht-set-key-t* (+ (struct-deref a content) (imht-set-hash value (deref a))))
   (if (deref h)
     (begin
-      (pre-if-defined imht-set-can-contain-zero?
+      (pre-if imht-set-can-contain-zero?
         ;the value zero is stored at a special index and is the only value that can be stored there
         (if (or (= (deref h) value) (= 0 value)) (return h)) (if (= (deref h) value) (return h)))
       (define content-end imht-set-key-t* (+ (struct-deref a content) (- (struct-deref a size) 1)))
@@ -110,8 +110,8 @@
   (define h imht-set-key-t* (+ (struct-deref a content) (imht-set-hash value (deref a))))
   (if (deref h)
     (begin
-      (pre-if-defined imht-set-can-contain-zero?
-        (if (or (= value (deref h)) (= 0 value)) (return h)) (if (= value (deref h)) (return h)))
+      (pre-if imht-set-can-contain-zero? (if (or (= value (deref h)) (= 0 value)) (return h))
+        (if (= value (deref h)) (return h)))
       (define content-end imht-set-key-t* (+ (struct-deref a content) (- (struct-deref a size) 1)))
       (define h2 imht-set-key-t* (+ 1 h))
       (while (and (< h2 content-end) (deref h2)) (set h2 (+ 1 h2)))
@@ -119,9 +119,9 @@
         (begin (set h2 (struct-deref a content))
           (while (and (< h2 h) (deref h2)) (set h2 (+ 1 h2)))
           (if (= h2 h) (return 0)
-            (pre-if-defined imht-set-can-contain-zero? (set (deref h2) (if* (= 0 value) 1 value))
+            (pre-if imht-set-can-contain-zero? (set (deref h2) (if* (= 0 value) 1 value))
               (set (deref h2) value))))))
     (begin
-      (pre-if-defined imht-set-can-contain-zero? (set (deref h) (if* (= 0 value) 1 value))
+      (pre-if imht-set-can-contain-zero? (set (deref h) (if* (= 0 value) 1 value))
         (set (deref h) value))
       (return h))))

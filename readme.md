@@ -78,9 +78,11 @@ returns 1 if the element was removed, 0 if it was not found.
 this is an important call for when the set is no longer needed, since its memory is otherwise not deallocated until the process ends. manual memory management is typical with c.
 
 ## configuration options
+configuration options can be set by defining macros before including the imht-set source code.
+
 ### integer size
 an imht-set only stores integers of the same type. supported are all typical integer values, from char to uint64_t.
-the type is fixed and set before compilation in the imht-set.sc source code file.
+the type that sets can take is fixed after compilation.
 
 ```
 (define-macro imht-set-key-t uint64_t)
@@ -100,13 +102,13 @@ this can be changed in this definition, and a lower set size factor approaching 
 the downside is, that the insert/delete/search performance may approach and reach o(n).
 
 ### zero support
-by default, the integer 0 is a valid value for a set. but as an optimisation, zero support can be disabled by commenting out the definition of "imht-set-can-contain-zero?"
+by default, the integer 0 is a valid value for a set. but as an optimisation, this can be disabled by defining a macro for "imht-set-can-contain-zero?" with the value zero.
 
 ```
-(define-macro imht-set-can-contain-zero?)
+(define-macro imht-set-can-contain-zero? 0)
 ```
 
-without this definition, a zero in sets can not be found, but the set routines should work a tiny little bit faster.
+with this definition, a zero in sets can not be found, but the set routines should work a tiny little bit faster.
 
 ## modularity and implementation
 the "imht-set-t" type is a structure with the two fields "size" and "content".
