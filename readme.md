@@ -82,7 +82,7 @@ configuration options can be set by defining macros before including the imht-se
 
 ### integer size
 an imht-set only stores integers of the same type. supported are all typical integer values, from char to uint64_t.
-the type that sets can take is fixed after compilation.
+the type that sets can take is fixed and can not be changed after inclusion of the imht-set source file.
 
 ```
 (define-macro imht-set-key-t uint64_t)
