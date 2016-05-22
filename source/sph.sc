@@ -1,12 +1,11 @@
 (pre-include "inttypes.h")
-
 ;short fixed length type names. as described on http://sph.mn/content/2a63
-(define-macro pointer uintptr-t
-  b0 void
+
+(define-macro b0 void
   b8 uint8_t
   b16 uint16_t
   b32 uint32_t
-  b64 uint64_t b8_s int8_t b16_s int16_t b32_s int32_t b64_s int64_t f32-s float f64-s double)
+  b64 uint64_t b8_s int8_t b16_s int16_t b32_s int32_t b64_s int64_t f32_s float f64_s double)
 
 (pre-if debug-log?
   ;prints arguments with pattern like printf, prepends current function name and line number and automatically adds a newline.
@@ -23,6 +22,7 @@
 (define-macro _noalias restrict)
 (define-macro (increment-one a) (set a (+ 1 a)))
 (define-macro (decrement-one a) (set a (- a 1)))
+(define-macro (zero? a) (= 0 a))
 ;following are helpers for using the local-memory pattern. it creates an allocated-heap-memory registry in local variables with a more automated free so that
 ;different routine end points, like after error occurences, can easily free all memory up to point
 
@@ -37,13 +37,3 @@
 (define-macro local-memory-free
   (while sph-local-memory-index (decrement-one sph-local-memory-index)
     (free (deref (+ sph-local-memory-addresses sph-local-memory-index)))))
-
-;local-error is a way to save error information at places and go to a single cleanup goto label, "error", to process the error information.
-;it is basically for using one goto label for errors instead of multiple goto labels
-(define-macro local-error-init (define local-error-number b32-s local-error-module b8*))
-
-(define-macro (local-error module-identifier error-identifier)
-  ;saves error information and jumps to the label "error".
-  ;local-error-module, is used to identify the package/library/module that the error-identifier/error-code belongs to.
-  ;for example "glibc", or any other custom name. it can be set to zero
-  (set local-error-module module-identifier) (set local-error-number error-identifier) (goto error))

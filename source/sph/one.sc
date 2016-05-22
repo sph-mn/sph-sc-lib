@@ -1,4 +1,4 @@
-;this library contains more experimental bindings
+;this library contains various more experimental bindings
 (pre-include "string.h")
 
 (define-macro string-length strlen
@@ -13,7 +13,8 @@
   string-duplicate strdup
   string-duplicate-n strndup
   string-index-ci strcasestr
-  string-span strcspn string-break strpbrk string-compare strcmp memory-copy memcpy)
+  string-span strcspn
+  string-break strpbrk string-compare strcmp memory-copy memcpy memory-compare memcmp)
 
 (define-macro (file-exists? path) (not (equal? (access path F-OK) -1)))
 
@@ -45,14 +46,15 @@
     (if* (bit-and a 32) 1 0) (if* (bit-and a 16) 1 0)
     (if* (bit-and a 8) 1 0) (if* (bit-and a 4) 1 0) (if* (bit-and a 2) 1 0) (if* (bit-and a 1) 1 0)))
 
-(enum sph-errors (sph-error-number-memory sph-error-number-input))
+(enum (sph-error-number-memory sph-error-number-input))
 
 (define (error-description n) (char* b32-s)
   (return
     (cond* ((= sph-error-number-memory n) "memory") ((= sph-error-number-input n) "input")
       (else "unknown"))))
 
-(define-macro (local-define-malloc variable-name type)
-  ;uses local-error to signal a potential malloc error
-  (define variable-name type* (malloc (sizeof type)))
-  (if (not variable-name) (local-error sph sph-error-number-memory)))
+(define-macro (local-define-malloc variable-name type on-error)
+  (define variable-name type* (malloc (sizeof type))) (if (not variable-name) on-error))
+
+(define-macro (free+null a) (free a) (set a 0))
+(define-macro (pointer-equal? a b) (= (convert-type a b0*) (convert-type b b0*)))

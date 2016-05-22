@@ -1,4 +1,5 @@
-(pre-include "stdio.h" "inttypes.h" "assert.h" "time.h" "imht-set.c")
+(pre-include "stdio.h" "inttypes.h" "assert.h" "time.h")
+(include-sc "../../sph/imht-set")
 (define-macro test-element-count 10000000)
 
 (define (test-zero set) (uint8_t imht-set-t*)
@@ -23,6 +24,5 @@
 
 (define (main) int
   (define set imht-set-t*) (imht-set-create test-element-count (address-of set))
-  (test-zero set) (insert-values set) (test-value-existence set) (imht-set-destroy set)
-  (printf "success\n")
-  (return 0))
+  (test-zero set) (insert-values set)
+  (test-value-existence set) (imht-set-destroy set) (printf "success\n") (return 0))
