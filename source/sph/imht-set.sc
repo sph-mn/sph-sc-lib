@@ -10,7 +10,7 @@
 ; GNU General Public License for more details.
 ; You should have received a copy of the GNU General Public License
 ; along with this program; if not, see <http://www.gnu.org/licenses/>.
-(pre-include "stdlib.h" "inttypes.h")
+(pre-include-once stdlib-h "stdlib.h" inttypes-h "inttypes.h")
 ;the following definition sets the integer type and size for values
 (pre-if-not-defined imht-set-key-t (define-macro imht-set-key-t uint64_t))
 ;commenting out the following leads to slightly faster set operations but a stored zero will not be found

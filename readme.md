@@ -113,4 +113,4 @@ with this definition, a zero in sets can not be found, but the set routines shou
 ## modularity and implementation
 the "imht-set-t" type is a structure with the two fields "size" and "content".
 "content" is a one-dimensional array that stores values at indices determined by a hash function.
-the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can easily be implemented by adding new add and remove routines (i would do it for bitcoin).
+the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can be implemented by adding new "add" and "remove" routines and rewriting the hash.

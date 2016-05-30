@@ -9,17 +9,17 @@
 (define-macro status-init (define status status-t))
 (define-macro status-ii-init (define status b32-t))
 
-(define-macro (status-goto module id)
+(define-macro (status-io-goto status-module status-id)
   ;integer integer -> object
-  (set status.module module status.id id) (goto exit))
+  (set status.module status-module status.id status-id) (goto exit))
 
-(define-macro (status-return module id)
+(define-macro (status-io-return module id)
   ;integer integer -> object
   (return (convert-type (struct-literal module module id id) status-t)))
 
 (define-macro (status-require-check status cont)
   ;object -> object
-  (if (not (status-success? status.id)) cont))
+  (if (not (status-success? status)) cont))
 
 (define-macro (status-require-check-goto status)
   ;object -> object
@@ -31,14 +31,14 @@
 
 (define-macro (status-require expression cont)
   ;object -> object
-  (set status expression) (status-require-check expression cont))
+  (set status expression) (status-require-check status cont))
 
-(define-macro (status-require-goto expression) (status-require expression (goto status)))
+(define-macro (status-require-goto expression) (status-require expression (goto exit)))
 (define-macro (status-require-return expression) (status-require expression (return status)))
 
-(define-macro (status-io-require-check module status cont)
+(define-macro (status-io-require-check status-module status cont)
   ;integer -> object
-  (if (not (status-success? status.id)) (begin (set status.module module) cont)))
+  (if (not (status-success? status)) (begin (set status.module status-module) cont)))
 
 (define-macro (status-io-require-check-goto module status)
   (status-io-require-check module status (goto exit)))
@@ -66,3 +66,4 @@
 (define-macro (status-ii-require-return expression) (status-ii-require expression (return status)))
 (define-macro (status-success? a) (= 0 a.id))
 (define-macro status-success 0)
+(define-macro (status-from-boolean a) (not a))

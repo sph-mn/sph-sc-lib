@@ -1,5 +1,7 @@
 ;this library contains various more experimental bindings
-(pre-include "string.h")
+
+(pre-include-once stdlib-h "stdlib.h"
+  errno-h "errno.h" sys-stat-h "sys/stat.h" libgen-h "libgen.h" string-h "string.h" unistd-h "unistd.h")
 
 (define-macro string-length strlen
   string-length-n strnlen
@@ -21,13 +23,35 @@
 (define (ensure-trailing-slash str) (char* char*)
   (define str-len b8 (string-length str))
   (if (or (not str-len) (equal? #\/ (deref (+ str (- str-len 1))))) (return str)
-    (begin (define new-str char* (malloc (+ 2 str-len))) (memory-copy new-str str str-len)
-      (memory-copy (+ new-str str-len) "/" 1) (set (deref new-str (+ 1 str-len)) 0) (return new-str))))
+    (begin (define new-str char* (malloc (+ 2 str-len))) (if (not new-str) (return 0))
+      (memory-copy new-str str str-len) (memory-copy (+ new-str str-len) "/" 1)
+      (set (deref new-str (+ 1 str-len)) 0) (return new-str))))
 
-(define-macro (array-contains-s array-start array-end search-value index-temp res)
-  (set index-temp array-start) (set res #f)
+(define (string-clone a) (b8* b8*)
+  (define a-size size-t (+ 1 (string-length a))) (define result b8* (malloc a-size))
+  (if result (memory-copy result a a-size)) (return result))
+
+(define (string-append a b) (b8* b8* b8*)
+  (define a-length size-t (string-length a)) (define b-length size-t (string-length b))
+  (define result b8* (malloc (+ 1 a-length b-length)))
+  (if result
+    (begin (memory-copy result a a-length) (memory-copy (+ result a-length) b (+ 1 b-length))))
+  (return result))
+
+(define (dirname-2 a) (b8* b8*)
+  ;the posix version of dirname may modify its argument
+  (define path-copy b8* (string-clone a)) (return (dirname path-copy)))
+
+(define (ensure-directory-structure path mkdir-mode) (boolean b8* mode-t)
+  (if (file-exists? path) (return #t)
+    (begin (define path-dirname b8* (dirname-2 path))
+      (define status boolean (ensure-directory-structure path-dirname mkdir-mode))
+      (free path-dirname) (and status (or (= 0 (mkdir path mkdir-mode)) (= EEXIST errno))))))
+
+(define-macro (array-contains-s array-start array-end search-value index-temp result)
+  (set index-temp array-start) (set result #f)
   (while (<= index-temp array-end)
-    (if (= (deref index-temp) search-value) (begin (set res #t) break)) (increment-one index-temp)))
+    (if (= (deref index-temp) search-value) (begin (set result #t) break)) (increment-one index-temp)))
 
 (define-macro (require-goto a label) (if (not a) (goto label)))
 

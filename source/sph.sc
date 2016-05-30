@@ -1,7 +1,8 @@
-(pre-include "inttypes.h")
+(pre-include-once inttypes-h "inttypes.h")
 ;short fixed length type names. as described on http://sph.mn/content/2a63
 
-(define-macro b0 void
+(define-macro boolean b8
+  b0 void
   b8 uint8_t
   b16 uint16_t
   b32 uint32_t
