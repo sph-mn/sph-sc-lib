@@ -65,5 +65,7 @@
 (define-macro (status-ii-require-goto expression) (status-ii-require expression (goto exit)))
 (define-macro (status-ii-require-return expression) (status-ii-require expression (return status)))
 (define-macro (status-success? a) (= 0 a.id))
+;todo: should status? bindings use implied local status variable?
+(define-macro (status-failure? a) (not (status-success? a)))
 (define-macro status-success 0)
 (define-macro (status-from-boolean a) (not a))

@@ -1,7 +1,8 @@
 ;this library contains various more experimental bindings
 
 (pre-include-once stdlib-h "stdlib.h"
-  errno-h "errno.h" sys-stat-h "sys/stat.h" libgen-h "libgen.h" string-h "string.h" unistd-h "unistd.h")
+  errno-h "errno.h"
+  sys-stat-h "sys/stat.h" libgen-h "libgen.h" string-h "string.h" unistd-h "unistd.h")
 
 (define-macro string-length strlen
   string-length-n strnlen
@@ -46,7 +47,7 @@
   (if (file-exists? path) (return #t)
     (begin (define path-dirname b8* (dirname-2 path))
       (define status boolean (ensure-directory-structure path-dirname mkdir-mode))
-      (free path-dirname) (and status (or (= 0 (mkdir path mkdir-mode)) (= EEXIST errno))))))
+      (free path-dirname) (and status (or (= EEXIST errno) (= 0 (mkdir path mkdir-mode)))))))
 
 (define-macro (array-contains-s array-start array-end search-value index-temp result)
   (set index-temp array-start) (set result #f)
