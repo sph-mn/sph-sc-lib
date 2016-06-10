@@ -1,28 +1,40 @@
-;a minimal integer linked list
+;a minimal linked list with custom element types.
+;this file can be included multiple times to create different type versions,
+;depending the value of the preprocessor variables "mi-list-name-infix" and "mi-list-element-t" before inclusion
 (pre-include-once stdlib-h "stdlib.h" inttypes-h "inttypes.h")
-(pre-if-not-defined mi-list-element-type-name (define-macro mi-list-element-type-name 64))
-(pre-if-not-defined mi-list-element-t (define-type mi-list-element-t uint64_t))
+(pre-if-not-defined mi-list-name-infix (define-macro mi-list-name-infix 64))
+(pre-if-not-defined mi-list-element-t (define-macro mi-list-element-t uint64_t))
+
+(pre-if-not-defined mi-list-name-concat
+  ;identifier concatenation is not more straightfoward in c in this case
+  (begin (define-macro (mi-list-name-concat a b) (pre-concat mi-list- a _ b))
+    (define-macro (mi-list-name-concatenator a b) (mi-list-name-concat a b))
+    (define-macro (mi-list-name name) (mi-list-name-concatenator mi-list-name-infix name))))
+
+(define-macro mi-list-struct-name (mi-list-name struct))
+(define-macro mi-list-t (mi-list-name t))
 
 (define-type mi-list-t
-  (struct mi-list-struct (link (struct mi-list-struct*)) (data mi-list-element-t)))
+  (struct mi-list-struct-name (link (struct mi-list-struct-name*)) (data mi-list-element-t)))
 
-(define-macro (mi-list-create) 0)
-(define-macro (mi-list-first a) (if* (= 0 a) 0 (struct-deref a data)))
-(define-macro (mi-list-first-address a) (if* (= 0 a) 0 (address-of (struct-deref a data))))
-(define-macro (mi-list-rest a) (if* (= 0 a) 0 (struct-deref a link)))
+(pre-if-not-defined mi-list-first
+  (begin (define-macro (mi-list-first a) (struct-deref a data))
+    (define-macro (mi-list-first-address a) (address-of (struct-deref a data)))
+    (define-macro (mi-list-rest a) (struct-deref a link))))
 
-(define (mi-list-drop a) (mi-list-t* mi-list-t*)
+(define ((mi-list-name drop) a) (mi-list-t* mi-list-t*)
   (define a-next mi-list-t* (mi-list-rest a)) (free a) (return a-next))
 
-(define (mi-list-destroy a) (void mi-list-t*)
+(define ((mi-list-name destroy) a) (void mi-list-t*)
   (define a-next mi-list-t* a)
   (while a-next (set a-next (struct-deref a link)) (free a) (set a a-next)))
 
-(define (mi-list-add a value) (mi-list-t* mi-list-t* mi-list-element-t)
-  (define element mi-list-t* (calloc 1 (sizeof mi-list-t)))
-  (if (not element) (return 0))
+(define ((mi-list-name add) a value) (mi-list-t* mi-list-t* mi-list-element-t)
+  (define element mi-list-t* (calloc 1 (sizeof mi-list-t))) (if (not element) (return 0))
   (set (struct-deref element data) value) (if a (set (struct-deref element link) a)) (return element))
 
-(define (mi-list-length a) (size-t mi-list-t*)
-  (define result size-t 0)
-  (while a (set result (+ 1 result)) (set a (mi-list-rest a))) (return result))
+(define ((mi-list-name length) a) (size-t mi-list-t*)
+  (define result size-t 0) (while a (set result (+ 1 result)) (set a (mi-list-rest a)))
+  (return result))
+
+(pre-undefine-macro mi-list-name-infix mi-list-element-t mi-list-struct-name mi-list-t)

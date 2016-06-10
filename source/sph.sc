@@ -2,6 +2,7 @@
 ;short fixed length type names. as described on http://sph.mn/content/2a63
 
 (define-macro boolean b8
+  pointer-t uintptr_t
   b0 void
   b8 uint8_t
   b16 uint16_t
