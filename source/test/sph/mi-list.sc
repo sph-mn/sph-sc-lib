@@ -1,6 +1,6 @@
 (pre-include "stdio.h" "inttypes.h" "assert.h" "time.h")
 (include-sc "../../sph/mi-list")
-(define-macro test-element-count 100)
+(pre-define test-element-count 100)
 
 (define (insert-values a) (mi-list-t* mi-list-t*)
   (define counter size-t test-element-count)
@@ -15,8 +15,8 @@
   (printf "print-contents\n")
   (while a (printf "%lu\n" (mi-list-first a)) (set a (mi-list-rest a))))
 
-(define-macro (get-time) (convert-type (time 0) uint64_t))
-(define-macro (print-time a) (printf "%u\n" a))
+(pre-define (get-time) (convert-type (time 0) uint64_t))
+(pre-define (print-time a) (printf "%u\n" a))
 
 (define (main) int
   (define a mi-list-t* (mi-list-create)) (set a (insert-values a))

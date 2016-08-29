@@ -1,7 +1,7 @@
 ;based on the optimised c implementation by darel rex finley from http://alienryderflex.com/quicksort/
 ;the following code depends on sph.sc because of the types used
 
-(define-macro (define-quicksort name type-array type-index max-levels)
+(pre-define (define-quicksort name type-array type-index max-levels)
   (define (name a element-count) (b8 type-array type-index)
     ;element-count limits a range that is used for sorting in the given array
     (define i type-index 0)

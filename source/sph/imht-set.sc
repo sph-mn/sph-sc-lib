@@ -12,11 +12,11 @@
 ; along with this program; if not, see <http://www.gnu.org/licenses/>.
 (pre-include-once stdlib-h "stdlib.h" inttypes-h "inttypes.h")
 ;the following definition sets the integer type and size for values
-(pre-if-not-defined imht-set-key-t (define-macro imht-set-key-t uint64_t))
+(pre-if-not-defined imht-set-key-t (pre-define imht-set-key-t uint64_t))
 ;commenting out the following leads to slightly faster set operations but a stored zero will not be found
-(pre-if-not-defined imht-set-can-contain-zero? (define-macro imht-set-can-contain-zero? 1))
+(pre-if-not-defined imht-set-can-contain-zero? (pre-define imht-set-can-contain-zero? 1))
 ;the minimum memory usage is size times imht-set-size-factor
-(pre-if-not-defined imht-set-size-factor (define-macro imht-set-size-factor 2))
+(pre-if-not-defined imht-set-size-factor (pre-define imht-set-size-factor 2))
 
 (define-array imht-set-primes uint16_t
   ;performance can be optimised by adding more primes nearer to the desired set size * set-size-factor
@@ -75,8 +75,8 @@
   (if a (begin (free (struct-deref a content)) (free a))))
 
 (pre-if imht-set-can-contain-zero?
-  (define-macro (imht-set-hash value hash-table) (if* value (+ 1 (modulo value hash-table.size)) 0))
-  (define-macro (imht-set-hash value hash-table) (modulo value hash-table.size)))
+  (pre-define (imht-set-hash value hash-table) (if* value (+ 1 (modulo value hash-table.size)) 0))
+  (pre-define (imht-set-hash value hash-table) (modulo value hash-table.size)))
 
 (define (imht-set-find a value) (imht-set-key-t* imht-set-t* imht-set-key-t)
   ;returns the address of the element in the set, 0 if it was not found.
@@ -98,7 +98,7 @@
         (set h2 (+ 1 h2)))))
   (return 0))
 
-(define-macro imht-set-contains? imht-set-find)
+(pre-define imht-set-contains? imht-set-find)
 
 (define (imht-set-remove a value) (uint8_t imht-set-t* imht-set-key-t)
   ;returns 1 if the element was removed, 0 if it was not found
