@@ -47,7 +47,7 @@
   (if (file-exists? path) (return #t)
     (begin (define path-dirname b8* (dirname-2 path))
       (define status boolean (ensure-directory-structure path-dirname mkdir-mode))
-      (free path-dirname) (and status (or (= EEXIST errno) (= 0 (mkdir path mkdir-mode)))))))
+      (free path-dirname) (return (and status (or (= EEXIST errno) (= 0 (mkdir path mkdir-mode))))))))
 
 (pre-define (array-contains-s array-start array-end search-value index-temp result)
   (set index-temp array-start) (set result #f)

@@ -1,4 +1,4 @@
-(pre-include-once inttypes-h "inttypes.h")
+(pre-include-once inttypes-h "inttypes.h" stdio-h "stdio.h")
 ;short fixed length type names. as described on http://sph.mn/content/2a63
 
 (pre-define boolean b8
