@@ -1,11 +1,12 @@
 (pre-define scm-first SCM_CAR scm-tail SCM_CDR)
+(pre-define scm-c-define-procedure-c-init (define scm-c-define-procedure-c-temp SCM))
 
-(pre-define
-  (scm-c-define-procedure-c scm-temp name required optional rest c-function documentation)
-  ;defines and registers/exports a c procedure as scheme procedure with documentation string
-  (set scm-temp (scm-c-define-gsubr name required optional rest c-function))
-  (scm-set-procedure-property! scm-temp (scm-from-locale-symbol "documentation")
-    (scm-from-locale-string documentation)))
+(pre-define (scm-c-define-procedure-c name required optional rest c-function documentation)
+  ;like scm-c-define-gsubr but also sets a documentation string.
+  ;defines and registers a c routine as a scheme procedure
+  (set scm-c-define-procedure-c-temp (scm-c-define-gsubr name required optional rest c-function))
+  (scm-set-procedure-property! scm-c-define-procedure-c-temp
+    (scm-from-locale-symbol "documentation") (scm-from-locale-string documentation)))
 
 (pre-define (scm-c-list-each list e body)
   ;SCM SCM c-compound-expression ->
@@ -28,20 +29,21 @@
   (define r SCM (scm-c-make-bytevector size-octets))
   (memcpy (SCM-BYTEVECTOR-CONTENTS r) a size-octets) (return r))
 
-(pre-define (scm-c-error-create name data)
-  (scm-call-3 scm-error-create (scm-from-locale-symbol __func__) (if* data data SCM-BOOL-F)))
+(pre-define (scm-c-error-create id group data)
+  (scm-call-3 scm-error-create (scm-from-uint id) (if* group (scm-from-uint group) SCM-BOOL-F) (if* data data SCM-EOL)))
 
-;scm-c-local-error is the scheme version of sph.c:local-error. it can create an error object defined in the scheme module (sph)
+(pre-define (scm-debug-log value)
+  (scm-call-2 (scm-variable-ref (scm-c-lookup "display")) value (scm-current-output-port)))
 
 (define scm-error-create SCM
-  scm-error? SCM scm-error-origin SCM scm-error-name SCM scm-error-data SCM)
+  scm-error? SCM scm-error-group SCM scm-error-id SCM scm-error-data SCM)
 
-(define (init-scm) b0
+(define (scm-error-init) b0
   ;the features defined in this file need run-time initialisation. call this once in an application before using the features here
   (define m SCM (scm-c-resolve-module "sph error"))
   (set scm-error-create (scm-variable-ref (scm-c-module-lookup m "error-create-p")))
-  (set scm-error-origin (scm-variable-ref (scm-c-module-lookup m "error-origin")))
-  (set scm-error-name (scm-variable-ref (scm-c-module-lookup m "error-name")))
+  (set scm-error-group (scm-variable-ref (scm-c-module-lookup m "error-group")))
+  (set scm-error-id (scm-variable-ref (scm-c-module-lookup m "error-id")))
   (set scm-error-data (scm-variable-ref (scm-c-module-lookup m "error-data")))
   (set scm-error? (scm-variable-ref (scm-c-module-lookup m "error?"))))
 
@@ -78,3 +80,26 @@
 
 (pre-define (scm-c-require-success-glibc a) (set s a) (if (< s 0) (scm-c-local-error-glibc s)))
 (pre-define (scm-c-require-success-system a) (if (< a 0) scm-c-local-error-system))
+(enum (sph-guile-status-id-wrong-argument-type))
+(pre-define sph-guile-status-module-sph-guile 4)
+
+(define (sph-guile-status-text status) (b8* status-t)
+  (return
+    (case* = status.module
+      (sph-guile-status-module-sph-guile
+        (string-append "sph-guile: "
+          (convert-type
+            (case* = status.id
+              (sph-guile-status-id-wrong-argument-type "wrong type for argument")
+              (else "error without description"))
+            b8*)))
+      (else (convert-type "" b8*)))))
+
+(pre-if scm-enable-typechecks?
+  (pre-define (scm-typecheck expr)
+    (if (not expr)
+      (begin
+        (set status.id sph-guile-status-id-wrong-argument-type
+          status.module sph-guile-status-module-sph-guile)
+        (goto exit))))
+  (pre-define (scm-typecheck expr) null))

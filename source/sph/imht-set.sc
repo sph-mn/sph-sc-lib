@@ -98,7 +98,7 @@
         (set h2 (+ 1 h2)))))
   (return 0))
 
-(pre-define imht-set-contains? imht-set-find)
+(pre-define (imht-set-contains? a value) (if* (= 0 (imht-set-find a value)) #f #t))
 
 (define (imht-set-remove a value) (uint8_t imht-set-t* imht-set-key-t)
   ;returns 1 if the element was removed, 0 if it was not found
@@ -106,7 +106,7 @@
   (if value-address (begin (set (deref value-address) 0) (return #t)) (return #f)))
 
 (define (imht-set-add a value) (imht-set-key-t* imht-set-t* imht-set-key-t)
-  ;returns the address of the added or already included element, 0 if there is no space left
+  ;returns the address of the added or already included element, 0 if there is no space left in the set
   (define h imht-set-key-t* (+ (struct-deref a content) (imht-set-hash value (deref a))))
   (if (deref h)
     (begin

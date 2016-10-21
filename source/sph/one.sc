@@ -21,18 +21,19 @@
 
 (pre-define (file-exists? path) (not (equal? (access path F-OK) -1)))
 
-(define (ensure-trailing-slash str) (char* char*)
-  (define str-len b8 (string-length str))
-  (if (or (not str-len) (equal? #\/ (deref (+ str (- str-len 1))))) (return str)
-    (begin (define new-str char* (malloc (+ 2 str-len))) (if (not new-str) (return 0))
-      (memory-copy new-str str str-len) (memory-copy (+ new-str str-len) "/" 1)
-      (set (deref new-str (+ 1 str-len)) 0) (return new-str))))
+(define (ensure-trailing-slash a) (char* char*)
+  (define a-len b8 (string-length a))
+  (if (or (not a-len) (equal? #\/ (deref (+ a (- a-len 1))))) (return a)
+    (begin (define new-a char* (malloc (+ 2 a-len))) (if (not new-a) (return 0))
+      (memory-copy new-a a a-len) (memory-copy (+ new-a a-len) "/" 1)
+      (set (deref new-a (+ 1 a-len)) 0) (return new-a))))
 
 (define (string-clone a) (b8* b8*)
   (define a-size size-t (+ 1 (string-length a))) (define result b8* (malloc a-size))
   (if result (memory-copy result a a-size)) (return result))
 
 (define (string-append a b) (b8* b8* b8*)
+  "always returns a new string"
   (define a-length size-t (string-length a)) (define b-length size-t (string-length b))
   (define result b8* (malloc (+ 1 a-length b-length)))
   (if result
@@ -48,35 +49,6 @@
     (begin (define path-dirname b8* (dirname-2 path))
       (define status boolean (ensure-directory-structure path-dirname mkdir-mode))
       (free path-dirname) (return (and status (or (= EEXIST errno) (= 0 (mkdir path mkdir-mode))))))))
-
-(pre-define (array-contains-s array-start array-end search-value index-temp result)
-  (set index-temp array-start) (set result #f)
-  (while (<= index-temp array-end)
-    (if (= (deref index-temp) search-value) (begin (set result #t) break)) (increment-one index-temp)))
-
-(pre-define (require-goto a label) (if (not a) (goto label)))
-
-(pre-if stability-typechecks
-  (pre-define (if-typecheck expr action)
-    (if (not expr)
-      (begin
-        (debug-log "type check failed %s"
-          (if* (< (string-length (pre-stringify expr)) 24) (pre-stringify expr) ""))
-        action)))
-  (pre-define (if-typecheck expr action) null))
-
-(pre-define (octet-write-string-binary target a)
-  (sprintf target "%d%d%d%d%d%d%d%d"
-    (if* (bit-and a 128) 1 0) (if* (bit-and a 64) 1 0)
-    (if* (bit-and a 32) 1 0) (if* (bit-and a 16) 1 0)
-    (if* (bit-and a 8) 1 0) (if* (bit-and a 4) 1 0) (if* (bit-and a 2) 1 0) (if* (bit-and a 1) 1 0)))
-
-(enum (sph-error-number-memory sph-error-number-input))
-
-(define (error-description n) (char* b32-s)
-  (return
-    (cond* ((= sph-error-number-memory n) "memory") ((= sph-error-number-input n) "input")
-      (else "unknown"))))
 
 (pre-define (local-define-malloc variable-name type on-error)
   (define variable-name type* (malloc (sizeof type))) (if (not variable-name) on-error))

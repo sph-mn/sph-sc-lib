@@ -26,12 +26,11 @@
   (define a-next mi-list-t* (mi-list-rest a)) (free a) (return a-next))
 
 (define ((mi-list-name destroy) a) (void mi-list-t*)
-  (define a-next mi-list-t* a)
-  (while a-next (set a-next (struct-deref a link)) (free a) (set a a-next)))
+  (define a-next mi-list-t* 0) (while a (set a-next (struct-deref a link)) (free a) (set a a-next)))
 
 (define ((mi-list-name add) a value) (mi-list-t* mi-list-t* mi-list-element-t)
   (define element mi-list-t* (calloc 1 (sizeof mi-list-t))) (if (not element) (return 0))
-  (set (struct-deref element data) value) (if a (set (struct-deref element link) a)) (return element))
+  (set (struct-deref element data) value (struct-deref element link) a) (return element))
 
 (define ((mi-list-name length) a) (size-t mi-list-t*)
   (define result size-t 0) (while a (set result (+ 1 result)) (set a (mi-list-rest a)))
