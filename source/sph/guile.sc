@@ -30,13 +30,14 @@
   (memcpy (SCM-BYTEVECTOR-CONTENTS r) a size-octets) (return r))
 
 (pre-define (scm-c-error-create id group data)
-  (scm-call-3 scm-error-create (scm-from-uint id) (if* group (scm-from-uint group) SCM-BOOL-F) (if* data data SCM-EOL)))
+  (scm-call-3 scm-error-create (scm-from-uint id)
+    (if* group (scm-from-uint group) SCM-BOOL-F) (if* data data SCM-EOL)))
 
-(pre-define (scm-debug-log value)
-  (scm-call-2 (scm-variable-ref (scm-c-lookup "display")) value (scm-current-output-port)))
+(define (scm-debug-log value) (b0 SCM)
+  (scm-call-2 (scm-variable-ref (scm-c-lookup "write")) value (scm-current-output-port))
+  (scm-newline (scm-current-output-port)))
 
-(define scm-error-create SCM
-  scm-error? SCM scm-error-group SCM scm-error-id SCM scm-error-data SCM)
+(define scm-error-create SCM scm-error? SCM scm-error-group SCM scm-error-id SCM scm-error-data SCM)
 
 (define (scm-error-init) b0
   ;the features defined in this file need run-time initialisation. call this once in an application before using the features here

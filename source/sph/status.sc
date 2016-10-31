@@ -6,7 +6,9 @@
 ;error ids and module ids can be managed with enumerated types and error descriptions added when necessary by additional routines.
 (define-type status-t (struct (id b32_s) (module b8)))
 (define-type status-i-t b32_s)
-(pre-define status-init (define status status-t (struct-literal 0 0)) status-ii-init (define status b32-t))
+
+(pre-define status-init (define status status-t (struct-literal 0 0))
+  status-ii-init (define status b32-t))
 
 (pre-define (status-io-goto status-module status-id)
   ;integer integer -> object
