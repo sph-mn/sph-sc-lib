@@ -1,6 +1,14 @@
 
+#ifndef sc_included_inttypes_h
 #include <inttypes.h>
-
+#define sc_included_inttypes_h
+#endif
+#ifndef sc_included_stdio_h
+#include <stdio.h>
+#define sc_included_stdio_h
+#endif
+#define boolean b8
+#define pointer_t uintptr_t
 #define b0 void
 #define b8 uint8_t
 #define b16 uint16_t
@@ -21,7 +29,7 @@
 #define debug_log(format,...) null
 
 #endif
-#define null (b0)(0)
+#define null ((b0)(0))
 #define _readonly const
 #define _noalias restrict
 #define increment_one(a) a=(1+a)

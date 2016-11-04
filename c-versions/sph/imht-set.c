@@ -1,7 +1,12 @@
 
+#ifndef sc_included_stdlib_h
 #include <stdlib.h>
+#define sc_included_stdlib_h
+#endif
+#ifndef sc_included_inttypes_h
 #include <inttypes.h>
-
+#define sc_included_inttypes_h
+#endif
 #ifndef imht_set_key_t
 
 #define imht_set_key_t uint64_t
@@ -32,32 +37,32 @@ size_t imht_set_calculate_hash_table_size(size_t min_size) {
         }
         else {
             primes=(1+primes);
-        }
-    }
+        };
+    };
     if((min_size<=(*primes))) {
         return((*primes));
-    }
+    };
     return((1|min_size));
-}
+};
 uint8_t imht_set_create(size_t min_size,imht_set_t** result) {
     (*result)=malloc(sizeof(imht_set_t));
     if(!(*result)) {
         return(0);
-    }
+    };
     min_size=imht_set_calculate_hash_table_size(min_size);
     (*(*result)).content=calloc(min_size,sizeof(imht_set_key_t));
     (*(*result)).size=min_size;
     return(((*(*result)).content?1:0));
-}
+};
 void imht_set_destroy(imht_set_t* a) {
     if(a) {
         free((*a).content);
         free(a);
-    }
-}
+    };
+};
 #if imht_set_can_contain_zero_p
 
-#define imht_set_hash(value,hash_table) (value?(1+(value%hash_table.size)):0)
+#define imht_set_hash(value,hash_table) (value?(1+(value%(hash_table.size-1))):0)
 
 #else
 
@@ -70,11 +75,11 @@ imht_set_key_t* imht_set_find(imht_set_t* a,imht_set_key_t value) {
 #if imht_set_can_contain_zero_p
         if((((*h)==value)||(0==value))) {
             return(h);
-        }
+        };
 #else
         if(((*h)==value)) {
             return(h);
-        }
+        };
 #endif
         imht_set_key_t* content_end=((*a).content+((*a).size-1));
         imht_set_key_t* h2=(1+h);
@@ -85,18 +90,18 @@ imht_set_key_t* imht_set_find(imht_set_t* a,imht_set_key_t value) {
             else {
                 if((value==(*h2))) {
                     return(h2);
-                }
-            }
+                };
+            };
             h2=(1+h2);
-        }
+        };
         if(!(*h2)) {
             return(0);
         }
         else {
             if((value==(*h2))) {
                 return(h2);
-            }
-        }
+            };
+        };
         h2=(*a).content;
         while((h2<h)) {
             if(!(*h2)) {
@@ -105,14 +110,14 @@ imht_set_key_t* imht_set_find(imht_set_t* a,imht_set_key_t value) {
             else {
                 if((value==(*h2))) {
                     return(h2);
-                }
-            }
+                };
+            };
             h2=(1+h2);
-        }
-    }
+        };
+    };
     return(0);
-}
-#define imht_set_contains_p imht_set_find
+};
+#define imht_set_contains_p(a,value) ((0==imht_set_find(a,value))?0:1)
 uint8_t imht_set_remove(imht_set_t* a,imht_set_key_t value) {
     imht_set_key_t* value_address=imht_set_find(a,value);
     if(value_address) {
@@ -121,30 +126,30 @@ uint8_t imht_set_remove(imht_set_t* a,imht_set_key_t value) {
     }
     else {
         return(0);
-    }
-}
+    };
+};
 imht_set_key_t* imht_set_add(imht_set_t* a,imht_set_key_t value) {
     imht_set_key_t* h=((*a).content+imht_set_hash(value,(*a)));
     if((*h)) {
 #if imht_set_can_contain_zero_p
         if(((value==(*h))||(0==value))) {
             return(h);
-        }
+        };
 #else
         if((value==(*h))) {
             return(h);
-        }
+        };
 #endif
         imht_set_key_t* content_end=((*a).content+((*a).size-1));
         imht_set_key_t* h2=(1+h);
-        while(((h2<content_end)&&(*h2))) {
+        while(((h2<=content_end)&&(*h2))) {
             h2=(1+h2);
-        }
-        if(((h2==content_end)&&(*h2))) {
+        };
+        if((h2>content_end)) {
             h2=(*a).content;
             while(((h2<h)&&(*h2))) {
                 h2=(1+h2);
-            }
+            };
             if((h2==h)) {
                 return(0);
             }
@@ -154,8 +159,14 @@ imht_set_key_t* imht_set_add(imht_set_t* a,imht_set_key_t value) {
 #else
                 (*h2)=value;
 #endif
-            }
-        }
+            };
+        } else {
+#if imht_set_can_contain_zero_p
+            (*h2)=((0==value)?1:value);
+#else
+            (*h2)=value;
+#endif
+        };
     } else {
 #if imht_set_can_contain_zero_p
         (*h)=((0==value)?1:value);
@@ -163,5 +174,5 @@ imht_set_key_t* imht_set_add(imht_set_t* a,imht_set_key_t value) {
         (*h)=value;
 #endif
         return(h);
-    }
-}
+    };
+};

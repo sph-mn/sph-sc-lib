@@ -114,3 +114,6 @@ with this definition, a zero in sets can not be found, but the set routines shou
 the "imht-set-t" type is a structure with the two fields "size" and "content".
 "content" is a one-dimensional array that stores values at indices determined by a hash function.
 the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can be implemented by adding new "add" and "remove" routines and rewriting the hash.
+
+# tests
+the test files are currently supposed to be compiled and run separately

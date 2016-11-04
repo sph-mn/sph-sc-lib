@@ -1,1 +1,1 @@
-contains libraries from ../source that as transcompiled c versions.
+contains c versions from code in ../source that was compiled from sc.
