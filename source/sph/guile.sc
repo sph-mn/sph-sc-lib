@@ -104,3 +104,8 @@
           status.module sph-guile-status-module-sph-guile)
         (goto exit))))
   (pre-define (scm-typecheck expr) null))
+
+(pre-define (scm-error-return-1 a) (if (scm-is-true (scm-call-1 scm-error? a)) (return a)))
+(pre-define (scm-error-return-2 a b) (scm-error-return-1 a) (scm-error-return-1 b))
+(pre-define (scm-error-return-3 a b c) (scm-error-return-2 a b) (scm-error-return-1 c))
+(pre-define (scm-error-return-4 a b c d) (scm-error-return-2 a b) (scm-error-return-2 c d))
