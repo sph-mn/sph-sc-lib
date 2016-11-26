@@ -1,71 +1,32 @@
-;return status code and error handling.
-;two basic return types are supported:
-;* integer: integer return code. 32 bit signed for compatibility reasons
-;* object: a status-t struct that also includes information about to which module an integer return status code belongs to
-;a status id of 0 means success, everything else means failure.
-;error ids and module ids can be managed with enumerated types and error descriptions added when necessary by additional routines.
-(define-type status-t (struct (id b32_s) (module b8)))
-(define-type status-i-t b32_s)
+;return status code and error handling with a status type.
+; a status conists of a status id and a status group id to discern between ids from different libraries.
+; status id 0 is success, everything else can be considered a failure.
+; status ids are 32 bit signed integers for compatibility with common error return codes
+(define-type status-t (struct (id b32_s) (group b8)))
 
-(pre-define status-init (define status status-t (struct-literal 0 0))
-  status-ii-init (define status b32-t))
+(pre-define status-success 0
+  status-init (define status status-t (struct-literal status-success status-success)))
 
-(pre-define (status-io-goto status-module status-id)
-  ;integer integer -> object
-  (set status.module status-module status.id status-id) (goto exit))
-
-(pre-define (status-io-return module id)
-  ;integer integer -> object
-  (return (convert-type (struct-literal module module id id) status-t)))
-
-(pre-define (status-require-check status cont)
-  ;object -> object
-  (if (not (status-success? status)) cont))
-
-(pre-define (status-require-check-goto status)
-  ;object -> object
-  (status-require-check status (goto exit)))
-
-(pre-define (status-require-check-return status)
-  ;object -> object
-  (status-require-check status (return status)))
-
-(pre-define (status-require expression cont)
-  ;object -> object
-  (set status expression) (status-require-check status cont))
-
-(pre-define (status-require-goto expression) (status-require expression (goto exit)))
-(pre-define (status-require-return expression) (status-require expression (return status)))
-
-(pre-define (status-io-require-check status-module status cont)
-  ;integer -> object
-  (if (not (status-success? status)) (begin (set status.module status-module) cont)))
-
-(pre-define (status-io-require-check-goto module status)
-  (status-io-require-check module status (goto exit)))
-
-(pre-define (status-io-require-check-return module status)
-  (status-io-require-check module status (return status)))
-
-(pre-define (status-io-require module expression cont)
-  ;integer -> object
-  (set status.id expression) (status-io-require-check module status cont))
-
-(pre-define (status-io-require-goto module expression)
-  (status-io-require module expression (goto exit)))
-
-(pre-define (status-io-require-return module expression)
-  (status-io-require module expression (return status)))
-
-(pre-define (status-ii-require-check status cont) (if (not (status-success? status)) cont))
-
-(pre-define (status-ii-require expression cont)
-  ;integer -> integer
-  (set status expression) (status-ii-require-check status cont))
-
-(pre-define (status-ii-require-goto expression) (status-ii-require expression (goto exit)))
-(pre-define (status-ii-require-return expression) (status-ii-require expression (return status)))
-(pre-define status-success 0)
 (pre-define (status-success? a) (= status-success a.id))
 (pre-define (status-failure? a) (not (status-success? a)))
 (pre-define (status-from-boolean a) (not a))
+
+(pre-define (status-do! group-id status-id cont) (struct-set status group group-id id status-id)
+  cont)
+
+(pre-define (status-goto! group id) (status-do! group id (goto exit)))
+(pre-define (status-return! group id) (status-do! group id (return status)))
+
+(pre-define (status-require-do group status cont)
+  (if (not (status-success? status)) (begin (set status.group group) cont)))
+
+(pre-define (status-require group status) (status-require-do status group (goto exit)))
+(pre-define (status-require-return group status) (status-require-do status group (return status)))
+
+(pre-define (status-require-do! group expression cont) (set status expression)
+  (status-require-do status group cont))
+
+(pre-define (status-require! group expression) (status-require-do expression group (goto exit)))
+
+(pre-define (status-require-return! group expression)
+  (status-require-do expression group (return status)))

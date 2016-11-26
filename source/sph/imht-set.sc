@@ -18,7 +18,7 @@
 ;the minimum memory usage is size times imht-set-size-factor
 (pre-if-not-defined imht-set-size-factor (pre-define imht-set-size-factor 2))
 
-(define-array imht-set-primes uint16_t
+(define-array imht-set-primes uint16_t ()
   ;performance can be optimised by adding more primes nearer to the desired set size * set-size-factor
   #f
   3
