@@ -1,5 +1,4 @@
 ;similar to bindings of "status.sc" but only uses a status integer and no special type. depends on "status.sc"
-(define-type status-i-t b32_s)
 (pre-define status-ii-init (define status-ii status-i-t status-success))
 (pre-define (status-ii-success? a) (= status-success a))
 (pre-define (status-ii-failure? a) (not (status-ii-success? a)))

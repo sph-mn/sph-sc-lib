@@ -101,10 +101,10 @@
   (set min-size (imht-set-calculate-hash-table-size min-size))
   (struct-set (deref (deref result)) content
     (calloc min-size (sizeof imht-set-key-t)) size min-size)
-  (return (if* (struct-deref (deref result) content) #t #f)))
+  (return (if* (struct-pointer-get (deref result) content) #t #f)))
 
 (define (imht-set-destroy a) (void imht-set-t*)
-  (if a (begin (free (struct-deref a content)) (free a))))
+  (if a (begin (free (struct-pointer-get a content)) (free a))))
 
 (pre-if imht-set-can-contain-zero?
   (pre-define (imht-set-hash value hash-table)
@@ -114,19 +114,19 @@
 (define (imht-set-find a value) (imht-set-key-t* imht-set-t* imht-set-key-t)
   ;returns the address of the element in the set, 0 if it was not found.
   ;caveat: if imht-set-can-contain-zero? is defined, which is the default, dereferencing a returned address for the found value 0 will return 1 instead
-  (define h imht-set-key-t* (+ (struct-deref a content) (imht-set-hash value (deref a))))
+  (define h imht-set-key-t* (+ (struct-pointer-get a content) (imht-set-hash value (deref a))))
   (if (deref h)
     (begin
       (pre-if imht-set-can-contain-zero?
         ;the value zero is stored at a special index and is the only value that can be stored there
         (if (or (= (deref h) value) (= 0 value)) (return h)) (if (= (deref h) value) (return h)))
-      (define content-end imht-set-key-t* (+ (struct-deref a content) (- (struct-deref a size) 1)))
+      (define content-end imht-set-key-t* (+ (struct-pointer-get a content) (- (struct-pointer-get a size) 1)))
       (define h2 imht-set-key-t* (+ 1 h))
       (while (< h2 content-end)
         ;prefer the test for non-existance because the number of possible keys is typically much bigger than the size of the set
         (if (not (deref h2)) (return 0) (if (= value (deref h2)) (return h2))) (set h2 (+ 1 h2)))
       (if (not (deref h2)) (return 0) (if (= value (deref h2)) (return h2)))
-      (set h2 (struct-deref a content))
+      (set h2 (struct-pointer-get a content))
       (while (< h2 h) (if (not (deref h2)) (return 0) (if (= value (deref h2)) (return h2)))
         (set h2 (+ 1 h2)))))
   (return 0))
@@ -140,18 +140,18 @@
 
 (define (imht-set-add a value) (imht-set-key-t* imht-set-t* imht-set-key-t)
   ;returns the address of the added or already included element, 0 if there is no space left in the set
-  (define h imht-set-key-t* (+ (struct-deref a content) (imht-set-hash value (deref a))))
+  (define h imht-set-key-t* (+ (struct-pointer-get a content) (imht-set-hash value (deref a))))
   (if (deref h)
     (begin
       ;the first element is special for storing 0
       (pre-if imht-set-can-contain-zero? (if (or (= value (deref h)) (= 0 value)) (return h))
         (if (= value (deref h)) (return h)))
-      (define content-end imht-set-key-t* (+ (struct-deref a content) (- (struct-deref a size) 1)))
+      (define content-end imht-set-key-t* (+ (struct-pointer-get a content) (- (struct-pointer-get a size) 1)))
       (define h2 imht-set-key-t* (+ 1 h))
       (while (and (<= h2 content-end) (deref h2)) (set h2 (+ 1 h2)))
       ;has been moved to the next entry without data or past the last entry
       (if (> h2 content-end)
-        (begin (set h2 (struct-deref a content))
+        (begin (set h2 (struct-pointer-get a content))
           (while (and (< h2 h) (deref h2)) (set h2 (+ 1 h2)))
           (if (= h2 h) (return 0)
             (pre-if imht-set-can-contain-zero? (set (deref h2) (if* (= 0 value) 1 value))
