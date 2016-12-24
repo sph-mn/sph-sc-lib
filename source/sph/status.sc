@@ -5,10 +5,10 @@
 (define-type status-i-t b32_s)
 (define-type status-t (struct (id status-i-t) (group b8)))
 
-(pre-define status-success 0
-  status-init (define status status-t (struct-literal status-success status-success)))
+(pre-define status-id-success 0
+  status-init (define status status-t (struct-literal status-id-success status-id-success)))
 
-(pre-define (status-success? a) (= status-success (struct-get a id)))
+(pre-define (status-success? a) (= status-id-success (struct-get a id)))
 (pre-define (status-failure? a) (not (status-success? a)))
 (pre-define (status-from-boolean a) (not a))
 

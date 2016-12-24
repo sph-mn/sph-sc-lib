@@ -33,7 +33,7 @@
   (if result (memory-copy result a a-size)) (return result))
 
 (define (string-append a b) (b8* b8* b8*)
-  "always returns a new string"
+  ;"always returns a new string"
   (define a-length size-t (string-length a)) (define b-length size-t (string-length b))
   (define result b8* (malloc (+ 1 a-length b-length)))
   (if result
