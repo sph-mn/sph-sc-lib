@@ -5,6 +5,7 @@
 ; there are two types of bindings:
 ; * bindings with a ! suffix set the group and status id in the status object
 ; * bindings without a ! suffix set only the group in the status object
+; status id is set -> status id is checked -> on failure, group id is set
 (define-type status-i-t b32_s)
 (define-type status-t (struct (id status-i-t) (group b8)))
 
@@ -12,31 +13,22 @@
   status-group-undefined 0
   status-init (define status status-t (struct-literal status-id-success status-group-undefined)))
 
-(pre-define (status-success? a) (equal? status-id-success (struct-get a id)))
-(pre-define (status-failure? a) (not (status-success? a)))
-(pre-define (status-do group-id cont) (struct-set status group group-id) cont)
-(pre-define (status-goto group-id id) (status-do group-id (goto exit)))
-(pre-define (status-return group-id id) (status-do group-id (return status)))
+(pre-define status-success? (equal? status-id-success (struct-get status id)))
+(pre-define status-failure? (not (status-success? status)))
+(pre-define status-goto (goto exit))
+(pre-define (status-set-group group-id) (struct-set status group group-id))
+(pre-define (status-set-id status-id) (struct-set status id status-id))
 
-(pre-define (status-require-do group-id status cont)
-  (if (status-failure? status) (status-do group-id cont)))
+(pre-define (status-set-both group-id status-id) (status-set-group group-id)
+  (status-set-id status-id))
 
-(pre-define (status-require group-id status) (status-require-do group-id status (goto exit)))
+(pre-define status-require (if status-failure? status-goto))
 
-(pre-define (status-require-return group-id status)
-  (status-require-do group-id status (return status)))
+(pre-define (status-require! expression) (set status expression)
+  (if status-failure? status-goto))
 
-(pre-define (status-do! group-id status-id cont) (struct-set status group group-id id status-id)
-  cont)
+(pre-define (status-set-id-goto status-id) (status-set-id status-id) status-goto)
+(pre-define (status-set-group-goto group-id) (status-set-group group-id) status-goto)
 
-(pre-define (status-goto! group-id id) (status-do! group-id id (goto exit)))
-(pre-define (status-return! group-id id) (status-do! group-id id (return status)))
-
-(pre-define (status-require-do! group-id expression cont) (set status expression)
-  (status-require-do group-id status cont))
-
-(pre-define (status-require! group-id expression)
-  (status-require-do! group-id expression (goto exit)))
-
-(pre-define (status-require-return! group-id expression)
-  (status-require-do! group-id expression (return status)))
+(pre-define (status-set-both-goto group-id status-id) (status-set-both group-id status-id)
+  status-goto)
