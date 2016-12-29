@@ -82,12 +82,12 @@
 (pre-define (scm-c-require-success-glibc a) (set s a) (if (< s 0) (scm-c-local-error-glibc s)))
 (pre-define (scm-c-require-success-system a) (if (< a 0) scm-c-local-error-system))
 (enum (sph-guile-status-id-wrong-argument-type))
-(pre-define sph-guile-status-module-sph-guile 4)
+(pre-define sph-guile-status-group-sph-guile 4)
 
 (define (sph-guile-status-text status) (b8* status-t)
   (return
-    (case* = status.module
-      (sph-guile-status-module-sph-guile
+    (case* = (struct-get status group)
+      (sph-guile-status-group-sph-guile
         (string-append "sph-guile: "
           (convert-type
             (case* = status.id
@@ -101,7 +101,7 @@
     (if (not expr)
       (begin
         (set status.id sph-guile-status-id-wrong-argument-type
-          status.module sph-guile-status-module-sph-guile)
+          (struct-get status group) sph-guile-status-group-sph-guile)
         (goto exit))))
   (pre-define (scm-typecheck expr) null))
 
