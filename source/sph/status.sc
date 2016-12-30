@@ -14,7 +14,7 @@
   status-init (define status status-t (struct-literal status-id-success status-group-undefined)))
 
 (pre-define status-success? (equal? status-id-success (struct-get status id)))
-(pre-define status-failure? (not (status-success? status)))
+(pre-define status-failure? (not status-success?))
 (pre-define status-goto (goto exit))
 (pre-define (status-set-group group-id) (struct-set status group group-id))
 (pre-define (status-set-id status-id) (struct-set status id status-id))
@@ -32,3 +32,6 @@
 
 (pre-define (status-set-both-goto group-id status-id) (status-set-both group-id status-id)
   status-goto)
+
+(pre-define (status-id-is? status-id)
+  (equal? status-id (struct-get status id)))
