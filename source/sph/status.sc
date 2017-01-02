@@ -1,11 +1,8 @@
 ; return status code and error handling. uses a local variable named "status" and a goto label named "exit".
 ; a status has an identifier and a group to discern between status identifiers of different libraries.
-; status id 0 is success, everything else can be considered a failure or at least a special case.
-; status ids are 32 bit signed integers for compatibility with error return codes from some other libraries.
-; there are two types of bindings:
-; * bindings with a ! suffix set the group and status id in the status object
-; * bindings without a ! suffix set only the group in the status object
-; status id is set -> status id is checked -> on failure, group id is set
+; status id 0 is success, everything else can be considered a failure or special case.
+; status ids are 32 bit signed integers for compatibility with error return codes from many other existing libraries.
+; bindings with a ! suffix update the status from an expression
 (define-type status-i-t b32_s)
 (define-type status-t (struct (id status-i-t) (group b8)))
 
