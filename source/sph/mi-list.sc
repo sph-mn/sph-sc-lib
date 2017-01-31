@@ -26,6 +26,7 @@
   (define a-next mi-list-t* (mi-list-rest a)) (free a) (return a-next))
 
 (define ((mi-list-name destroy) a) (void mi-list-t*)
+  ;it would be nice to set the pointer to zero, but that would require more indirection with a pointer-pointer
   (define a-next mi-list-t* 0)
   (while a (set a-next (struct-pointer-get a link)) (free a) (set a a-next)))
 
