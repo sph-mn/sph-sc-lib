@@ -1,7 +1,8 @@
+(sc-depend "sph")
+
 (pre-include-once string-h "string.h"
   ;malloc
   stdlib-h "stdlib.h"
-  sph-c "sph.c"
   ;"access"
   unistd-h "unistd.h"
   ;mkdir
@@ -25,6 +26,13 @@
       (memcpy new-a a a-len) (memcpy (+ new-a a-len) "/" 1)
       (set (deref new-a (+ 1 a-len)) 0) (set (deref result) new-a) (return 2))))
 
+(define (ensure-directory-structure path mkdir-mode) (boolean b8* mode-t)
+  "return 1 if the path exists or has been successfully created"
+  (if (file-exists? path) (return #t)
+    (begin (define path-dirname b8* (dirname-2 path))
+      (define status boolean (ensure-directory-structure path-dirname mkdir-mode))
+      (free path-dirname) (return (and status (or (= EEXIST errno) (= 0 (mkdir path mkdir-mode))))))))
+
 (define (string-clone a) (b8* b8*)
   "return a new string with the same contents as the given string. return 0 if the memory allocation failed"
   (define a-size size-t (+ 1 (strlen a))) (define result b8* (malloc a-size))
@@ -39,12 +47,3 @@
 (define (dirname-2 a) (b8* b8*)
   "like posix dirname, but never modifies its argument and always returns a new string"
   (define path-copy b8* (string-clone a)) (return (dirname path-copy)))
-
-(define (ensure-directory-structure path mkdir-mode) (boolean b8* mode-t)
-  "return 1 if the path exists or has been successfully created"
-  (if (file-exists? path) (return #t)
-    (begin (define path-dirname b8* (dirname-2 path))
-      (define status boolean (ensure-directory-structure path-dirname mkdir-mode))
-      (free path-dirname) (return (and status (or (= EEXIST errno) (= 0 (mkdir path mkdir-mode))))))))
-
-(define (main) void #t)

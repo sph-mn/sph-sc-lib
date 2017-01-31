@@ -1,1 +1,0 @@
-contains c versions from code in ../source that was compiled from sc.

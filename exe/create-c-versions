@@ -3,12 +3,16 @@
 
 (import (sph common))
 (chdir "source")
+(setenv "SC_LOAD_PATH" (getcwd))
 
 (each
   (l (path)
     (let (c-path (string-append "../c-versions/" (string-replace-string path ".sc" ".c")))
       (ensure-directory-structure (dirname c-path))
-      (shell-eval (string-append "sc " (string-quote path) " | astyle > " (string-quote c-path)))))
+      (shell-eval
+        (string-append "sc " (string-quote path)
+          " | astyle --indent=spaces=4 --align-pointer=type --pad-oper --style=otbs > "
+          (string-quote c-path)))))
   (remove string-null?
     (string-split (string-trim (shell-eval->string "find -type f -name '*.sc' -printf '%P\\n'"))
       #\newline)))
