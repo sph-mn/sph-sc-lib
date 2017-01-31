@@ -71,6 +71,9 @@ void imht_set_destroy(imht_set_t* a)
 #define imht_set_hash(value,hash_table) (value%hash_table.size)
 
 #endif
+/** returns the address of the element in the set, 0 if it was not found.
+  caveat: if imht-set-can-contain-zero? is defined, which is the default,
+  dereferencing a returned address for the found value 0 will return 1 instead */
 imht_set_key_t* imht_set_find(imht_set_t* a, imht_set_key_t value)
 {
     imht_set_key_t* h = ((*a).content + imht_set_hash(value, (*a)));
@@ -118,6 +121,7 @@ imht_set_key_t* imht_set_find(imht_set_t* a, imht_set_key_t value)
     return(0);
 };
 #define imht_set_contains_p(a,value) ((0==imht_set_find(a,value))?0:1)
+/** returns 1 if the element was removed, 0 if it was not found */
 uint8_t imht_set_remove(imht_set_t* a, imht_set_key_t value)
 {
     imht_set_key_t* value_address = imht_set_find(a, value);
@@ -128,6 +132,7 @@ uint8_t imht_set_remove(imht_set_t* a, imht_set_key_t value)
         return(0);
     };
 };
+/** returns the address of the added or already included element, 0 if there is no space left in the set */
 imht_set_key_t* imht_set_add(imht_set_t* a, imht_set_key_t value)
 {
     imht_set_key_t* h = ((*a).content + imht_set_hash(value, (*a)));

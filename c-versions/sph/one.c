@@ -81,7 +81,8 @@ b8 ensure_trailing_slash(b8* a, b8** result)
         (*result) = new_a;
         return(2);
     };
-};/** return 1 if the path exists or has been successfully created */
+};
+/** return 1 if the path exists or has been successfully created */
 boolean ensure_directory_structure(b8* path, mode_t mkdir_mode)
 {
     if(file_exists_p(path)) {
@@ -92,7 +93,8 @@ boolean ensure_directory_structure(b8* path, mode_t mkdir_mode)
         free(path_dirname);
         return((status && ((EEXIST == errno) || (0 == mkdir(path, mkdir_mode)))));
     };
-};/** return a new string with the same contents as the given string. return 0 if the memory allocation failed */
+};
+/** return a new string with the same contents as the given string. return 0 if the memory allocation failed */
 b8* string_clone(b8* a)
 {
     size_t a_size = (1 + strlen(a));
@@ -101,7 +103,8 @@ b8* string_clone(b8* a)
         memcpy(result, a, a_size);
     };
     return(result);
-};/** always returns a new string */
+};
+/** always returns a new string */
 b8* string_append(b8* a, b8* b)
 {
     size_t a_length = strlen(a);
@@ -112,7 +115,8 @@ b8* string_append(b8* a, b8* b)
         memcpy((result + a_length), b, (1 + b_length));
     };
     return(result);
-};/** like posix dirname, but never modifies its argument and always returns a new string */
+};
+/** like posix dirname, but never modifies its argument and always returns a new string */
 b8* dirname_2(b8* a)
 {
     b8* path_copy = string_clone(a);

@@ -2,7 +2,7 @@
 
 various c libraries written in [sc](http://sph.mn/content/3d3).
 
-the directory "c-versions" contains transcompiled c versions of the sc code from under sources/. commentary unfortunately is only to be found in the sc versions.
+the directory "c-versions" contains formatted, transcompiled c versions of the sc code from under sources/.
 
 # included files
 * imht-set: a minimalistic fixed size hash table based data structure for sets of integers
