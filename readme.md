@@ -2,7 +2,7 @@
 
 various c libraries written in [sc](http://sph.mn/c/view/me).
 
-\emphasis: documentation outdated
+*documentation outdated*
 
 the directory "c-versions" contains formatted, transcompiled c versions of the sc code from under sources/.
 
