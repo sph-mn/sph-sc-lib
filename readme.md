@@ -1,12 +1,13 @@
 # sph-sc-lib
 
-various c libraries written in [sc](http://sph.mn/content/3d3).
+various c libraries written in [sc](http://sph.mn/c/view/me).
+
+\emphasis: documentation outdated
 
 the directory "c-versions" contains formatted, transcompiled c versions of the sc code from under sources/.
 
 # included files
 * imht-set: a minimalistic fixed size hash table based data structure for sets of integers
-* sph: a small file with mostly type aliases and utilities for using the local-error and local-memory pattern as described on http://sph.mn/content/3827
 * one: experimental helpers
 * scm: helpers for working with guile
 * quicksort: an untested quicksort array sorting algorithm implementation derived from the c implementation by darel rex finley from http://alienryderflex.com/quicksort/
