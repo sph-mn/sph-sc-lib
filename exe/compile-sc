@@ -17,4 +17,5 @@
             (execute* "sc" a b) (execute* "clang-format" "-i" b))))
       paths)))
 
+(setenv "SC_LOAD_PATH" (string-append (getcwd) "/source/sc"))
 (compile-sc-dir "source/sc" "source/c-precompiled")
