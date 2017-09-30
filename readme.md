@@ -1,12 +1,11 @@
 # sph-sc-lib
 
 various utility c libraries written in [sc](http://sph.mn/c/view/me).
-
 c versions are in source/c-precompiled.
 
-# included files
+# included libraries
 * imht-set: a minimal, macro-based fixed size hash-table based data structure for sets of integers
-* mi-list: a minimal, macro-based linked list with custom element types
+* mi-list: a minimal, macro-based linked list
 * status: return status and error handling with a tiny status object for status id and source library id
 * one: various helpers. experimental
 * guile: helpers for working with guile. experimental
@@ -144,6 +143,29 @@ while(rest) {
 }
 ```
 
+## bindings
+```c
+{prefix}_add
+{prefix}_destroy
+{prefix}_drop
+{prefix}_length
+{prefix}_struct
+{prefix}_t
+mi_list_first
+mi_list_first_address
+mi_list_rest
+```
+
+## type
+the type for mi-lists is defined as follows. this information would be useful for defining new list primitives.
+
+```c
+typedef struct mi_list_name_prefix##_struct {
+  struct mi_list_name_prefix##_struct *link;
+  mi_list_element_t data;
+} mi_list_t;
+```
+
 # status
 helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes.
 
@@ -170,7 +192,7 @@ exit:
 }
 ```
 
-bindings
+## bindings
 ```
 status_failure_p
 status_goto
