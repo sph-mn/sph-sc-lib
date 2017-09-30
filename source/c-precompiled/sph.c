@@ -21,13 +21,10 @@
 #define f32_s float
 #define f64_s double
 #if debug_log_p
-
-#define debug_log(format,...) fprintf(stderr,"%s:%d " format "\n",__func__,__LINE__,__VA_ARGS__)
-
+#define debug_log(format, ...)                                                 \
+  fprintf(stderr, "%s:%d " format "\n", __func__, __LINE__, __VA_ARGS__)
 #else
-
-#define debug_log(format,...) null
-
+#define debug_log(format, ...) null
 #endif
 #define null ((b0)(0))
-#define zero_p(a) (0==a)
+#define zero_p(a) (0 == a)

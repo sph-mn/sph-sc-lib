@@ -10,15 +10,6 @@
 ; GNU General Public License for more details.
 ; You should have received a copy of the GNU General Public License
 ; along with this program; if not, see <http://www.gnu.org/licenses/>.
-;
-; usage:
-;   ; set the data type with
-;   (pre-define imht-set-key-t uint64_t)
-;   ; if you do not need to store zero use (pre-define imht-set-can-contain-zero? #f)
-;   ; create a set
-;   (define a imht-set-t*)
-;   (imht-set-create 10 (address-of a))
-
 (pre-include-once stdlib-h "stdlib.h" inttypes-h "inttypes.h")
 ;the following definition sets the integer type and size for values
 (pre-if-not-defined imht-set-key-t (pre-define imht-set-key-t uint64_t))
@@ -65,22 +56,20 @@
 (define imht-set-primes-end uint16_t* (+ imht-set-primes 83))
 (define-type imht-set-t (struct (size size-t) (content imht-set-key-t*)))
 
-(define (imht-set-calculate-hash-table-size size) (size-t size-t)
-  (set size (* imht-set-size-factor size)) (define primes uint16_t* imht-set-primes)
+(define (imht-set-calculate-hash-table-size min-size) (size-t size-t)
+  (set min-size (* imht-set-size-factor min-size)) (define primes uint16_t* imht-set-primes)
   (while (< primes imht-set-primes-end)
-    (if (<= size (deref primes)) (return (deref primes)) (set primes (+ 1 primes))))
-  (if (<= size (deref primes)) (return (deref primes)))
+    (if (<= min-size (deref primes)) (return (deref primes)) (set primes (+ 1 primes))))
+  (if (<= min-size (deref primes)) (return (deref primes)))
   ;if no prime has been found, use size-factor times size made odd as a best guess
-  (return (bit-or 1 size)))
+  (return (bit-or 1 min-size)))
 
-(define (imht-set-create size result) (uint8_t size-t imht-set-t**)
-  "size must be > 0 and specified the number of elements the set will be optimised to store.
-  the set is not resized if it is full.
-  returns 1 on success or 0 if the memory allocation failed"
+(define (imht-set-create min-size result) (uint8_t size-t imht-set-t**)
+  ;returns 1 on success or 0 if the memory allocation failed
   (set (deref result) (malloc (sizeof imht-set-t))) (if (not (deref result)) (return #f))
-  (set size (imht-set-calculate-hash-table-size size))
+  (set min-size (imht-set-calculate-hash-table-size min-size))
   (struct-set (deref (deref result)) content
-    (calloc size (sizeof imht-set-key-t)) size size)
+    (calloc min-size (sizeof imht-set-key-t)) size min-size)
   (return (if* (struct-pointer-get (deref result) content) #t #f)))
 
 (define (imht-set-destroy a) (void imht-set-t*)

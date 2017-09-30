@@ -1,4 +1,4 @@
-(sc-depend "sph")
+(sc-include-once sph "../sph")
 
 (pre-include-once string-h "string.h"
   ;malloc
