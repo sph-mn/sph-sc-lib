@@ -116,6 +116,9 @@ the set routines automatically adapt should the values for size and content chan
 # mi-list
 a minimal, generically usable linked list with custom element types.
 
+## dependencies
+* the c standard library (stdlib.h and inttypes.h)
+
 ## usage example
 ```c
 // include to define a list type

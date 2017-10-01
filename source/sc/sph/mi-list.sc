@@ -1,12 +1,14 @@
-;a minimal linked list with custom element types.
-;this file can be included multiple times to create different type versions,
-;depending the value of the preprocessor variables "mi-list-name-infix" and "mi-list-element-t" before inclusion
+(sc-comment
+  "a minimal linked list with custom element types.
+   this file can be included multiple times to create differently typed versions,
+   depending the value of the preprocessor variables mi-list-name-infix and mi-list-element-t before inclusion")
+
 (pre-include-once stdlib-h "stdlib.h" inttypes-h "inttypes.h")
 (pre-if-not-defined mi-list-name-prefix (pre-define mi-list-name-prefix mi-list-64))
 (pre-if-not-defined mi-list-element-t (pre-define mi-list-element-t uint64_t))
 
 (pre-if-not-defined mi-list-name-concat
-  ;identifier concatenation is not more straightfoward in c in this case
+  "there does not seem to be a simpler way for identifier concatenation in c in this case"
   (begin (pre-define (mi-list-name-concat a b) (pre-concat a _ b))
     (pre-define (mi-list-name-concatenator a b) (mi-list-name-concat a b))
     (pre-define (mi-list-name name) (mi-list-name-concatenator mi-list-name-prefix name))))
@@ -26,7 +28,7 @@
   (define a-next mi-list-t* (mi-list-rest a)) (free a) (return a-next))
 
 (define ((mi-list-name destroy) a) (void mi-list-t*)
-  ;it would be nice to set the pointer to zero, but that would require more indirection with a pointer-pointer
+  "it would be nice to set the pointer to zero, but that would require more indirection with a pointer-pointer"
   (define a-next mi-list-t* 0)
   (while a (set a-next (struct-pointer-get a link)) (free a) (set a a-next)))
 
