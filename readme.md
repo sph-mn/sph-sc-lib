@@ -214,3 +214,29 @@ status_set_id(status_id)
 status_set_id_goto(status_id)
 status_success_p
 ```
+
+# local-memory
+register memory allocations locally on the stack and free all allocations up to point easily
+
+```c
+#include "sph/local-memory.c"
+
+int main() {
+  local_memory_init(2);
+  int* data_a = malloc(12 * sizeof(int));
+  if(!data_a) goto exit;  // have to free nothing
+  local_memory_add(data_a);
+  // more code ...
+  char* data_b = malloc(20 * sizeof(char));
+  if(!data_b) goto exit;  // have to free "data_a"
+  local_memory_add(data_b);
+  // ...
+  if (is_error) goto exit;  // have to free "data_a" and "data_b"
+  // ...
+exit:
+  local_memory_free();
+  return(0);
+}
+```
+
+defines two hidden local variables: an array for addresses and the next index
