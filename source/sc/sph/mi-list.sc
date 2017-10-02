@@ -7,8 +7,9 @@
 (pre-if-not-defined mi-list-name-prefix (pre-define mi-list-name-prefix mi-list-64))
 (pre-if-not-defined mi-list-element-t (pre-define mi-list-element-t uint64_t))
 
+(sc-comment
+  "there does not seem to be a simpler way for identifier concatenation in c in this case")
 (pre-if-not-defined mi-list-name-concat
-  "there does not seem to be a simpler way for identifier concatenation in c in this case"
   (begin (pre-define (mi-list-name-concat a b) (pre-concat a _ b))
     (pre-define (mi-list-name-concatenator a b) (mi-list-name-concat a b))
     (pre-define (mi-list-name name) (mi-list-name-concatenator mi-list-name-prefix name))))

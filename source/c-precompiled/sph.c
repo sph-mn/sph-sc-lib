@@ -20,11 +20,11 @@
 #define b64_s int64_t
 #define f32_s float
 #define f64_s double
-#if debug_log_p
+/** writes values with current routine name and line info to standard output.
+  example: (debug-log "%d" 1)
+  otherwise like printf */
 #define debug_log(format, ...)                                                 \
-  fprintf(stderr, "%s:%d " format "\n", __func__, __LINE__, __VA_ARGS__)
-#else
-#define debug_log(format, ...) null
-#endif
+  fprintf(stdout, "%s:%d " format "\n", __func__, __LINE__, __VA_ARGS__)
+;
 #define null ((b0)(0))
 #define zero_p(a) (0 == a)
