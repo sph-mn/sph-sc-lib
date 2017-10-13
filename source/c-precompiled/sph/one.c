@@ -25,11 +25,6 @@
 #endif
 #define file_exists_p(path) !(access(path, F_OK) == -1)
 #define pointer_equal_p(a, b) (((b0 *)(a)) == ((b0 *)(b)))
-#define free_and_set_zero(a)                                                   \
-  free(a);                                                                     \
-  a = 0
-#define increment(a) a = (1 + a)
-#define decrement(a) a = (a - 1)
 /** set result to a new string with a trailing slash added, or the given string
   if it already has a trailing slash. returns 0 if result is the given string, 1
   if new memory could not be allocated, 2 if result is a new string */
@@ -88,4 +83,35 @@ b8 *string_append(b8 *a, b8 *b) {
     memcpy((result + a_length), b, (1 + b_length));
   };
   return (result);
+};
+/** sum numbers with rounding error compensation using kahan summation with
+ * neumaier modification */
+f32_s float_sum(f32_s *numbers, b32 len) {
+  f32_s temp;
+  f32_s element;
+  f32_s correction = 0;
+  dec(len);
+  f32_s result = (*(numbers + len));
+  while (len) {
+    dec(len);
+    element = (*(numbers + len));
+    temp = (result + element);
+    correction =
+        (correction + ((result >= element) ? ((result - temp) + element)
+                                           : ((element - temp) + result)));
+    result = temp;
+  };
+  return ((correction + result));
+};
+/** approximate float comparison. margin is a factor and is low for low accepted
+   differences. http://floating-point-gui.de/errors/comparison/ */
+boolean float_nearly_equal_p(f32_s a, f32_s b, f32_s margin) {
+  if ((a == b)) {
+    return (1);
+  } else {
+    f32_s diff = fabs((a - b));
+    return (((((0 == a)) || ((0 == b)) || (diff < DBL_MIN))
+                 ? (diff < (margin * DBL_MIN))
+                 : ((diff / fmin((fabs(a) + fabs(b)), DBL_MAX)) < margin)));
+  };
 };
