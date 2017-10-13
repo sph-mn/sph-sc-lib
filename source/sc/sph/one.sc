@@ -1,14 +1,14 @@
 ;(sc-include-once sph "sph")
 
 (pre-include-once string-h "string.h"
-  ;malloc
+  ; malloc
   stdlib-h "stdlib.h"
-  ;"access"
+  ; "access"
   unistd-h "unistd.h"
-  ;mkdir
+  ; mkdir
   sys-stat-h "sys/stat.h"
-  ;dirname
-  libgen-h "libgen.h" errno-h "errno.h")
+  ; dirname
+  libgen-h "libgen.h" errno-h "errno.h" float-h "float.h")
 
 (pre-define (file-exists? path) (not (equal? (access path F-OK) -1)))
 (pre-define (pointer-equal? a b) (= (convert-type a b0*) (convert-type b b0*)))
@@ -48,8 +48,8 @@
 (define (float-sum numbers len) (f32-s f32-s* b32)
   "sum numbers with rounding error compensation using kahan summation with neumaier modification"
   (define temp f32-s element f32-s) (define correction f32-s 0)
-  (dec len) (define result f32-s (deref numbers len))
-  (while len (dec len)
+  (set len (- len 1)) (define result f32-s (deref numbers len))
+  (while len (set len (- len 1))
     (set element (deref numbers len)) (set temp (+ result element))
     (set correction
       (+ correction
