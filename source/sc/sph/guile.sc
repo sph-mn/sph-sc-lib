@@ -1,5 +1,7 @@
-(pre-define scm-first SCM_CAR
-  scm-tail SCM_CDR scm-c-define-procedure-c-init (define scm-c-define-procedure-c-temp SCM))
+(pre-define
+  scm-first SCM_CAR
+  scm-tail SCM_CDR
+  scm-c-define-procedure-c-init (define scm-c-define-procedure-c-temp SCM))
 
 (pre-define (scm-is-undefined a) (= SCM-UNDEFINED a))
 
@@ -8,7 +10,8 @@
   ;like scm-c-define-gsubr but also sets documentation.
   ;scm-c-define-procedure-c-init must have been called in scope
   (set scm-c-define-procedure-c-temp (scm-c-define-gsubr name required optional rest c-function))
-  (scm-set-procedure-property! scm-c-define-procedure-c-temp
+  (scm-set-procedure-property!
+    scm-c-define-procedure-c-temp
     (scm-from-locale-symbol "documentation") (scm-from-locale-string documentation)))
 
 (define (scm-debug-log value) (b0 SCM)
@@ -19,9 +22,13 @@
 (define (scm-c-bytevector-take size-octets a) (SCM size-t b8*)
   ;creates a new bytevector of size-octects that contains the given bytevector
   (define r SCM (scm-c-make-bytevector size-octets))
-  (memcpy (SCM-BYTEVECTOR-CONTENTS r) a size-octets) (return r))
+  (memcpy (SCM-BYTEVECTOR-CONTENTS r) a size-octets)
+  (return r))
 
 (pre-define (scm-c-list-each list e body)
   ;SCM SCM c-compound-expression ->
   ;iterate over scm-list in c
-  (while (not (scm-is-null list)) (set e (scm-first list)) body (set list (scm-tail list))))
+  (while (not (scm-is-null list))
+    (set e (scm-first list))
+    body
+    (set list (scm-tail list))))
