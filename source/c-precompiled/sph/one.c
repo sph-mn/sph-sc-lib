@@ -23,6 +23,14 @@
 #include <errno.h>
 #define sc_included_errno_h
 #endif
+#ifndef sc_included_float_h
+#include <float.h>
+#define sc_included_float_h
+#endif
+#ifndef sc_included_math_h
+#include <math.h>
+#define sc_included_math_h
+#endif
 #define file_exists_p(path) !(access(path, F_OK) == -1)
 #define pointer_equal_p(a, b) (((b0 *)(a)) == ((b0 *)(b)))
 /** set result to a new string with a trailing slash added, or the given string
@@ -86,14 +94,14 @@ b8 *string_append(b8 *a, b8 *b) {
 };
 /** sum numbers with rounding error compensation using kahan summation with
  * neumaier modification */
-f32_s float_sum(f32_s *numbers, b32 len) {
-  f32_s temp;
-  f32_s element;
-  f32_s correction = 0;
-  dec(len);
-  f32_s result = (*(numbers + len));
+f64_s f64_sum(f64_s *numbers, b32 len) {
+  f64_s temp;
+  f64_s element;
+  f64_s correction = 0;
+  len = (len - 1);
+  f64_s result = (*(numbers + len));
   while (len) {
-    dec(len);
+    len = (len - 1);
     element = (*(numbers + len));
     temp = (result + element);
     correction =
@@ -105,11 +113,11 @@ f32_s float_sum(f32_s *numbers, b32 len) {
 };
 /** approximate float comparison. margin is a factor and is low for low accepted
    differences. http://floating-point-gui.de/errors/comparison/ */
-boolean float_nearly_equal_p(f32_s a, f32_s b, f32_s margin) {
+boolean f64_nearly_equal_p(f64_s a, f64_s b, f64_s margin) {
   if ((a == b)) {
     return (1);
   } else {
-    f32_s diff = fabs((a - b));
+    f64_s diff = fabs((a - b));
     return (((((0 == a)) || ((0 == b)) || (diff < DBL_MIN))
                  ? (diff < (margin * DBL_MIN))
                  : ((diff / fmin((fabs(a) + fabs(b)), DBL_MAX)) < margin)));

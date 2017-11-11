@@ -11,7 +11,8 @@
   ; dirname
   libgen-h "libgen.h"
   errno-h "errno.h"
-  float-h "float.h")
+  float-h "float.h"
+  math-h "math.h")
 
 (pre-define (file-exists? path) (not (equal? (access path F-OK) -1)))
 (pre-define (pointer-equal? a b) (= (convert-type a b0*) (convert-type b b0*)))
