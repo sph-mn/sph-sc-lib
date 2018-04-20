@@ -1,17 +1,90 @@
-# sph-sc-lib
+imh# sph-sc-lib
 
 various utility c libraries written in [sc](http://sph.mn/c/view/me).
 c versions are in source/c-precompiled.
 
 # included libraries
+* local-memory: manage heap memory in function scope
+* status: return status and error handling with a tiny status object that contains status id and source library id
 * imht-set: a minimal, macro-based fixed size hash-table based data structure for sets of integers
 * mi-list: a minimal, macro-based linked list
-* status: return status and error handling with a tiny status object for status id and source library id
 * one: various helpers. experimental
 * guile: helpers for working with guile. experimental
 
 # license
 code is under gpl3+, documentation under cc-by-nc.
+
+# local-memory
+register memory allocations locally on the stack and free all allocations up to point easily
+
+```c
+#include "sph/local-memory.c"
+
+int main() {
+  local_memory_init(2);
+  int* data_a = malloc(12 * sizeof(int));
+  if(!data_a) goto exit;  // have to free nothing
+  local_memory_add(data_a);
+  // more code ...
+  char* data_b = malloc(20 * sizeof(char));
+  if(!data_b) goto exit;  // have to free "data_a"
+  local_memory_add(data_b);
+  // ...
+  if (is_error) goto exit;  // have to free "data_a" and "data_b"
+  // ...
+exit:
+  local_memory_free();
+  return(0);
+}
+```
+
+defines two hidden local variables: an array for addresses and the next index
+
+# status
+helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes.
+
+## usage example
+```c
+status_t test() {
+  status_init;
+  if (1 < 2) {
+    int group_id = 123;
+    int error_id = 456;
+    status_set_both_goto(group_id, error_id);
+  }
+exit:
+  return status;
+}
+
+int main() {
+  status_init;
+  // code ...
+  status_require(test());
+  // more code ...
+exit:
+  return status.id;
+}
+```
+
+## bindings
+```
+status_failure_p
+status_goto
+status_group_undefined
+status_id_is_p(status_id)
+status_id_success
+status_init
+status_require
+status_require_x(expression)
+status_reset
+status_set_both(group_id, status_id)
+status_set_both_goto(group_id, status_id)
+status_set_group(group_id)
+status_set_group_goto(group_id)
+status_set_id(status_id)
+status_set_id_goto(status_id)
+status_success_p
+```
 
 # imht-set
 a data structure for storing a set of integers.
@@ -88,7 +161,7 @@ the type that sets can take is fixed and can not be changed after inclusion of t
 
 the default type is unsigned 64 bit.
 
-if you would like to use multiple sets with different integer sizes at the same time, you might have to create a derivative of the imht-set.sc file with modified identifiers.
+if you would like to use multiple sets with different integer sizes at the same time, include the source file multiple times with imht_set_key_t set to different values before inclusion.
 
 ### memory usagec
 ```
@@ -97,7 +170,7 @@ if you would like to use multiple sets with different integer sizes at the same 
 
 by default, the memory allocated for the set is at least double the number of elements it is supposed to store.
 this can be changed in this definition, and a lower set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
-the downside is, that the insert/delete/search performance may approach and reach o(n).
+the downside is that the insert/delete/search performance is more likely to approach and reach o(n).
 
 ### zero support
 by default, the integer 0 is a valid value for a set. but as an optimisation, this can be disabled by defining a macro for "imht_set_can_contain_zero_p" with the value zero.
@@ -168,75 +241,3 @@ typedef struct mi_list_name_prefix##_struct {
   mi_list_element_t data;
 } mi_list_t;
 ```
-
-# status
-helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes.
-
-## usage example
-```c
-status_t test() {
-  status_init;
-  if (1 < 2) {
-    int group_id = 123;
-    int error_id = 456;
-    status_set_both_goto(group_id, error_id);
-  }
-exit:
-  return status;
-}
-
-int main() {
-  status_init;
-  // code ...
-  status_require(test());
-  // more code ...
-exit:
-  return status.id;
-}
-```
-
-## bindings
-```
-status_failure_p
-status_goto
-status_group_undefined
-status_id_is_p(status_id)
-status_id_success
-status_init
-status_require
-status_require_x(expression)
-status_reset
-status_set_both(group_id, status_id)
-status_set_both_goto(group_id, status_id)
-status_set_group(group_id)
-status_set_group_goto(group_id)
-status_set_id(status_id)
-status_set_id_goto(status_id)
-status_success_p
-```
-
-# local-memory
-register memory allocations locally on the stack and free all allocations up to point easily
-
-```c
-#include "sph/local-memory.c"
-
-int main() {
-  local_memory_init(2);
-  int* data_a = malloc(12 * sizeof(int));
-  if(!data_a) goto exit;  // have to free nothing
-  local_memory_add(data_a);
-  // more code ...
-  char* data_b = malloc(20 * sizeof(char));
-  if(!data_b) goto exit;  // have to free "data_a"
-  local_memory_add(data_b);
-  // ...
-  if (is_error) goto exit;  // have to free "data_a" and "data_b"
-  // ...
-exit:
-  local_memory_free();
-  return(0);
-}
-```
-
-defines two hidden local variables: an array for addresses and the next index
