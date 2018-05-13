@@ -1,5 +1,5 @@
-; a minimalistic fixed size hash table based data structure for sets of integers.
-; Copyright (C) 2016-2017 sph <sph@posteo.eu>
+; a small fixed size hash table based data structure for sets of integers.
+; Copyright (C) 2016-2018 sph <sph@posteo.eu>
 ; This program is free software; you can redistribute it and/or modify it
 ; under the terms of the GNU General Public License as published by
 ; the Free Software Foundation; either version 3 of the License, or
@@ -15,18 +15,18 @@
   stdlib-h "stdlib.h"
   inttypes-h "inttypes.h")
 
-;the following definition sets the integer type and size for values
+; the following definition sets the integer type and size for values
 (pre-if-not-defined imht-set-key-t (pre-define imht-set-key-t uint64_t))
-;using the following leads to slightly faster set operations but a stored zero will not be found
+; using the following leads to slightly faster set operations but a stored zero will not be found
 (pre-if-not-defined imht-set-can-contain-zero? (pre-define imht-set-can-contain-zero? 1))
-;the minimum memory usage is size times imht-set-size-factor
+; the minimum memory usage is size times imht-set-size-factor
 (pre-if-not-defined imht-set-size-factor (pre-define imht-set-size-factor 2))
 
 (define-array
   imht-set-primes
   uint16_t
   ()
-  ;performance can be optimised for bigger sets by adding additional primes nearer to the desired set size * set-size-factor
+  ; performance can be optimised for bigger sets by adding additional primes nearer to the desired set size * set-size-factor
   #f
   3
   7
