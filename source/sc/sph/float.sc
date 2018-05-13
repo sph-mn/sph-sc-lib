@@ -10,10 +10,10 @@
       element type)
     (define correction type 0)
     (set len (- len 1))
-    (define result type (deref numbers len))
+    (define result type (pointer-get numbers len))
     (while len
       (set len (- len 1))
-      (set element (deref numbers len))
+      (set element (pointer-get numbers len))
       (set temp (+ result element))
       (set
         correction
@@ -29,7 +29,7 @@
     (define index size-t 0)
     (if (not (= a-len b-len)) (return #f))
     (while (< index a-len)
-      (if (not ((pre-concat prefix _nearly-equal?) (deref a index) (deref b index) error-margin))
+      (if (not ((pre-concat prefix _nearly-equal?) (pointer-get a index) (pointer-get b index) error-margin))
         (return #f))
       (set index (+ 1 index)))
     (return #t)))

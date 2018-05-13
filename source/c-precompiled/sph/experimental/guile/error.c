@@ -19,7 +19,7 @@ b0 scm_error_init() {
 #define scm_c_local_error_init                                                 \
   SCM local_error_origin;                                                      \
   SCM local_error_name;                                                        \
-  SCM local_error_data
+  SCM local_error_data;
 #define scm_c_local_error(i, d)                                                \
   local_error_origin = scm_from_locale_symbol(__func__);                       \
   local_error_name = scm_from_locale_symbol(i);                                \

@@ -27,9 +27,9 @@ uint8_t test_value_existence(imht_set_t *set) {
   };
 };
 void print_contents(imht_set_t *set) {
-  size_t index = (struct_deref(set, size) - 1);
+  size_t index = ((*set).size - 1);
   while (index) {
-    printf("%lu\n", (*(struct_deref(set, content) + index)));
+    printf("%lu\n", (*((*set).content + index)));
     index = (index - 1);
   };
 };

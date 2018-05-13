@@ -16,8 +16,8 @@
   (while counter (assert (not (= 0 (imht-set-find set counter)))) (set counter (- counter 1))))
 
 (define (print-contents set) (void imht-set-t*)
-  (define index size-t (- (struct-deref set size) 1))
-  (while index (printf "%lu\n" (deref (struct-deref set content) index)) (set index (- index 1))))
+  (define index size-t (- (struct-pointer-get set size) 1))
+  (while index (printf "%lu\n" (pointer-get (struct-pointer-get set content) index)) (set index (- index 1))))
 
 (pre-define (get-time) (convert-type (time 0) uint64_t))
 (pre-define (print-time a) (printf "%u\n" a))

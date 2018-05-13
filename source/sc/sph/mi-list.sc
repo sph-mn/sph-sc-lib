@@ -20,16 +20,19 @@
     (pre-define (mi-list-name-concatenator a b) (mi-list-name-concat a b))
     (pre-define (mi-list-name name) (mi-list-name-concatenator mi-list-name-prefix name))))
 
-(pre-define mi-list-struct-name (mi-list-name struct))
-(pre-define mi-list-t (mi-list-name t))
+(pre-define
+  mi-list-struct-name (mi-list-name struct)
+  mi-list-t (mi-list-name t))
 
-(define-type mi-list-t
-  (struct
-    mi-list-struct-name
-    (link
-      (struct
-        mi-list-struct-name*))
-    (data mi-list-element-t)))
+(declare
+  mi-list-t
+  (type
+    (struct
+      mi-list-struct-name
+      (link
+        (struct
+          mi-list-struct-name*))
+      (data mi-list-element-t))))
 
 (pre-if-not-defined
   mi-list-first

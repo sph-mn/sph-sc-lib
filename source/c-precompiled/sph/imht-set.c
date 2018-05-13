@@ -67,8 +67,8 @@ void imht_set_destroy(imht_set_t *a) {
 #endif
 /** returns the address of the element in the set, 0 if it was not found.
   caveat: if imht-set-can-contain-zero? is defined, which is the default,
-  dereferencing a returned address for the found value 0 will return 1 instead
-*/
+  pointer-geterencing a returned address for the found value 0 will return 1
+  instead */
 imht_set_key_t *imht_set_find(imht_set_t *a, imht_set_key_t value) {
   imht_set_key_t *h = ((*a).content + imht_set_hash(value, (*a)));
   if ((*h)) {

@@ -29,14 +29,15 @@
   f32-s
   float
   f64-s
-  double)
-
-(pre-define (debug-log format ...)
-  "writes values with current routine name and line info to standard output.
-  example: (debug-log \"%d\" 1)
-  otherwise like printf"
-  (fprintf stdout (pre-string-concat "%s:%d " format "\n") __func__ __LINE__ __VA_ARGS__))
-
-; typical definition of null as seen in other libraries
-(pre-define null (convert-type 0 b0))
-(pre-define (zero? a) (= 0 a))
+  double
+  (debug-log format ...)
+  (begin
+    "writes values with current routine name and line info to standard output.
+    example: (debug-log \"%d\" 1)
+    otherwise like printf"
+    (fprintf stdout (pre-string-concat "%s:%d " format "\n") __func__ __LINE__ __VA_ARGS__))
+  ; definition of null as seen in other libraries
+  null
+  (convert-type 0 b0)
+  (zero? a)
+  (= 0 a))
