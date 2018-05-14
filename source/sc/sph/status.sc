@@ -5,6 +5,8 @@
    status ids are 32 bit signed integers for compatibility with error return codes from many other existing libraries.
    bindings with a ! suffix update the status from an expression")
 
+(pre-pragma once)
+
 (pre-define
   (status-init-group group)
   (begin
@@ -50,7 +52,8 @@
     (if status-failure? status-goto)))
 
 (declare
-  status-i-t (type b32_s) status-t
+  status-i-t (type b32_s)
+  status-t
   (type
     (struct
       (id status-i-t)

@@ -1,6 +1,5 @@
-(pre-include-once
-  float-h "float.h"
-  math-h "math.h")
+(pre-pragma once)
+(pre-include "float.h" "math.h")
 
 (pre-define (define-float-sum prefix type)
   (define ((pre-concat prefix _sum) numbers len) (type type* size-t)

@@ -1,13 +1,8 @@
 
 /* depends on sph.sc */
-#ifndef sc_included_string_h
-#include <string.h>
-#define sc_included_string_h
-#endif
-#ifndef sc_included_stdlib_h
+#pragma once
 #include <stdlib.h>
-#define sc_included_stdlib_h
-#endif
+#include <string.h>
 /** set result to a new string with a trailing slash added, or the given string
   if it already has a trailing slash.
   returns 0 if result is the given string, 1 if new memory could not be

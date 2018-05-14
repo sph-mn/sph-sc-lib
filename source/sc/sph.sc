@@ -1,9 +1,8 @@
-(pre-include-once
-  inttypes-h "inttypes.h"
-  stdio-h "stdio.h")
+(pre-pragma once)
+(pre-include "inttypes.h" "stdio.h")
 
 (pre-define
-  ; short fixed-length type names derived from inttypes.h
+  ; shorter fixed-length type names derived from inttypes.h
   boolean b8
   pointer-t uintptr_t
   b0 void

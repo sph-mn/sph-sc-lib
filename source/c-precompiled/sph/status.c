@@ -6,6 +6,7 @@
    ids are 32 bit signed integers for compatibility with error return codes from
    many other existing libraries. bindings with a ! suffix update the status
    from an expression */
+#pragma once
 /** like status init but sets a default group */
 #define status_init_group(group) status_t status = {status_id_success, group}
 #define status_id_success 0

@@ -1,3 +1,5 @@
+(pre-pragma once)
+
 (pre-define
   scm-first SCM_CAR
   scm-tail SCM_CDR

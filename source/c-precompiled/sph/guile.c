@@ -1,4 +1,5 @@
 
+#pragma once
 #define scm_first SCM_CAR
 #define scm_tail SCM_CDR
 #define scm_c_define_procedure_c_init SCM scm_c_define_procedure_c_temp

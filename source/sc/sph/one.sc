@@ -1,10 +1,6 @@
 (sc-comment "depends on sph.sc")
-
-(pre-include-once
-  string-h "string.h"
-  ; malloc
-  stdlib-h "stdlib.h")
-
+(pre-pragma once)
+(pre-include "string.h" "stdlib.h")
 ;-- string
 
 (define (ensure-trailing-slash a result) (b8 b8* b8**)

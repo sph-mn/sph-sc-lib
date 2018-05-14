@@ -1,12 +1,7 @@
 
-#ifndef sc_included_float_h
+#pragma once
 #include <float.h>
-#define sc_included_float_h
-#endif
-#ifndef sc_included_math_h
 #include <math.h>
-#define sc_included_math_h
-#endif
 #define define_float_sum(prefix, type)                                         \
   type prefix##_sum(type *numbers, size_t len) {                               \
     type temp;                                                                 \
