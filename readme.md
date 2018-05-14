@@ -1,11 +1,11 @@
-imh# sph-sc-lib
+# sph-sc-lib
 
 various utility c libraries written in [sc](http://sph.mn/c/view/me).
 c versions are in source/c-precompiled.
 
 # included libraries
 * local-memory: manage heap memory in function scope
-* status: return status and error handling with a tiny status object that contains status id and source library id
+* status: return-status and error handling with a tiny status object with status id and source library id
 * imht-set: a minimal, macro-based fixed size hash-table based data structure for sets of integers
 * mi-list: a minimal, macro-based linked list
 * one: various helpers. experimental
@@ -15,7 +15,7 @@ c versions are in source/c-precompiled.
 code is under gpl3+, documentation under cc-by-nc.
 
 # local-memory
-register memory allocations locally on the stack and free all allocations up to point easily
+track memory allocations on the stack and free all allocations up to point easily
 
 ```c
 #include "sph/local-memory.c"
@@ -146,10 +146,10 @@ returns 1 if the element was removed, 0 if it was not found.
 imht_set_destroy(set);
 ```
 
-this is an important call for when the set is no longer needed, since its memory is otherwise not deallocated until the process ends. manual memory management is typical with c.
+this is an important call for when the set is no longer needed, since its memory is otherwise not deallocated until the process ends.
 
 ## configuration options
-configuration options can be set by defining macros before including the imht-set source code.
+configuration can be done by defining certain macro variables before including the imht-set source code.
 
 ### integer size
 an imht-set only stores integers of the same type. supported are all typical integer values, from char to uint64_t.
@@ -163,12 +163,12 @@ the default type is unsigned 64 bit.
 
 if you would like to use multiple sets with different integer sizes at the same time, include the source file multiple times with imht_set_key_t set to different values before inclusion.
 
-### memory usagec
+### memory usage
 ```
 #define imht_set_size_factor 2
 ```
 
-by default, the memory allocated for the set is at least double the number of elements it is supposed to store.
+by default, the memory allocated for the set is at least double the number of elements it is supposed to store (rounded to the nearest prime eventually).
 this can be changed in this definition, and a lower set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
 the downside is that the insert/delete/search performance is more likely to approach and reach o(n).
 
@@ -182,9 +182,8 @@ by default, the integer 0 is a valid value for a set. but as an optimisation, th
 with this definition, a zero in sets can not be found, but the set routines should work a tiny little bit faster.
 
 ## modularity and implementation
-the "imht_set_t" type is a structure with the two fields "size" and "content".
-"content" is a one-dimensional array that stores values at indices determined by a hash function.
-the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can be implemented by adding new "add" and "remove" routines and rewriting the hash.
+the "imht_set_t" type is a structure with the two fields "size" and "content". "content" is a one-dimensional array that stores values at indices determined by a hash function.
+the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can be implemented by adding new "add" and "remove" routines and rewriting the content data.
 
 # mi-list
 a minimal, generically usable linked list with custom element types.

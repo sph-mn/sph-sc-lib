@@ -5,30 +5,21 @@
    status ids are 32 bit signed integers for compatibility with error return codes from many other existing libraries.
    bindings with a ! suffix update the status from an expression")
 
-(pre-define (status-init-group group)
+(pre-define
+  (status-init-group group)
   (begin
     "like status init but sets a default group"
     (define status status-t (struct-literal status-id-success group)))
-  status-id-success
-  0
-  status-group-undefined
-  0
-  status-init
-  (define status status-t (struct-literal status-id-success status-group-undefined))
-  status-reset
-  (status-set-both status-group-undefined status-id-success)
-  status-success?
-  (equal? status-id-success (struct-get status id))
-  status-failure?
-  (not status-success?)
-  status-goto
-  (goto exit)
-  status-require
-  (if status-failure? status-goto)
-  (status-set-group group-id)
-  (struct-set status group group-id)
-  (status-set-id status-id)
-  (struct-set status id status-id)
+  status-id-success 0
+  status-group-undefined 0
+  status-init (define status status-t (struct-literal status-id-success status-group-undefined))
+  status-reset (status-set-both status-group-undefined status-id-success)
+  status-success? (equal? status-id-success (struct-get status id))
+  status-failure? (not status-success?)
+  status-goto (goto exit)
+  status-require (if status-failure? status-goto)
+  (status-set-group group-id) (struct-set status group group-id)
+  (status-set-id status-id) (struct-set status id status-id)
   (status-set-both group-id status-id)
   (begin
     (status-set-group group-id)
@@ -51,8 +42,7 @@
   (begin
     (status-set-both group-id status-id)
     status-goto)
-  (status-id-is? status-id)
-  (equal? status-id (struct-get status id))
+  (status-id-is? status-id) (equal? status-id (struct-get status id))
   (status-i-require! expression)
   (begin
     "update status with the result of expression, check for failure and goto error if so"

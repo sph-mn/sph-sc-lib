@@ -1,4 +1,5 @@
-(pre-define (local-memory-init register-size)
+(pre-define
+  (local-memory-init register-size)
   (begin
     "register memory in a local variable to free all memory allocated at point"
     (define-array sph-local-memory-register b0* (register-size))

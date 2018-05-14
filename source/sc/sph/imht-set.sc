@@ -130,13 +130,15 @@
   "returns the address of the element in the set, 0 if it was not found.
   caveat: if imht-set-can-contain-zero? is defined, which is the default,
   pointer-geterencing a returned address for the found value 0 will return 1 instead"
-  (define h imht-set-key-t* (+ (struct-pointer-get a content) (imht-set-hash value (pointer-get a))))
+  (define h imht-set-key-t*
+    (+ (struct-pointer-get a content) (imht-set-hash value (pointer-get a))))
   (if (pointer-get h)
     (begin
       (pre-if
         imht-set-can-contain-zero?
         ;the value zero is stored at a special index and is the only value that can be stored there
-        (if (or (= (pointer-get h) value) (= 0 value)) (return h)) (if (= (pointer-get h) value) (return h)))
+        (if (or (= (pointer-get h) value) (= 0 value)) (return h))
+        (if (= (pointer-get h) value) (return h)))
       (define content-end imht-set-key-t*
         (+ (struct-pointer-get a content) (- (struct-pointer-get a size) 1)))
       (define h2 imht-set-key-t* (+ 1 h))
@@ -164,13 +166,15 @@
 
 (define (imht-set-add a value) (imht-set-key-t* imht-set-t* imht-set-key-t)
   "returns the address of the added or already included element, 0 if there is no space left in the set"
-  (define h imht-set-key-t* (+ (struct-pointer-get a content) (imht-set-hash value (pointer-get a))))
+  (define h imht-set-key-t*
+    (+ (struct-pointer-get a content) (imht-set-hash value (pointer-get a))))
   (if (pointer-get h)
     (begin
       ;the first element is special for storing 0
       (pre-if
         imht-set-can-contain-zero?
-        (if (or (= value (pointer-get h)) (= 0 value)) (return h)) (if (= value (pointer-get h)) (return h)))
+        (if (or (= value (pointer-get h)) (= 0 value)) (return h))
+        (if (= value (pointer-get h)) (return h)))
       (define content-end imht-set-key-t*
         (+ (struct-pointer-get a content) (- (struct-pointer-get a size) 1)))
       (define h2 imht-set-key-t* (+ 1 h))
@@ -192,5 +196,6 @@
           (set (pointer-get h2) (if* (= 0 value) 1 value)) (set (pointer-get h2) value))))
     (begin
       (pre-if
-        imht-set-can-contain-zero? (set (pointer-get h) (if* (= 0 value) 1 value)) (set (pointer-get h) value))
+        imht-set-can-contain-zero?
+        (set (pointer-get h) (if* (= 0 value) 1 value)) (set (pointer-get h) value))
       (return h))))
