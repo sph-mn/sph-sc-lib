@@ -3,10 +3,7 @@
    this file can be included multiple times to create differently typed versions,
    depending the value of the preprocessor variables mi-list-name-infix and mi-list-element-t before inclusion")
 
-(pre-include-once
-  stdlib-h "stdlib.h"
-  inttypes-h "inttypes.h")
-
+(pre-include "stdlib.h" "inttypes.h")
 (pre-if-not-defined mi-list-name-prefix (pre-define mi-list-name-prefix mi-list-64))
 (pre-if-not-defined mi-list-element-t (pre-define mi-list-element-t uint64_t))
 

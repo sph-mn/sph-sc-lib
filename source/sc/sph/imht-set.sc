@@ -10,11 +10,7 @@
 ; GNU General Public License for more details.
 ; You should have received a copy of the GNU General Public License
 ; along with this program; if not, see <http://www.gnu.org/licenses/>.
-
-(pre-include-once
-  stdlib-h "stdlib.h"
-  inttypes-h "inttypes.h")
-
+(pre-include "stdlib.h" "inttypes.h")
 ; the following definition sets the integer type and size for values
 (pre-if-not-defined imht-set-key-t (pre-define imht-set-key-t uint64_t))
 ; using the following leads to slightly faster set operations but a stored zero will not be found
@@ -93,7 +89,8 @@
 
 (define imht-set-primes-end uint16_t* (+ imht-set-primes 83))
 
-(declare imht-set-t
+(declare
+  imht-set-t
   (type
     (struct
       (size size-t)

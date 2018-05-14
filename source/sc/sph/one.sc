@@ -1,5 +1,5 @@
-(sc-comment "depends on sph.sc")
 (pre-pragma once)
+(sc-comment "depends on sph.sc")
 (pre-include "string.h" "stdlib.h")
 ;-- string
 
@@ -40,14 +40,13 @@
 
 ;-- filesystem
 
-(pre-include-once
+(pre-include
   ; "access"
-  unistd-h "unistd.h"
+  "unistd.h"
   ; mkdir
-  sys-stat-h "sys/stat.h"
+  "sys/stat.h"
   ; dirname
-  libgen-h "libgen.h"
-  errno-h "errno.h")
+  "libgen.h" "errno.h")
 
 (pre-define (file-exists? path) (not (equal? (access path F-OK) -1)))
 

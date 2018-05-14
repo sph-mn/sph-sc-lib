@@ -1,6 +1,6 @@
 
-/* depends on sph.sc */
 #pragma once
+/* depends on sph.sc */
 #include <stdlib.h>
 #include <string.h>
 /** set result to a new string with a trailing slash added, or the given string
@@ -45,22 +45,10 @@ b8 *string_clone(b8 *a) {
   };
   return (result);
 };
-#ifndef sc_included_unistd_h
-#include <unistd.h>
-#define sc_included_unistd_h
-#endif
-#ifndef sc_included_sys_stat_h
-#include <sys/stat.h>
-#define sc_included_sys_stat_h
-#endif
-#ifndef sc_included_libgen_h
-#include <libgen.h>
-#define sc_included_libgen_h
-#endif
-#ifndef sc_included_errno_h
 #include <errno.h>
-#define sc_included_errno_h
-#endif
+#include <libgen.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #define file_exists_p(path) !(access(path, F_OK) == -1)
 /** like posix dirname, but never modifies its argument and always returns a new
  * string */

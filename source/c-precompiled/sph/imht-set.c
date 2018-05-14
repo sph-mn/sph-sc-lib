@@ -1,12 +1,6 @@
 
-#ifndef sc_included_stdlib_h
-#include <stdlib.h>
-#define sc_included_stdlib_h
-#endif
-#ifndef sc_included_inttypes_h
 #include <inttypes.h>
-#define sc_included_inttypes_h
-#endif
+#include <stdlib.h>
 #ifndef imht_set_key_t
 #define imht_set_key_t uint64_t
 #endif

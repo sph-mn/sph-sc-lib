@@ -3,14 +3,8 @@
    this file can be included multiple times to create differently typed
    versions, depending the value of the preprocessor variables
    mi-list-name-infix and mi-list-element-t before inclusion */
-#ifndef sc_included_stdlib_h
-#include <stdlib.h>
-#define sc_included_stdlib_h
-#endif
-#ifndef sc_included_inttypes_h
 #include <inttypes.h>
-#define sc_included_inttypes_h
-#endif
+#include <stdlib.h>
 #ifndef mi_list_name_prefix
 #define mi_list_name_prefix mi_list_64
 #endif
