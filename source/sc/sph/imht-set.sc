@@ -22,79 +22,82 @@
 ; the minimum memory usage is size times imht-set-size-factor
 (pre-if-not-defined imht-set-size-factor (pre-define imht-set-size-factor 2))
 
-(define-array
+(declare
   imht-set-primes
-  uint16_t
-  ()
-  ; performance can be optimised for bigger sets by adding additional primes nearer to the desired set size * set-size-factor
-  #f
-  3
-  7
-  13
-  19
-  29
-  37
-  43
-  53
-  61
-  71
-  79
-  89
-  101
-  107
-  113
-  131
-  139
-  151
-  163
-  173
-  181
-  193
-  199
-  223
-  229
-  239
-  251
-  263
-  271
-  281
-  293
-  311
-  317
-  337
-  349
-  359
-  373
-  383
-  397
-  409
-  421
-  433
-  443
-  457
-  463
-  479
-  491
-  503
-  521
-  541
-  557
-  569
-  577
-  593
-  601
-  613
-  619
-  641
-  647
-  659 673 683 701 719 733 743 757 769 787 809 821 827 839 857 863 881 887 911 929 941 953 971 983 997)
+  (array
+    uint16_t
+    ()
+    ; performance can be optimised for bigger sets by adding additional primes nearer to the desired set size times set-size-factor
+    #f
+    3
+    7
+    13
+    19
+    29
+    37
+    43
+    53
+    61
+    71
+    79
+    89
+    101
+    107
+    113
+    131
+    139
+    151
+    163
+    173
+    181
+    193
+    199
+    223
+    229
+    239
+    251
+    263
+    271
+    281
+    293
+    311
+    317
+    337
+    349
+    359
+    373
+    383
+    397
+    409
+    421
+    433
+    443
+    457
+    463
+    479
+    491
+    503
+    521
+    541
+    557
+    569
+    577
+    593
+    601
+    613
+    619
+    641
+    647
+    659
+    673 683 701 719 733 743 757 769 787 809 821 827 839 857 863 881 887 911 929 941 953 971 983 997))
 
 (define imht-set-primes-end uint16_t* (+ imht-set-primes 83))
 
-(define-type imht-set-t
-  (struct
-    (size size-t)
-    (content imht-set-key-t*)))
+(declare imht-set-t
+  (type
+    (struct
+      (size size-t)
+      (content imht-set-key-t*))))
 
 (define (imht-set-calculate-hash-table-size min-size) (size-t size-t)
   (set min-size (* imht-set-size-factor min-size))
