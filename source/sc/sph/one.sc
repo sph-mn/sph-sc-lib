@@ -1,7 +1,6 @@
-(pre-pragma once)
 (sc-comment "depends on sph.sc")
-(pre-include "string.h" "stdlib.h")
 ;-- string
+(pre-include "string.h" "stdlib.h")
 
 (define (ensure-trailing-slash a result) (b8 b8* b8**)
   "set result to a new string with a trailing slash added, or the given string if it already has a trailing slash.
@@ -39,15 +38,8 @@
   (return result))
 
 ;-- filesystem
-
-(pre-include
-  ; "access"
-  "unistd.h"
-  ; mkdir
-  "sys/stat.h"
-  ; dirname
-  "libgen.h" "errno.h")
-
+; access, mkdir dirname
+(pre-include "unistd.h" "sys/stat.h" "libgen.h" "errno.h")
 (pre-define (file-exists? path) (not (equal? (access path F-OK) -1)))
 
 (define (dirname-2 a) (b8* b8*)

@@ -1,4 +1,3 @@
-(pre-pragma once)
 (pre-include "float.h" "math.h")
 
 (pre-define (define-float-sum prefix type)

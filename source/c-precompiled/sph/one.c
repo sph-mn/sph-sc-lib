@@ -1,5 +1,4 @@
 
-#pragma once
 /* depends on sph.sc */
 #include <stdlib.h>
 #include <string.h>

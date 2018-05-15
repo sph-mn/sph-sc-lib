@@ -1,5 +1,3 @@
-(pre-pragma once)
-
 (pre-define
   (local-memory-init register-size)
   (begin

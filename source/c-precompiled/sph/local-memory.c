@@ -1,5 +1,4 @@
 
-#pragma once
 /** register memory in a local variable to free all memory allocated at point */
 #define local_memory_init(register_size)                                       \
   define_array(sph_local_memory_register, b0 *, register_size());              \

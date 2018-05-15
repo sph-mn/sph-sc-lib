@@ -1,4 +1,3 @@
-(pre-pragma once)
 (pre-include "inttypes.h" "stdio.h")
 
 (pre-define
