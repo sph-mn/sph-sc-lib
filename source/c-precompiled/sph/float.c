@@ -1,4 +1,3 @@
-
 #include <float.h>
 #include <math.h>
 #define define_float_sum(prefix, type)                                         \

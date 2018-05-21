@@ -1,6 +1,10 @@
 (pre-include "stdio.h" "inttypes.h" "assert.h" "time.h")
 (sc-include "../../sph/imht-set")
-(pre-define test-element-count 10000000)
+
+(pre-define
+  test-element-count 10000000
+  (get-time) (convert-type (time 0) uint64_t)
+  (print-time a) (printf "%u\n" a))
 
 (define (test-zero set) (uint8_t imht-set-t*)
   (assert (= 0 (imht-set-find set 0)))
@@ -27,11 +31,8 @@
     (printf "%lu\n" (pointer-get (struct-pointer-get set content) index))
     (set index (- index 1))))
 
-(pre-define (get-time) (convert-type (time 0) uint64_t))
-(pre-define (print-time a) (printf "%u\n" a))
-
 (define (main) int
-  (define set imht-set-t*)
+  (declare set imht-set-t*)
   (imht-set-create test-element-count (address-of set))
   (test-zero set)
   (insert-values set)

@@ -1,4 +1,3 @@
-
 #define array_it_define_type(name, size_t, data_t)                             \
   define_type(name, struct {                                                   \
     size_t size;                                                               \

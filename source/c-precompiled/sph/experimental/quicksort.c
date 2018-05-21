@@ -1,4 +1,3 @@
-
 #define define_quicksort(name, type_array, type_index, max_levels)             \
   b8 name(type_array a, type_index element_count) {                            \
     type_index i = 0;                                                          \
@@ -7,8 +6,8 @@
     type_index end[max_levels];                                                \
     type_index left;                                                           \
     type_index right;                                                          \
-    (*(start + 0)) = 0;                                                        \
-    (*(end + 0)) = element_count;                                              \
+    *start = 0;                                                                \
+    *end = element_count;                                                      \
     while ((i >= 0)) {                                                         \
       left = (*(start + i));                                                   \
       right = ((*(end + i)) - 1);                                              \

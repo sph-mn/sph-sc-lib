@@ -1,4 +1,3 @@
-
 #include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -172,6 +171,8 @@ imht_set_key_t *imht_set_add(imht_set_t *a, imht_set_key_t value) {
   };
 };
 #define test_element_count 10000000
+#define get_time() ((uint64_t)(time(0)))
+#define print_time(a) printf("%u\n", a)
 uint8_t test_zero(imht_set_t *set) {
   assert((0 == imht_set_find(set, 0)));
   imht_set_add(set, 0);
@@ -200,8 +201,6 @@ void print_contents(imht_set_t *set) {
     index = (index - 1);
   };
 };
-#define get_time() ((uint64_t)(time(0)))
-#define print_time(a) printf("%u\n", a)
 int main() {
   imht_set_t *set;
   imht_set_create(test_element_count, &set);

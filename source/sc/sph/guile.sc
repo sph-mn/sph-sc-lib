@@ -1,7 +1,7 @@
 (pre-define
   scm-first SCM_CAR
   scm-tail SCM_CDR
-  scm-c-define-procedure-c-init (define scm-c-define-procedure-c-temp SCM)
+  scm-c-define-procedure-c-init (declare scm-c-define-procedure-c-temp SCM)
   (scm-is-undefined a) (= SCM-UNDEFINED a)
   (scm-c-define-procedure-c name required optional rest c-function documentation)
   (begin
@@ -22,12 +22,12 @@
       (set list (scm-tail list)))))
 
 (define (scm-debug-log value) (b0 SCM)
-  ;display value with scheme write and add a newline
+  "display value with scheme write and add a newline"
   (scm-call-2 (scm-variable-ref (scm-c-lookup "write")) value (scm-current-output-port))
   (scm-newline (scm-current-output-port)))
 
 (define (scm-c-bytevector-take size-octets a) (SCM size-t b8*)
-  ;creates a new bytevector of size-octects that contains the given bytevector
+  "creates a new bytevector of size-octects that contains the given bytevector"
   (define r SCM (scm-c-make-bytevector size-octets))
   (memcpy (SCM-BYTEVECTOR-CONTENTS r) a size-octets)
   (return r))

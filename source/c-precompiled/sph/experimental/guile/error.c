@@ -1,4 +1,3 @@
-
 #define scm_c_error_create(id, group, data)                                    \
   scm_call_3(scm_error_create, scm_from_uint(id),                              \
              (group ? scm_from_uint(group) : SCM_BOOL_F),                      \

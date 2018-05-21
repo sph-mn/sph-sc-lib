@@ -1,4 +1,3 @@
-
 /* a minimal linked list with custom element types.
    this file can be included multiple times to create differently typed
    versions, depending the value of the preprocessor variables

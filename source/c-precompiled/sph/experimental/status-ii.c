@@ -1,4 +1,3 @@
-
 #define status_ii_init status_i_t status_ii = status_success
 #define status_ii_success_p(a) (status_success == a)
 #define status_ii_failure_p(a) !status_ii_success_p(a)

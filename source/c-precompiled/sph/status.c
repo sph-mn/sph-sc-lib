@@ -1,4 +1,3 @@
-
 /* return status code and error handling. uses a local variable named "status"
    and a goto label named "exit". a status has an identifier and a group to
    discern between status identifiers of different libraries. status id 0 is
@@ -32,7 +31,6 @@
   if (status_failure_p) {                                                      \
     status_goto;                                                               \
   }
-
 /** set the status id and goto error */
 #define status_set_id_goto(status_id)                                          \
   status_set_id(status_id);                                                    \
