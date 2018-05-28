@@ -6,10 +6,10 @@
     type element;                                                              \
     type correction = 0;                                                       \
     len = (len - 1);                                                           \
-    type result = (*(numbers + len));                                          \
+    type result = numbers[len];                                                \
     while (len) {                                                              \
       len = (len - 1);                                                         \
-      element = (*(numbers + len));                                            \
+      element = numbers[len];                                                  \
       temp = (result + element);                                               \
       correction =                                                             \
           (correction + ((result >= element) ? ((result - temp) + element)     \
@@ -26,8 +26,7 @@
       return (0);                                                              \
     };                                                                         \
     while ((index < a_len)) {                                                  \
-      if (!prefix##_nearly_equal_p((*(a + index)), (*(b + index)),             \
-                                   error_margin)) {                            \
+      if (!prefix##_nearly_equal_p(a[index], b[index], error_margin)) {        \
         return (0);                                                            \
       };                                                                       \
       index = (1 + index);                                                     \

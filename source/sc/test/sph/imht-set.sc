@@ -26,9 +26,9 @@
     (set counter (- counter 1))))
 
 (define (print-contents set) (void imht-set-t*)
-  (define index size-t (- (struct-pointer-get set size) 1))
+  (define index size-t (- set:size 1))
   (while index
-    (printf "%lu\n" (pointer-get (struct-pointer-get set content) index))
+    (printf "%lu\n" (array-get set:content index))
     (set index (- index 1))))
 
 (define (main) int

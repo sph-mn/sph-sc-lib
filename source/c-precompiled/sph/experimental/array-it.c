@@ -11,4 +11,4 @@
 #define array_it_reset(a) a.index = 0
 #define array_it_data(a) struct_ref(a, data)
 #define array_it_get_address(a) (struct_ref(a, data) + struct_ref(a, index))
-#define array_it_get(a) (*array_it_get_address(a))
+#define array_it_get(a) (*(array_it_get_address(a)))

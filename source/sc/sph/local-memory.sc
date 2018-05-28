@@ -8,7 +8,7 @@
   (begin
     "do not try to add more entries than specified by register-size or a buffer overflow occurs"
     (set
-      (pointer-get sph-local-memory-register sph-local-memory-index) address
+      (array-get sph-local-memory-register sph-local-memory-index) address
       sph-local-memory-index (+ 1 sph-local-memory-index)))
   local-memory-free
   (while sph-local-memory-index
