@@ -2,8 +2,10 @@
   (local-memory-init register-size)
   (begin
     "register memory in a local variable to free all memory allocated at point"
-    (define-array sph-local-memory-register b0* (register-size))
-    (define sph-local-memory-index b8 0))
+    (declare
+      sph-local-memory-register (array b0* (register-size))
+      sph-local-memory-index b8)
+    (set sph-local-memory-index 0))
   (local-memory-add address)
   (begin
     "do not try to add more entries than specified by register-size or a buffer overflow occurs"

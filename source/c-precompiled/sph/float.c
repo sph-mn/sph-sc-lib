@@ -40,7 +40,7 @@ boolean f64_nearly_equal_p(f64_s a, f64_s b, f64_s margin) {
     return (1);
   } else {
     f64_s diff = fabs((a - b));
-    return (((((0 == a)) || ((0 == b)) || (diff < DBL_MIN))
+    return ((((0 == a) || (0 == b) || (diff < DBL_MIN))
                  ? (diff < (margin * DBL_MIN))
                  : ((diff / fmin((fabs(a) + fabs(b)), DBL_MAX)) < margin)));
   };
@@ -52,7 +52,7 @@ boolean f32_nearly_equal_p(f32_s a, f32_s b, f32_s margin) {
     return (1);
   } else {
     f32_s diff = fabs((a - b));
-    return (((((0 == a)) || ((0 == b)) || (diff < FLT_MIN))
+    return ((((0 == a) || (0 == b) || (diff < FLT_MIN))
                  ? (diff < (margin * FLT_MIN))
                  : ((diff / fmin((fabs(a) + fabs(b)), FLT_MAX)) < margin)));
   };
