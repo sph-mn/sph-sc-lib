@@ -11,5 +11,5 @@
 #define local_memory_free                                                      \
   while (sph_local_memory_index) {                                             \
     sph_local_memory_index = (sph_local_memory_index - 1);                     \
-    free((*((sph_local_memory_register + sph_local_memory_index))));           \
+    free((*(sph_local_memory_register + sph_local_memory_index)));             \
   };

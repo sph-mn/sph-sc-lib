@@ -26,7 +26,7 @@
       return (0);                                                              \
     };                                                                         \
     while ((index < a_len)) {                                                  \
-      if (!prefix##_nearly_equal_p(a[index], b[index], error_margin)) {        \
+      if (!prefix##_nearly_equal_p((a[index]), (b[index]), error_margin)) {    \
         return (0);                                                            \
       };                                                                       \
       index = (1 + index);                                                     \
@@ -36,7 +36,7 @@
 /** approximate float comparison. margin is a factor and is low for low accepted
    differences. http://floating-point-gui.de/errors/comparison/ */
 boolean f64_nearly_equal_p(f64_s a, f64_s b, f64_s margin) {
-  if ((a == b)) {
+  if (a == b) {
     return (1);
   } else {
     f64_s diff = fabs((a - b));
@@ -48,7 +48,7 @@ boolean f64_nearly_equal_p(f64_s a, f64_s b, f64_s margin) {
 /** approximate float comparison. margin is a factor and is low for low accepted
    differences. http://floating-point-gui.de/errors/comparison/ */
 boolean f32_nearly_equal_p(f32_s a, f32_s b, f32_s margin) {
-  if ((a == b)) {
+  if (a == b) {
     return (1);
   } else {
     f32_s diff = fabs((a - b));

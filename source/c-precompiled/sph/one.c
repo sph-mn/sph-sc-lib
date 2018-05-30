@@ -7,7 +7,7 @@
   allocated, 2 if result is a new string */
 b8 ensure_trailing_slash(b8 *a, b8 **result) {
   b32 a_len = strlen(a);
-  if ((!a_len || ('/' == (*((a + (a_len - 1))))))) {
+  if (!a_len || ('/' == *(a + (a_len - 1)))) {
     *result = a;
     return (0);
   } else {
