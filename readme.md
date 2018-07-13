@@ -46,7 +46,7 @@ helpers for error and return status code handling with a routine local goto labe
 ## usage example
 ```c
 status_t test() {
-  status_init;
+  status_declare;
   if (1 < 2) {
     int group_id = 123;
     int error_id = 456;
@@ -57,7 +57,7 @@ exit:
 }
 
 int main() {
-  status_init;
+  status_declare;
   // code ...
   status_require(test());
   // more code ...
@@ -68,22 +68,18 @@ exit:
 
 ## bindings
 ```
-status_failure_p
+status_is_failure
 status_goto
 status_group_undefined
-status_id_is_p(status_id)
 status_id_success
-status_init
-status_require
-status_require_x(expression)
+status_declare
+status_require(expression)
 status_reset
+status_set_id_goto(status_id)
+status_set_group_goto(group_id)
 status_set_both(group_id, status_id)
 status_set_both_goto(group_id, status_id)
-status_set_group(group_id)
-status_set_group_goto(group_id)
-status_set_id(status_id)
-status_set_id_goto(status_id)
-status_success_p
+status_is_success
 ```
 
 # imht-set
@@ -123,7 +119,7 @@ returns the address of the added or already included element, 0 if there is no s
 
 ### search
 ```c
-imht_set_contains_p(set, 4) ? 1 : 0;
+imht_set_contains(set, 4) ? 1 : 0;
 ```
 
 ```c
@@ -132,7 +128,7 @@ uint64_t* value_address = imht_set_find(set, 4);
 
 returns the address of the element in the set, 0 if it was not found.
 
-caveat: if "imht_set_can_contain_zero_p" is defined, which is the default, dereferencing the memory address for the value 0, if it was found, will give 1 instead.
+caveat: if "imht_set_can_contain_zero" is defined, which is the default, dereferencing the memory address for the value 0, if it was found, will give 1 instead.
 
 ### removal
 ```c
@@ -173,10 +169,10 @@ this can be changed in this definition, and a lower set size factor approaching 
 the downside is that the insert/delete/search performance is more likely to approach and reach o(n).
 
 ### zero support
-by default, the integer 0 is a valid value for a set. but as an optimisation, this can be disabled by defining a macro for "imht_set_can_contain_zero_p" with the value zero.
+by default, the integer 0 is a valid value for a set. but as an optimisation, this can be disabled by defining a macro for "imht_set_can_contain_zero" with the value zero.
 
 ```c
-#define imht_set_can_contain_zero_p 0
+#define imht_set_can_contain_zero 0
 ```
 
 with this definition, a zero in sets can not be found, but the set routines should work a tiny little bit faster.
