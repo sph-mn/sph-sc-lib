@@ -35,27 +35,27 @@
       (set index (+ 1 index)))
     (return #t)))
 
-(define (f64-nearly-equal? a b margin) (boolean f64-s f64-s f64-s)
+(define (f64-nearly-equal? a b margin) (boolean f64 f64 f64)
   "approximate float comparison. margin is a factor and is low for low accepted differences.
    http://floating-point-gui.de/errors/comparison/"
   (if (= a b) (return #t)
     (begin
-      (define diff f64-s (fabs (- a b)))
+      (define diff f64 (fabs (- a b)))
       (return
         (if* (or (= 0 a) (= 0 b) (< diff DBL_MIN)) (< diff (* margin DBL_MIN))
           (< (/ diff (fmin (+ (fabs a) (fabs b)) DBL_MAX)) margin))))))
 
-(define (f32-nearly-equal? a b margin) (boolean f32-s f32-s f32-s)
+(define (f32-nearly-equal? a b margin) (boolean f32 f32 f32)
   "approximate float comparison. margin is a factor and is low for low accepted differences.
    http://floating-point-gui.de/errors/comparison/"
   (if (= a b) (return #t)
     (begin
-      (define diff f32-s (fabs (- a b)))
+      (define diff f32 (fabs (- a b)))
       (return
         (if* (or (= 0 a) (= 0 b) (< diff FLT_MIN)) (< diff (* margin FLT_MIN))
           (< (/ diff (fmin (+ (fabs a) (fabs b)) FLT_MAX)) margin))))))
 
-(define-float-array-nearly-equal? f32 f32-s)
-(define-float-array-nearly-equal? f64 f64-s)
-(define-float-sum f32 f32-s)
-(define-float-sum f64 f64-s)
+(define-float-array-nearly-equal? f32 f32)
+(define-float-array-nearly-equal? f64 f64)
+(define-float-sum f32 f32)
+(define-float-sum f64 f64)

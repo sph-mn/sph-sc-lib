@@ -35,11 +35,11 @@
   }
 /** approximate float comparison. margin is a factor and is low for low accepted
    differences. http://floating-point-gui.de/errors/comparison/ */
-boolean f64_nearly_equal_p(f64_s a, f64_s b, f64_s margin) {
+boolean f64_nearly_equal_p(f64 a, f64 b, f64 margin) {
   if (a == b) {
     return (1);
   } else {
-    f64_s diff = fabs((a - b));
+    f64 diff = fabs((a - b));
     return ((((0 == a) || (0 == b) || (diff < DBL_MIN))
                  ? (diff < (margin * DBL_MIN))
                  : ((diff / fmin((fabs(a) + fabs(b)), DBL_MAX)) < margin)));
@@ -47,17 +47,17 @@ boolean f64_nearly_equal_p(f64_s a, f64_s b, f64_s margin) {
 };
 /** approximate float comparison. margin is a factor and is low for low accepted
    differences. http://floating-point-gui.de/errors/comparison/ */
-boolean f32_nearly_equal_p(f32_s a, f32_s b, f32_s margin) {
+boolean f32_nearly_equal_p(f32 a, f32 b, f32 margin) {
   if (a == b) {
     return (1);
   } else {
-    f32_s diff = fabs((a - b));
+    f32 diff = fabs((a - b));
     return ((((0 == a) || (0 == b) || (diff < FLT_MIN))
                  ? (diff < (margin * FLT_MIN))
                  : ((diff / fmin((fabs(a) + fabs(b)), FLT_MAX)) < margin)));
   };
 };
-define_float_array_nearly_equal_p(f32, f32_s);
-define_float_array_nearly_equal_p(f64, f64_s);
-define_float_sum(f32, f32_s);
-define_float_sum(f64, f64_s);
+define_float_array_nearly_equal_p(f32, f32);
+define_float_array_nearly_equal_p(f64, f64);
+define_float_sum(f32, f32);
+define_float_sum(f64, f64);

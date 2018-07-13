@@ -21,12 +21,12 @@
       body
       (set list (scm-tail list)))))
 
-(define (scm-debug-log value) (b0 SCM)
+(define (scm-debug-log value) (void SCM)
   "display value with scheme write and add a newline"
   (scm-call-2 (scm-variable-ref (scm-c-lookup "write")) value (scm-current-output-port))
   (scm-newline (scm-current-output-port)))
 
-(define (scm-c-bytevector-take size-octets a) (SCM size-t b8*)
+(define (scm-c-bytevector-take size-octets a) (SCM size-t ui8*)
   "creates a new bytevector of size-octects that contains the given bytevector"
   (define r SCM (scm-c-make-bytevector size-octets))
   (memcpy (SCM-BYTEVECTOR-CONTENTS r) a size-octets)
