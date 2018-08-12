@@ -1,44 +1,19 @@
 # sph-sc-lib
 
-various utility c libraries written in [sc](http://sph.mn/c/view/me).
-c versions are in source/c-precompiled.
+various utility c libraries.
+c versions are in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then compiled to normal, readable c.
 
 # included libraries
-* local-memory: manage heap memory in function scope
 * status: return-status and error handling with a tiny status object with status id and source library id
-* imht-set: a minimal, macro-based fixed size hash-table based data structure for sets of integers
+* local-memory: manage heap memory in function scope
+* imht-set: a minimal, macro-based fixed size hash-table data structure for sets of integers
+* i-array: a fixed size array with variable length content that makes iteration easier to code
 * mi-list: a minimal, macro-based linked list
 * one: various helpers. experimental
 * guile: helpers for working with guile. experimental
 
 # license
 code is under gpl3+, documentation under cc-by-nc.
-
-# local-memory
-track memory allocations on the stack and free all allocations up to point easily
-
-```c
-#include "sph/local-memory.c"
-
-int main() {
-  local_memory_init(2);
-  int* data_a = malloc(12 * sizeof(int));
-  if(!data_a) goto exit;  // have to free nothing
-  local_memory_add(data_a);
-  // more code ...
-  char* data_b = malloc(20 * sizeof(char));
-  if(!data_b) goto exit;  // have to free "data_a"
-  local_memory_add(data_b);
-  // ...
-  if (is_error) goto exit;  // have to free "data_a" and "data_b"
-  // ...
-exit:
-  local_memory_free();
-  return(0);
-}
-```
-
-defines two hidden local variables: an array for addresses and the next index
 
 # status
 helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes.
@@ -81,6 +56,32 @@ status_set_both(group_id, status_id)
 status_set_both_goto(group_id, status_id)
 status_is_success
 ```
+
+# local-memory
+track memory allocations on the stack and free all allocations up to point easily
+
+```c
+#include "sph/local-memory.c"
+
+int main() {
+  local_memory_init(2);
+  int* data_a = malloc(12 * sizeof(int));
+  if(!data_a) goto exit;  // have to free nothing
+  local_memory_add(data_a);
+  // more code ...
+  char* data_b = malloc(20 * sizeof(char));
+  if(!data_b) goto exit;  // have to free "data_a"
+  local_memory_add(data_b);
+  // ...
+  if (is_error) goto exit;  // have to free "data_a" and "data_b"
+  // ...
+exit:
+  local_memory_free();
+  return(0);
+}
+```
+
+defines two hidden local variables: an array for addresses and the next index
 
 # imht-set
 a data structure for storing a set of integers.
@@ -169,7 +170,7 @@ this can be changed in this definition, and a lower set size factor approaching 
 the downside is that the insert/delete/search performance is more likely to approach and reach o(n).
 
 ### zero support
-by default, the integer 0 is a valid value for a set. but as an optimisation, this can be disabled by defining a macro for "imht_set_can_contain_zero" with the value zero.
+by default, the integer 0 is a valid value for a set. but as an optimisation, this can be disabled by defining the macro variable for "imht_set_can_contain_zero" with the value zero before inclusion.
 
 ```c
 #define imht_set_can_contain_zero 0
@@ -181,8 +182,26 @@ with this definition, a zero in sets can not be found, but the set routines shou
 the "imht_set_t" type is a structure with the two fields "size" and "content". "content" is a one-dimensional array that stores values at indices determined by a hash function.
 the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can be implemented by adding new "add" and "remove" routines and rewriting the content data.
 
+# i-array
+a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list.
+most bindings are generic macros that will work on all i-array types. i_array_add and i_array_forward go from left to right.
+
+## dependencies
+* the c standard library (stdlib.h)
+
+## usage example
+```c
+// arguments: custom_name, element_type
+i_array_declare_type(my_type, int);
+i_array_allocate_my_type(a, 4);
+i_array_add(a, 1);
+i_array_add(a, 2);
+while(i_array_in_range(a)) { i_array_get(a); }
+i_array_free(a);
+```
+
 # mi-list
-a minimal, generically usable linked list with custom element types.
+a basic linked list with custom element types.
 
 ## dependencies
 * the c standard library (stdlib.h and inttypes.h)
@@ -228,7 +247,7 @@ mi_list_rest
 ```
 
 ## type
-the type for mi-lists is defined as follows. this information would be useful for defining new list primitives.
+the mi-list type is defined by mi-list.c automatically on inclusion as follows
 
 ```c
 typedef struct mi_list_name_prefix##_struct {
