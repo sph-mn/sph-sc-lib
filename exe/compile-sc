@@ -14,7 +14,7 @@
         (let
           (b (string-append target (string-drop-suffix ".sc" (string-drop-prefix source a)) ".c"))
           (and (ensure-directory-structure (dirname b)) (execute* "echo" "sc" a b)
-            (execute* "sc" a b) (execute* "clang-format" "-i" b))))
+            (execute* "sc" a b) (execute* "exe/format-c" "-i" b))))
       paths)))
 
 (setenv "SC_LOAD_PATH" (string-append (getcwd) "/source/sc"))
