@@ -1,5 +1,6 @@
 #include <float.h>
 #include <math.h>
+#include <sph/types.c>
 #define define_float_sum(prefix, type) \
   type prefix##_sum(type* numbers, size_t len) { \
     type temp; \

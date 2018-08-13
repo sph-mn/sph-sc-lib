@@ -4,7 +4,7 @@
     "register memory in a local variable to free all memory allocated at point"
     (declare
       sph-local-memory-register (array void* (register-size))
-      sph-local-memory-index ui8)
+      sph-local-memory-index uint8-t)
     (set sph-local-memory-index 0))
   (local-memory-add address)
   (begin

@@ -104,7 +104,7 @@
   ; if no prime has been found, use size-factor times size made odd as a best guess
   (return (bit-or 1 min-size)))
 
-(define (imht-set-create min-size result) (uint8_t size-t imht-set-t**)
+(define (imht-set-create min-size result) (uint8-t size-t imht-set-t**)
   ; returns 1 on success or 0 if the memory allocation failed
   (set *result (malloc (sizeof imht-set-t)))
   (if (not *result) (return #f))
