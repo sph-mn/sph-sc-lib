@@ -3,23 +3,23 @@
 
 (pre-define
   test-element-count 10000000
-  (get-time) (convert-type (time 0) uint64_t)
+  (get-time) (convert-type (time 0) uint64-t)
   (print-time a) (printf "%u\n" a))
 
-(define (test-zero set) (uint8_t imht-set-t*)
+(define (test-zero set) (uint8-t imht-set-t*)
   (assert (= 0 (imht-set-find set 0)))
   (imht-set-add set 0)
   (assert (not (= 0 (imht-set-find set 0))))
   (imht-set-remove set 0)
   (assert (= 0 (imht-set-find set 0))))
 
-(define (insert-values set) (uint8_t imht-set-t*)
+(define (insert-values set) (uint8-t imht-set-t*)
   (define counter size-t test-element-count)
   (while counter
     (imht-set-add set counter)
     (set counter (- counter 1))))
 
-(define (test-value-existence set) (uint8_t imht-set-t*)
+(define (test-value-existence set) (uint8-t imht-set-t*)
   (define counter size-t test-element-count)
   (while counter
     (assert (not (= 0 (imht-set-find set counter))))

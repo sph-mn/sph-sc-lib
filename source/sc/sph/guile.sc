@@ -1,6 +1,6 @@
 (pre-define
-  scm-first SCM_CAR
-  scm-tail SCM_CDR
+  scm-first SCM-CAR
+  scm-tail SCM-CDR
   scm-c-define-procedure-c-init (declare scm-c-define-procedure-c-temp SCM)
   (scm-is-undefined a) (= SCM-UNDEFINED a)
   (scm-c-define-procedure-c name required optional rest c-function documentation)

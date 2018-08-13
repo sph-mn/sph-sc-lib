@@ -9,7 +9,7 @@
     (set counter (- counter 1)))
   (mi-list-64-add a counter))
 
-(define (test-value-existence a) (uint8_t mi-list-64-t*)
+(define (test-value-existence a) (uint8-t mi-list-64-t*)
   (define counter size-t 0)
   (while (<= counter test-element-count)
     (assert (= counter (mi-list-first a)))
@@ -22,7 +22,7 @@
     (printf "%lu\n" (mi-list-first a))
     (set a (mi-list-rest a))))
 
-(pre-define (get-time) (convert-type (time 0) uint64_t))
+(pre-define (get-time) (convert-type (time 0) uint64-t))
 (pre-define (print-time a) (printf "%u\n" a))
 
 (define (main) int

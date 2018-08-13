@@ -5,7 +5,7 @@
 
 (pre-include "stdlib.h" "inttypes.h")
 (pre-if-not-defined mi-list-name-prefix (pre-define mi-list-name-prefix mi-list-64))
-(pre-if-not-defined mi-list-element-t (pre-define mi-list-element-t uint64_t))
+(pre-if-not-defined mi-list-element-t (pre-define mi-list-element-t uint64-t))
 
 (sc-comment
   "there does not seem to be a simpler way for identifier concatenation in c in this case")

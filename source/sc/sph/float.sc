@@ -42,8 +42,8 @@
     (begin
       (define diff f64 (fabs (- a b)))
       (return
-        (if* (or (= 0 a) (= 0 b) (< diff DBL_MIN)) (< diff (* margin DBL_MIN))
-          (< (/ diff (fmin (+ (fabs a) (fabs b)) DBL_MAX)) margin))))))
+        (if* (or (= 0 a) (= 0 b) (< diff DBL-MIN)) (< diff (* margin DBL-MIN))
+          (< (/ diff (fmin (+ (fabs a) (fabs b)) DBL-MAX)) margin))))))
 
 (define (f32-nearly-equal? a b margin) (uint8-t f32 f32 f32)
   "approximate float comparison. margin is a factor and is low for low accepted differences.
@@ -52,8 +52,8 @@
     (begin
       (define diff f32 (fabs (- a b)))
       (return
-        (if* (or (= 0 a) (= 0 b) (< diff FLT_MIN)) (< diff (* margin FLT_MIN))
-          (< (/ diff (fmin (+ (fabs a) (fabs b)) FLT_MAX)) margin))))))
+        (if* (or (= 0 a) (= 0 b) (< diff FLT-MIN)) (< diff (* margin FLT-MIN))
+          (< (/ diff (fmin (+ (fabs a) (fabs b)) FLT-MAX)) margin))))))
 
 (define-float-array-nearly-equal? f32 f32)
 (define-float-array-nearly-equal? f64 f64)
