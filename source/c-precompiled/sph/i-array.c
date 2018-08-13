@@ -19,7 +19,7 @@
     element_type* end; \
     element_type* start; \
   } name; \
-  boolean i_array_allocate_##name(name* a, size_t length) { \
+  uint8_t i_array_allocate_##name(name* a, size_t length) { \
     element_type* start; \
     start = malloc((length * sizeof(element_type))); \
     if (!start) { \

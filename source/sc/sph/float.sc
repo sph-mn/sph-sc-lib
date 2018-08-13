@@ -24,7 +24,7 @@
 
 (pre-define (define-float-array-nearly-equal? prefix type)
   (define ((pre-concat prefix _array-nearly-equal?) a a-len b b-len error-margin)
-    (boolean type* size-t type* size-t type)
+    (uint8-t type* size-t type* size-t type)
     (define index size-t 0)
     (if (not (= a-len b-len)) (return #f))
     (while (< index a-len)
@@ -35,7 +35,7 @@
       (set index (+ 1 index)))
     (return #t)))
 
-(define (f64-nearly-equal? a b margin) (boolean f64 f64 f64)
+(define (f64-nearly-equal? a b margin) (uint8-t f64 f64 f64)
   "approximate float comparison. margin is a factor and is low for low accepted differences.
    http://floating-point-gui.de/errors/comparison/"
   (if (= a b) (return #t)
@@ -45,7 +45,7 @@
         (if* (or (= 0 a) (= 0 b) (< diff DBL_MIN)) (< diff (* margin DBL_MIN))
           (< (/ diff (fmin (+ (fabs a) (fabs b)) DBL_MAX)) margin))))))
 
-(define (f32-nearly-equal? a b margin) (boolean f32 f32 f32)
+(define (f32-nearly-equal? a b margin) (uint8-t f32 f32 f32)
   "approximate float comparison. margin is a factor and is low for low accepted differences.
    http://floating-point-gui.de/errors/comparison/"
   (if (= a b) (return #t)

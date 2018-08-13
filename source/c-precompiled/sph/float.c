@@ -18,7 +18,7 @@
     return ((correction + result)); \
   }
 #define define_float_array_nearly_equal_p(prefix, type) \
-  boolean prefix##_array_nearly_equal_p(type* a, size_t a_len, type* b, size_t b_len, type error_margin) { \
+  uint8_t prefix##_array_nearly_equal_p(type* a, size_t a_len, type* b, size_t b_len, type error_margin) { \
     size_t index = 0; \
     if (!(a_len == b_len)) { \
       return (0); \
@@ -33,7 +33,7 @@
   }
 /** approximate float comparison. margin is a factor and is low for low accepted differences.
    http://floating-point-gui.de/errors/comparison/ */
-boolean f64_nearly_equal_p(f64 a, f64 b, f64 margin) {
+uint8_t f64_nearly_equal_p(f64 a, f64 b, f64 margin) {
   if (a == b) {
     return (1);
   } else {
@@ -43,7 +43,7 @@ boolean f64_nearly_equal_p(f64 a, f64 b, f64 margin) {
 };
 /** approximate float comparison. margin is a factor and is low for low accepted differences.
    http://floating-point-gui.de/errors/comparison/ */
-boolean f32_nearly_equal_p(f32 a, f32 b, f32 margin) {
+uint8_t f32_nearly_equal_p(f32 a, f32 b, f32 margin) {
   if (a == b) {
     return (1);
   } else {

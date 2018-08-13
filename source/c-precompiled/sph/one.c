@@ -51,12 +51,12 @@ uint8_t* dirname_2(uint8_t* a) {
   return (dirname(path_copy));
 };
 /** return 1 if the path exists or has been successfully created */
-boolean ensure_directory_structure(uint8_t* path, mode_t mkdir_mode) {
+uint8_t ensure_directory_structure(uint8_t* path, mode_t mkdir_mode) {
   if (file_exists_p(path)) {
     return (1);
   } else {
     uint8_t* path_dirname = dirname_2(path);
-    boolean status = ensure_directory_structure(path_dirname, mkdir_mode);
+    uint8_t status = ensure_directory_structure(path_dirname, mkdir_mode);
     free(path_dirname);
     return ((status && ((EEXIST == errno) || (0 == mkdir(path, mkdir_mode)))));
   };

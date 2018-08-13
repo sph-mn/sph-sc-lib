@@ -25,7 +25,7 @@
           (unused element-type*)
           (end element-type*)
           (start element-type*))))
-    (define ((pre-concat i-array-allocate- name) a length) (boolean name* size-t)
+    (define ((pre-concat i-array-allocate- name) a length) (uint8-t name* size-t)
       (declare start element-type*)
       (set start (malloc (* length (sizeof element-type))))
       (if (not start) (return 0))
