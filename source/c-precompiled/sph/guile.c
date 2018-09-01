@@ -7,7 +7,7 @@
     scm-c-define-procedure-c-init must have been called in scope */
 #define scm_c_define_procedure_c(name, required, optional, rest, c_function, documentation) \
   scm_c_define_procedure_c_temp = scm_c_define_gsubr(name, required, optional, rest, c_function); \
-  scm_set_procedure_property_x(scm_c_define_procedure_c_temp, scm_from_locale_symbol("documentation"), scm_from_locale_string(documentation))
+  scm_set_procedure_property_x(scm_c_define_procedure_c_temp, (scm_from_locale_symbol("documentation")), (scm_from_locale_string(documentation)))
 /** SCM SCM c-compound-expression ->
     iterate over scm-list in c */
 #define scm_c_list_each(list, e, body) \
@@ -18,12 +18,12 @@
   }
 /** display value with scheme write and add a newline */
 void scm_debug_log(SCM value) {
-  scm_call_2(scm_variable_ref(scm_c_lookup("write")), value, scm_current_output_port());
-  scm_newline(scm_current_output_port());
+  scm_call_2((scm_variable_ref((scm_c_lookup("write")))), value, (scm_current_output_port()));
+  scm_newline((scm_current_output_port()));
 };
 /** creates a new bytevector of size-octects that contains the given bytevector */
 SCM scm_c_bytevector_take(size_t size_octets, uint8_t* a) {
   SCM r = scm_c_make_bytevector(size_octets);
-  memcpy(SCM_BYTEVECTOR_CONTENTS(r), a, size_octets);
+  memcpy((SCM_BYTEVECTOR_CONTENTS(r)), a, size_octets);
   return (r);
 };

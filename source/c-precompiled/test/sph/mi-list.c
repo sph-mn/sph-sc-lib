@@ -30,6 +30,7 @@ typedef struct mi_list_struct_name {
 #define mi_list_first_address(a) &(a->data)
 #define mi_list_rest(a) a->link
 #endif
+/** removes and deallocates the first element */
 mi_list_t* mi_list_name(drop)(mi_list_t* a) {
   mi_list_t* a_next = mi_list_rest(a);
   free(a);
@@ -45,7 +46,7 @@ void mi_list_name(destroy)(mi_list_t* a) {
   };
 };
 mi_list_t* mi_list_name(add)(mi_list_t* a, mi_list_element_t value) {
-  mi_list_t* element = calloc(1, sizeof(mi_list_t));
+  mi_list_t* element = calloc(1, (sizeof(mi_list_t)));
   if (!element) {
     return (0);
   };
@@ -65,7 +66,6 @@ size_t mi_list_name(length)(mi_list_t* a) {
 #undef mi_list_element_t
 #undef mi_list_struct_name
 #undef mi_list_t
-;
 #define test_element_count 100
 mi_list_64_t* insert_values(mi_list_64_t* a) {
   size_t counter = test_element_count;
@@ -86,7 +86,7 @@ uint8_t test_value_existence(mi_list_64_t* a) {
 void print_contents(mi_list_64_t* a) {
   printf("print-contents\n");
   while (a) {
-    printf("%lu\n", mi_list_first(a));
+    printf("%lu\n", (mi_list_first(a)));
     a = mi_list_rest(a);
   };
 };

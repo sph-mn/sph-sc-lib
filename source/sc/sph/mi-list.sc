@@ -38,6 +38,7 @@
     (pre-define (mi-list-rest a) a:link)))
 
 (define ((mi-list-name drop) a) (mi-list-t* mi-list-t*)
+  "removes and deallocates the first element"
   (define a-next mi-list-t* (mi-list-rest a))
   (free a)
   (return a-next))
