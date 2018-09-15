@@ -1,7 +1,9 @@
+/* working but deprecated. use the more generic memreg.sc
+local-memory registers memory in a local variable to free all memory allocated at point */
 /** register memory in a local variable to free all memory allocated at point */
 #define local_memory_init(register_size) \
   void* sph_local_memory_register[register_size]; \
-  uint8_t sph_local_memory_index; \
+  unsigned int sph_local_memory_index; \
   sph_local_memory_index = 0
 /** do not try to add more entries than specified by register-size or a buffer overflow occurs */
 #define local_memory_add(address) \

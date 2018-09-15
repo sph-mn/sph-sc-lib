@@ -57,31 +57,38 @@ status_set_both_goto(group_id, status_id)
 status_is_success
 ```
 
-# local-memory
+# memreg
 track memory allocations on the stack and free all allocations up to point easily
 
 ```c
-#include "sph/local-memory.c"
+#include "sph/memreg.c"
 
 int main() {
-  local_memory_init(2);
+  memreg_init(2);
   int* data_a = malloc(12 * sizeof(int));
   if(!data_a) goto exit;  // have to free nothing
-  local_memory_add(data_a);
+  memreg_add(data_a);
   // more code ...
   char* data_b = malloc(20 * sizeof(char));
   if(!data_b) goto exit;  // have to free "data_a"
-  local_memory_add(data_b);
+  memreg_add(data_b);
   // ...
   if (is_error) goto exit;  // have to free "data_a" and "data_b"
   // ...
 exit:
-  local_memory_free();
+  memreg_free();
   return(0);
 }
 ```
 
-defines two hidden local variables: an array for addresses and the next index
+uses two hidden local variables: an array for addresses and one for the next index.
+
+memreg.c also contains *_named variants that support multiple concurrent registers identified by name
+```c
+memreg_init_named(testname, 4);
+memreg_add_named(testname, &variable);
+memreg_free_named(testname);
+```c
 
 # imht-set
 a data structure for storing a set of integers.
