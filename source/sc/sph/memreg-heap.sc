@@ -14,6 +14,10 @@
 (pre-define
   memreg-heap-add i-array-add
   memreg-heap-free-register i-array-free
+  (memreg-heap-declare variable-name)
+  (begin
+    "makes sure that values are null and free succeeds even if not allocated yet"
+    (i-array-declare variable-name memreg-register-t))
   (memreg-heap-allocate register-size register-address)
   (begin
     "true on success, false on failure (failed memory allocation)"

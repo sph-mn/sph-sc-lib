@@ -109,7 +109,7 @@ memreg_free_named(testname);
 ``sph/memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables for example
 
 ```c
-memreg_register_t allocations;
+memreg_heap_declare(allocations);
 if(memreg_heap_allocate(4, allocations)) {
   // allocation error
 }
