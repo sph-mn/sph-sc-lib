@@ -22,7 +22,7 @@
   (begin
     "free only the registered memory"
     (while (i-array-in-range register)
-      (free (i-array-get memreg-register))))
+      (free (i-array-get register))))
   (memreg-heap-free register)
   (begin
     "free all currently registered pointers and the register array"
