@@ -110,9 +110,8 @@ memreg_free_named(testname);
 
 ```c
 memreg_register_t allocations;
-if(!memreg_heap_allocate(4, allocations)) {
-  // allocation error.
-  return(1);
+if(memreg_heap_allocate(4, allocations)) {
+  // allocation error
 }
 memreg_heap_add(allocations, &variable-1);
 memreg_heap_add(allocations, &variable-2);
