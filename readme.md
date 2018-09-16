@@ -1,13 +1,13 @@
 # sph-sc-lib
 
 various utility c libraries.
-c versions are in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then compiled to normal, readable c.
+c versions are in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then compiled to normal, readable c
 
 # included libraries
 * status: return-status and error handling with a tiny status object with status id and source library id
-* local-memory: manage heap memory in function scope
-* imht-set: a minimal, macro-based fixed size hash-table data structure for sets of integers
 * i-array: a fixed size array with variable length content that makes iteration easier to code
+* imht-set: a minimal, macro-based fixed size hash-table data structure for sets of integers
+* memreg: track heap memory allocations in function scope
 * mi-list: a minimal, macro-based linked list
 * one: various helpers. experimental
 * guile: helpers for working with guile. experimental
@@ -16,14 +16,24 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 code is under gpl3+, documentation under cc-by-nc.
 
 # status
-helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes.
+helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes
+
+status_t is defined as follows
+```c
+typedef struct {
+  int id;
+  uint8_t* group;
+} status_t;
+```
+
+group is a string, otherwise it would be more difficult to not conflict with groups used by other libraries
 
 ## usage example
 ```c
 status_t test() {
   status_declare;
   if (1 < 2) {
-    int group_id = 123;
+    int group_id = "test";
     int error_id = 456;
     status_set_both_goto(group_id, error_id);
   }
@@ -40,6 +50,8 @@ exit:
   return status.id;
 }
 ```
+
+``status_require`` goes directly to exit if the returned ``status_t`` from ``test()`` isnt ``status_id_success``
 
 ## bindings
 ```
@@ -58,7 +70,7 @@ status_is_success
 ```
 
 # memreg
-track memory allocations on the stack and free all allocations up to point easily
+track memory allocations locally on the stack and free all allocations up to point easily
 
 ```c
 #include "sph/memreg.c"
@@ -76,19 +88,35 @@ int main() {
   if (is_error) goto exit;  // have to free "data_a" and "data_b"
   // ...
 exit:
-  memreg_free();
+  memreg_free;
   return(0);
 }
 ```
 
-uses two hidden local variables: an array for addresses and one for the next index.
+uses two hidden local variables: memreg_register, an array for addresses, and memreg_index, the next index.
 
-memreg.c also contains *_named variants that support multiple concurrent registers identified by name
+## memreg_named
+``sph/memreg.c`` also contains a *_named variant that supports multiple concurrent registers identified by name
+
 ```c
 memreg_init_named(testname, 4);
 memreg_add_named(testname, &variable);
 memreg_free_named(testname);
+```
+
+## memreg_heap
+``sph/memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions.
+
 ```c
+memreg_register_t allocations;
+if(!memreg_heap_allocate(4, allocations)) {
+  // allocation error.
+  return(1);
+}
+memreg_heap_add(allocations, &variable-1);
+memreg_heap_add(allocations, &variable-2);
+memreg_heap_free(allocations);
+```
 
 # imht-set
 a data structure for storing a set of integers.
@@ -191,7 +219,7 @@ the set routines automatically adapt should the values for size and content chan
 
 # i-array
 a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list.
-most bindings are generic macros that will work on all i-array types. i_array_add and i_array_forward go from left to right.
+most bindings are generic macros that will work on all i-array types. i_array_add and i_array_forward go from left to right
 
 ## dependencies
 * the c standard library (stdlib.h)
@@ -254,7 +282,7 @@ mi_list_rest
 ```
 
 ## type
-the mi-list type is defined by mi-list.c automatically on inclusion as follows
+the mi-list type is defined by mi-list.c on inclusion as follows
 
 ```c
 typedef struct mi_list_name_prefix##_struct {
