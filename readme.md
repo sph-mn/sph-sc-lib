@@ -93,7 +93,8 @@ exit:
 }
 ```
 
-uses two hidden local variables: memreg_register, an array for addresses, and memreg_index, the next index.
+introduces two local variables: memreg_register, an array for addresses, and memreg_index, the next index.
+memreg_init size must be a static value
 
 ## memreg_named
 ``sph/memreg.c`` also contains a *_named variant that supports multiple concurrent registers identified by name
@@ -105,7 +106,7 @@ memreg_free_named(testname);
 ```
 
 ## memreg_heap
-``sph/memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions.
+``sph/memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables for example
 
 ```c
 memreg_register_t allocations;
@@ -228,11 +229,39 @@ most bindings are generic macros that will work on all i-array types. i_array_ad
 ```c
 // arguments: custom_name, element_type
 i_array_declare_type(my_type, int);
-i_array_allocate_my_type(a, 4);
+my_type a;
+if(i_array_allocate_my_type(4, &a)) {
+  // memory allocation error
+}
 i_array_add(a, 1);
 i_array_add(a, 2);
 while(i_array_in_range(a)) { i_array_get(a); }
 i_array_free(a);
+```
+
+## bindings
+### macros
+```c
+i_array_add(a, value)
+i_array_clear(a)
+i_array_declare(a, type)
+i_array_declare_type(name, element_type)
+i_array_forward(a)
+i_array_free(a)
+i_array_get(a)
+i_array_get_at(a, index)
+i_array_in_range(a)
+i_array_length(a)
+i_array_max_length(a)
+i_array_remove(a)
+i_array_rewind(a)
+i_array_set_null(a)
+```
+
+### routines
+```c
+i_array_allocate_custom_##name(length, allocator, result)
+i_array_allocate_##name(length, result)
 ```
 
 # mi-list
