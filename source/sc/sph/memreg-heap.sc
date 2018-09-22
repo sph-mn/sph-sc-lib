@@ -4,7 +4,7 @@
   that can be passed between functions"
   "usage:
      memreg_register_t allocations;
-     if(!memreg_heap_allocate(4, allocations)) { return(1); }
+     if(!memreg_heap_allocate(4, &allocations)) { return(1); }
      memreg_heap_add(allocations, &variable-1);
      memreg_heap_add(allocations, &variable-2);
      memreg_heap_free(allocations);")
@@ -22,13 +22,15 @@
   (begin
     "true on success, false on failure (failed memory allocation)"
     (i-array-allocate-memreg-register-t register-size register-address))
-  (memreg-heap-free-pointers register)
+  (memreg-heap-free-pointers reg)
   (begin
     "free only the registered memory"
-    (while (i-array-in-range register)
-      (free (i-array-get register))))
-  (memreg-heap-free register)
+    (while (i-array-in-range reg)
+      (free (i-array-get reg))
+      (i-array-forward reg)))
+  (memreg-heap-free reg)
   (begin
-    "free all currently registered pointers and the register array"
-    (memreg-heap-free-pointers register)
-    (memreg-heap-free-register register)))
+    "memreg-register-t -> unspecified
+    free all currently registered pointers and the register array"
+    (memreg-heap-free-pointers reg)
+    (memreg-heap-free-register reg)))
