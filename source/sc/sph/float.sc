@@ -1,4 +1,5 @@
-(pre-include "float.h" "math.h" "sph/types.c")
+(sc-comment "depends on sph/types.c")
+(pre-include "float.h" "math.h")
 
 (pre-define (define-float-sum prefix type)
   (define ((pre-concat prefix _sum) numbers len) (type type* size-t)
