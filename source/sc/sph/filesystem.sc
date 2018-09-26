@@ -1,4 +1,5 @@
-(pre-include "unistd.h" "sys/stat.h" "libgen.h" "errno.h")
+(sc-comment "depends on sph/string.c")
+(pre-include "unistd.h" "sys/stat.h" "sys/types.h" "libgen.h" "errno.h")
 (pre-define (file-exists? path) (not (= (access path F-OK) -1)))
 
 (define (dirname-2 a) (uint8-t* uint8-t*)
