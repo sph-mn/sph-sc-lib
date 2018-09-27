@@ -1,5 +1,7 @@
+/* depends on sph/string.c */
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <libgen.h>
 #include <errno.h>
 #define file_exists_p(path) !(access(path, F_OK) == -1)
