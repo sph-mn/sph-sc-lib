@@ -38,7 +38,6 @@
 (define (thread-pool-worker a) (void thread-pool-t*)
   (declare task thread-pool-task-t*)
   "internal worker routine"
-  (declare task-result boolean)
   (label get-task
     (pthread-mutex-lock &a:queue-mutex)
     (label wait
@@ -49,10 +48,7 @@
           (goto wait))
         (set task (queue-get (queue-deq &a:queue) thread-pool-task-t q))))
     (pthread-mutex-unlock &a:queue-mutex)
-    (set
-      task-result (task:f task) task)
-    (set task)
-    (if task-result (goto get-task)
+    (if (task:f task) (goto get-task)
       (pthread-exit 0))))
 
 (define (thread-pool-new size a) (int thread-pool-size-t thread-pool-t*)
@@ -79,11 +75,10 @@
     (pthread-attr-destroy &attr)
     (return rc)))
 
-(define (thread-finish) (boolean) (return #f))
+(define (thread-finish) boolean (return #f))
 
 (define (thread-pool-finish a wait) (void thread-pool-t* boolean)
-  "(thread ...) -> (thread-exit-value ...)
-  let threads complete all currently enqueued tasks and exit.
+  "let threads complete all currently enqueued tasks and exit.
   returns the first pthread-join error code if an error occurred"
   status-declare
   (declare
@@ -94,10 +89,10 @@
   (set
     size a:size
     task.f thread-finish)
-  (for ((set i 0) (< size) (set (+ 1 i)))
+  (for ((set i 0) (< i size) (set i (+ 1 i)))
     (thread-pool-enqueue a task))
   (if wait
-    (for ((set i 0) (< size) (set (+ 1 i)))
+    (for ((set i 0) (< i size) (set i (+ 1 i)))
       (pthread-join (+ i a.threads) &exit-value))))
 
 (define (thread-pool-destroy a) (void thread-pool-t*)

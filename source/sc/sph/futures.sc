@@ -34,14 +34,14 @@
   (if (not a) (return 1))
   (set
     a:finished #f
-    a:result #f
+    a:output #f
     a:task.f future-eval
     a:task.data a)
   (thread-pool-enqueue sph-futures-pool &a.task))
 
-(define (touch a) (future-t*)
+(define (touch a) (void* future-t*)
   (label loop
-    (if a:finished (return a:result)
+    (if a:finished (return a:output)
       (begin
         (usleep 500000)
         (goto loop)))))
