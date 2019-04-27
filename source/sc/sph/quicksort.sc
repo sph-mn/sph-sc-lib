@@ -1,3 +1,6 @@
+(sc-comment
+  "quicksort implementation based on the public domain implementation from http://alienryderflex.com/quicksort/")
+
 (pre-define
   quicksort-t int
   quicksort-count-t int

@@ -1,5 +1,5 @@
 (sc-comment
-  "a fifo queue with the operations enqueue, dequeue and is-empty with custom element types.
+  "a fifo queue with the operations enqueue, dequeue and is-empty that can enqueue any struct type and even a mix of types.
   # example usage
   typedef struct {
     // custom field definitions ...
@@ -12,10 +12,13 @@
   queue_get(queue_deq(&q), element_t, queue_node);")
 
 (pre-include "stdlib.h" "inttypes.h")
-(pre-define queue-size-t uint32-t)
 
-(pre-define (queue-get node type field)
-  (convert-type (- (convert-type node char*) (offsetof type field)) type*))
+(pre-define
+  queue-size-t uint32-t
+  (queue-get node type field)
+  (begin
+    "returns a pointer to the enqueued struct"
+    (convert-type (- (convert-type node char*) (offsetof type field)) type*)))
 
 (declare
   queue-node-t struct
@@ -33,7 +36,7 @@
       (last queue-node-t*))))
 
 (define (queue-init a) (void queue-t*)
-  "initialise or clear a queue"
+  "initialise a queue or remove all elements"
   (set
     a:first 0
     a:last 0
