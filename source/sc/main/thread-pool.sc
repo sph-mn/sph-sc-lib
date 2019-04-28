@@ -48,9 +48,12 @@
   (pthread-cond-signal &a:queue-not-empty)
   (pthread-mutex-unlock &a:queue-mutex))
 
-(define (thread-pool-finish a) (int thread-pool-t*)
+(define (thread-pool-finish a no-wait discard-queue) (int thread-pool-t* uint8-t uint8-t)
   "let threads complete all currently enqueued tasks and exit.
-  returns the first pthread-join error code if an error occurred"
+  if no_wait is true then the call is non-blocking and threads might still be running until they finish the queue after this call.
+  thread_pool_finish can be called again without no_wait.
+  if discard_queue is true then the current queue is emptied, but note
+  that if enqueued tasks free their task object these tasks wont get called anymore"
   status-declare
   (declare
     exit-value void*
@@ -58,14 +61,20 @@
     i thread-pool-size-t
     size thread-pool-size-t
     task thread-pool-task-t*)
+  (if discard-queue
+    (begin
+      (pthread-mutex-lock &a:queue-mutex)
+      (queue-init &a:queue)
+      (pthread-mutex-unlock &a:queue-mutex)))
   (set size a:size)
   (for ((set i 0) (< i size) (set i (+ 1 i)))
     (set task (malloc (sizeof thread-pool-task-t)))
     (if (not task) (return 1))
     (set task:f thread-finish)
     (thread-pool-enqueue a task))
-  (for ((set i 0) (< i size) (set i (+ 1 i)))
-    (pthread-join (array-get a:threads i) &exit-value))
+  (if (not no-wait)
+    (for ((set i 0) (< i size) (set i (+ 1 i)))
+      (if (= 0 (pthread-join (array-get a:threads i) &exit-value)) (set a:size (- a:size 1)))))
   (return 0))
 
 (define (thread-pool-worker a) (void* thread-pool-t*)
@@ -106,7 +115,7 @@
           (begin
             (sc-comment "try to finish previously created threads")
             (set a:size i)
-            (thread-pool-finish a)))
+            (thread-pool-finish a #t 0)))
         (goto exit))))
   (set a:size size)
   (label exit

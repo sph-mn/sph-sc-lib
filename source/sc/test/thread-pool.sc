@@ -7,7 +7,7 @@
     task thread-pool-task-t
     i size-t)
   (test-helper-assert "thread-pool new" (not (thread-pool-new 10 &pool)))
-  (test-helper-assert "thread-pool finish" (not (thread-pool-finish &pool)))
+  (test-helper-assert "thread-pool finish" (not (thread-pool-finish &pool 0 0)))
   (label exit
     (return status)))
 

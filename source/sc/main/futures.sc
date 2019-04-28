@@ -5,9 +5,9 @@
 
 (sc-comment "for usleep")
 (pre-include "unistd.h")
+(define sph-futures-pool-is-initialised uint8-t #f)
 
 (declare
-  sph-futures-pool-is-initialised uint8-t
   sph-futures-pool thread-pool-t
   future-f-t (type (function-pointer void* void*))
   future-t
@@ -19,11 +19,15 @@
 
 (define (future-init thread-count) (int thread-pool-size-t)
   "call once to initialise the future thread pool that persists for
-  the whole process or until future-deinit is called"
+  the whole process or until future-deinit is called.
+  can be called multiple times and just returns if the thread pool already exists.
+  returns zero on success"
   (declare status int)
-  (set status (thread-pool-new thread-count &sph-futures-pool))
-  (if (not status) (set sph-futures-pool-is-initialised #t))
-  (return status))
+  (if sph-futures-pool-is-initialised (return 0)
+    (begin
+      (set status (thread-pool-new thread-count &sph-futures-pool))
+      (if (= 0 status) (set sph-futures-pool-is-initialised #t))
+      (return status))))
 
 (define (future-eval task) (void thread-pool-task-t*)
   "internal future worker.
@@ -52,8 +56,9 @@
   (return a))
 
 (define (future-deinit) void
-  "can be called to stop and free the main thread-pool"
-  (thread-pool-finish &sph-futures-pool)
+  "can be called to stop and free the main thread-pool.
+  waits till all active futures are finished"
+  (thread-pool-finish &sph-futures-pool 0 0)
   (thread-pool-destroy &sph-futures-pool))
 
 (define (touch a) (void* future-t*)

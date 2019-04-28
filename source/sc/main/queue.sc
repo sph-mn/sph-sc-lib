@@ -18,7 +18,8 @@
   (queue-get node type field)
   (begin
     "returns a pointer to the enqueued struct based on the offset of the queue-node-t field in the struct.
-    because of this queue nodes dont have to be allocated separate from user data"
+    because of this queue nodes dont have to be allocated separate from user data.
+    downside is that the same user data object cant be contained multiple times"
     (convert-type (- (convert-type node char*) (offsetof type field)) type*)))
 
 (declare

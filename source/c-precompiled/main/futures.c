@@ -4,7 +4,7 @@ manages the memory of thread-pool task objects.
 thread-pool.c must be included beforehand */
 /* for usleep */
 #include <unistd.h>
-uint8_t sph_futures_pool_is_initialised;
+uint8_t sph_futures_pool_is_initialised = 0;
 thread_pool_t sph_futures_pool;
 typedef void* (*future_f_t)(void*);
 typedef struct {
@@ -13,14 +13,20 @@ typedef struct {
   future_f_t f;
 } future_t;
 /** call once to initialise the future thread pool that persists for
-  the whole process or until future-deinit is called */
+  the whole process or until future-deinit is called.
+  can be called multiple times and just returns if the thread pool already exists.
+  returns zero on success */
 int future_init(thread_pool_size_t thread_count) {
   int status;
-  status = thread_pool_new(thread_count, (&sph_futures_pool));
-  if (!status) {
-    sph_futures_pool_is_initialised = 1;
+  if (sph_futures_pool_is_initialised) {
+    return (0);
+  } else {
+    status = thread_pool_new(thread_count, (&sph_futures_pool));
+    if (0 == status) {
+      sph_futures_pool_is_initialised = 1;
+    };
+    return (status);
   };
-  return (status);
 };
 /** internal future worker.
   returns true to keep thread running.
@@ -48,9 +54,10 @@ future_t* future_new(future_f_t f, void* data) {
   thread_pool_enqueue((&sph_futures_pool), (&(a->task)));
   return (a);
 };
-/** can be called to stop and free the main thread-pool */
+/** can be called to stop and free the main thread-pool.
+  waits till all active futures are finished */
 void future_deinit() {
-  thread_pool_finish((&sph_futures_pool));
+  thread_pool_finish((&sph_futures_pool), 0, 0);
   thread_pool_destroy((&sph_futures_pool));
 };
 /** blocks until future is finished and returns its result */

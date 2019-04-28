@@ -14,7 +14,8 @@
 #include <stddef.h>
 #define queue_size_t uint32_t
 /** returns a pointer to the enqueued struct based on the offset of the queue-node-t field in the struct.
-    because of this queue nodes dont have to be allocated separate from user data */
+    because of this queue nodes dont have to be allocated separate from user data.
+    downside is that the same user data object cant be contained multiple times */
 #define queue_get(node, type, field) ((type*)((((char*)(node)) - offsetof(type, field))))
 struct queue_node_t;
 typedef struct queue_node_t {

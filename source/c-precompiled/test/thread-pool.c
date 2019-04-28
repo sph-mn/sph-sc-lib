@@ -9,7 +9,7 @@ status_t test_thread_pool() {
   thread_pool_task_t task;
   size_t i;
   test_helper_assert("thread-pool new", (!thread_pool_new(10, (&pool))));
-  test_helper_assert("thread-pool finish", (!thread_pool_finish((&pool))));
+  test_helper_assert("thread-pool finish", (!thread_pool_finish((&pool), 0, 0)));
 exit:
   return (status);
 };

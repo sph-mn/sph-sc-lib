@@ -37,14 +37,22 @@ void thread_pool_enqueue(thread_pool_t* a, thread_pool_task_t* task) {
   pthread_mutex_unlock((&(a->queue_mutex)));
 };
 /** let threads complete all currently enqueued tasks and exit.
-  returns the first pthread-join error code if an error occurred */
-int thread_pool_finish(thread_pool_t* a) {
+  if no_wait is true then the call is non-blocking and threads might still be running until they finish the queue after this call.
+  thread_pool_finish can be called again without no_wait.
+  if discard_queue is true then the current queue is emptied, but note
+  that if enqueued tasks free their task object these tasks wont get called anymore */
+int thread_pool_finish(thread_pool_t* a, uint8_t no_wait, uint8_t discard_queue) {
   status_declare;
   void* exit_value;
   int error;
   thread_pool_size_t i;
   thread_pool_size_t size;
   thread_pool_task_t* task;
+  if (discard_queue) {
+    pthread_mutex_lock((&(a->queue_mutex)));
+    queue_init((&(a->queue)));
+    pthread_mutex_unlock((&(a->queue_mutex)));
+  };
   size = a->size;
   for (i = 0; (i < size); i = (1 + i)) {
     task = malloc((sizeof(thread_pool_task_t)));
@@ -54,8 +62,12 @@ int thread_pool_finish(thread_pool_t* a) {
     task->f = thread_finish;
     thread_pool_enqueue(a, task);
   };
-  for (i = 0; (i < size); i = (1 + i)) {
-    pthread_join(((a->threads)[i]), (&exit_value));
+  if (!no_wait) {
+    for (i = 0; (i < size); i = (1 + i)) {
+      if (0 == pthread_join(((a->threads)[i]), (&exit_value))) {
+        a->size = (a->size - 1);
+      };
+    };
   };
   return (0);
 };
@@ -93,7 +105,7 @@ int thread_pool_new(thread_pool_size_t size, thread_pool_t* a) {
       if (0 < i) {
         /* try to finish previously created threads */
         a->size = i;
-        thread_pool_finish(a);
+        thread_pool_finish(a, 1, 0);
       };
       goto exit;
     };

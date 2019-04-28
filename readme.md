@@ -1,16 +1,20 @@
 # sph-sc-lib
 
 various utility c libraries.
-c versions are in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then compiled to normal, readable c
+c versions are in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then compiled to normal, readable c formatted with clang-format
 
 # included libraries
-* status: return-status and error handling with a tiny status object with status id and source library id
+* futures: fine-grained parallelism with objects that can be waited on for results
 * i-array: a fixed size array with variable length content that makes iteration easier to code
 * imht-set: a minimal, macro-based fixed size hash-table data structure for sets of integers
 * memreg: track heap memory allocations in function scope
 * mi-list: a minimal, macro-based linked list
-* one: various helpers. experimental
-* guile: helpers for working with guile. experimental
+* queue: a minimal queue for any data type
+* status: return-status and error handling with a tiny status object with status id and source library id
+* thread-pool: a pthread thread-pool that uses wait conditions to pause inactive threads
+* experimental
+  * one: miscellaneous helpers
+  * guile: a few helpers for working with guile
 
 # license
 code is under gpl3+, documentation under cc-by-nc.
@@ -317,4 +321,90 @@ typedef struct mi_list_name_prefix##_struct {
   struct mi_list_name_prefix##_struct *link;
   mi_list_element_t data;
 } mi_list_t;
+```
+
+# queue
+a fifo queue with the operations enqueue and dequeue that can enqueue any struct type and a mix of types.
+for elements what is needed is a struct with a queue_node_t field with a custom name. a queue_node_t object to be added must not already be in the queue.
+the queue does not need to allocate memory. depends on queue.c.
+
+
+## example usage
+```c
+typedef struct {
+  // custom field definitions ...
+  queue_node_t queue_node;
+} element_t;
+
+element_t e;
+queue_t q;
+queue_init(&q);
+queue_enq(&q, &e.queue_node);
+queue_get(queue_deq(&q), element_t, queue_node);
+if (0 = q.size) { printf("it's empty\n"); }
+```
+
+# thread-pool
+```c
+#include "queue.c"
+#include "thread-pool.c"
+
+void work(thread_pool_task_t* task) {
+  // ... do things in parallel ...
+  // task can be freed here
+  free(task);
+};
+
+int main () {
+  int error;
+  thread_pool_t pool;
+  thread_pool_task_t* task;
+  error = thread_pool_new(10, &pool);
+  if (error) return(error);
+  task = malloc(sizeof(thread_pool_task_t));
+  if (!task) return(1);
+  task->f = work;
+  thread_pool_enqueue(a, task);
+  // when the thread pool is not needed anymore all threads can be closed.
+  // arguments: thread_pool, no_wait, discard_queue
+  thread_pool_finish(&pool, 0, 0);
+}
+```
+
+# futures
+provides task objects with functions that are executed in a thread-pool.
+calling touch on an object waits for its completion and returns its result.
+depends on thread-pool.c.
+
+```c
+#include "queue.c"
+#include "thread-pool.c"
+#include "futures.c"
+
+void* future_work(void* data) {
+  // return value is a void pointer.
+  // just for example this returns a new object. data could be modified and the pointer returned
+  uint8_t* a;
+  a = malloc(sizeof(uint8_t));
+  *a = 2 + *(uint8_t*)(data);
+  return (a);
+};
+
+int main () {
+  future_t* future;
+  uint8_t data;
+  uint8_t* result;
+  data = 8;
+  // this must be called at least once somewhere before futures can be used
+  future_init(10);
+
+  // create a new future and get the result later
+  future = future_new(future_work, &data);
+  result = (uint8_t*)(touch(future));
+
+  // result is 10
+  free(result);
+  // this frees the thread-pool in case futures are not needed anymore in the process or before exit
+  future_deinit();
+}
 ```
