@@ -89,7 +89,7 @@ int main() {
   if(!data_b) goto exit;  // have to free "data_a"
   memreg_add(data_b);
   // ...
-  if (is_error) goto exit;  // have to free "data_a" and "data_b"
+  if(is_error) goto exit;  // have to free "data_a" and "data_b"
   // ...
 exit:
   memreg_free;
@@ -341,7 +341,7 @@ queue_t q;
 queue_init(&q);
 queue_enq(&q, &e.queue_node);
 queue_get(queue_deq(&q), element_t, queue_node);
-if (0 = q.size) { printf("it's empty\n"); }
+if(0 = q.size) { printf("it's empty\n"); }
 ```
 
 # thread-pool
@@ -360,9 +360,9 @@ int main () {
   thread_pool_t pool;
   thread_pool_task_t* task;
   error = thread_pool_new(10, &pool);
-  if (error) return error;
+  if(error) return error;
   task = malloc(sizeof(thread_pool_task_t));
-  if (!task) return 1;
+  if(!task) return 1;
   task->f = work;
   thread_pool_enqueue(a, task);
   // when the thread pool is not needed anymore then all threads can be closed.
@@ -399,8 +399,9 @@ int main () {
   // this must be called at least once somewhere before futures can be used
   future_init(10);
 
-  // create a new future and get the result later
+  // create a new future and get the result later with touch
   future = future_new(future_work, &data);
+  if(!future) return 1;
   result = (uint8_t*)(touch(future));
 
   // result is 10
