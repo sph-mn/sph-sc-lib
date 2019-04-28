@@ -1,5 +1,5 @@
-/* fine-grain parallelism based on sph/thread-pool.c.
-provides task objects with functions executed in a thread-pool that can be waited for to get a result value.
+/* fine-grain parallelism based on thread-pool.c.
+provides task objects with functions executed in threads that can be waited for to get a result value.
 manages the memory of thread-pool task objects.
 thread-pool.c must be included beforehand */
 /* for usleep */
@@ -29,7 +29,6 @@ int future_init(thread_pool_size_t thread_count) {
   };
 };
 /** internal future worker.
-  returns true to keep thread running.
   a->f returns because modifying data likely needs extra type conversions inside a->f.
   thread-pool does not have a finished field by default so that tasks can themselves free
   their object when they finish */

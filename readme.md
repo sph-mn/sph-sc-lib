@@ -10,6 +10,7 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 * memreg: track heap memory allocations in function scope
 * mi-list: a minimal, macro-based linked list
 * queue: a minimal queue for any data type
+* a generic quicksort implementation for arrays of any type
 * status: return-status and error handling with a tiny status object with status id and source library id
 * thread-pool: a task queue with pthread threads and wait conditions to pause inactive threads
 * experimental
@@ -355,7 +356,7 @@ void work(thread_pool_task_t* task) {
   free(task);
 };
 
-int main () {
+int main() {
   int error;
   thread_pool_t pool;
   thread_pool_task_t* task;
@@ -391,7 +392,7 @@ void* future_work(void* data) {
   return a;
 };
 
-int main () {
+int main() {
   future_t* future;
   uint8_t data;
   uint8_t* result;
@@ -410,4 +411,38 @@ int main () {
   future_deinit();
   return 0;
 }
+```
+
+# quicksort
+also works with arrays of structs and any other array type.
+
+```c
+quicksort(uint8_t (*less_p)(void*, void*), void (*swap)(void*, void*), uint8_t element_size, void* array, size_t array_len);
+```
+
+```c
+uint8_t uint32_less_p(void* a, void* b) {
+  return *((uint32_t*)(a)) < *((uint32_t*)(b));
+};
+void uint32_swapper(void* a, void* b) {
+  uint32_t c;
+  c = *((uint32_t*)(a));
+  *((uint32_t*)(a)) = *((uint32_t*)(b));
+  *((uint32_t*)(b)) = c;
+};
+#define test_element_count 100;
+int main() {
+  size_t i;
+  uint32_t uint32_array[test_element_count];
+  for (i = 0; (i < test_element_count); i = 1 + i) {
+    uint32_array[i] = test_element_count - i;
+  };
+
+  quicksort(uint32_less_p, uint32_swapper, 4, uint32_array, test_element_count);
+
+  for (i = 0; (i < test_element_count); i = 1 + i) {
+    printf("%u", uint32_array[i]);
+  };
+  return 0;
+};
 ```

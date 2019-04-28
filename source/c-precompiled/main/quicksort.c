@@ -1,4 +1,7 @@
-/* quicksort implementation based on the public domain implementation from http://alienryderflex.com/quicksort/ */
+/* a generic quicksort implementation.
+based on the public domain implementation from http://alienryderflex.com/quicksort/ */
+/** less should return true if the first argument is < than the second.
+   swap should exchange the values of the two arguments it receives */
 void quicksort(uint8_t (*less_p)(void*, void*), void (*swap)(void*, void*), uint8_t element_size, void* array, size_t array_len) {
   char* pivot;
   char* a;

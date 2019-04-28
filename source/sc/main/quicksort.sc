@@ -1,9 +1,12 @@
 (sc-comment
-  "quicksort implementation based on the public domain implementation from http://alienryderflex.com/quicksort/")
+  "a generic quicksort implementation."
+  "based on the public domain implementation from http://alienryderflex.com/quicksort/")
 
 (define (quicksort less? swap element-size array array-len)
   (void
     (function-pointer uint8-t void* void*) (function-pointer void void* void*) uint8-t void* size-t)
+  "less should return true if the first argument is < than the second.
+   swap should exchange the values of the two arguments it receives"
   (declare
     pivot char*
     a char*
