@@ -93,7 +93,7 @@ int main() {
   // ...
 exit:
   memreg_free;
-  return(0);
+  return 0;
 }
 ```
 
@@ -360,14 +360,15 @@ int main () {
   thread_pool_t pool;
   thread_pool_task_t* task;
   error = thread_pool_new(10, &pool);
-  if (error) return(error);
+  if (error) return error;
   task = malloc(sizeof(thread_pool_task_t));
-  if (!task) return(1);
+  if (!task) return 1;
   task->f = work;
   thread_pool_enqueue(a, task);
   // when the thread pool is not needed anymore then all threads can be closed.
   // arguments: thread_pool, no_wait, discard_queue
   thread_pool_finish(&pool, 0, 0);
+  return 0;
 }
 ```
 
@@ -387,7 +388,7 @@ void* future_work(void* data) {
   uint8_t* a;
   a = malloc(sizeof(uint8_t));
   *a = 2 + *(uint8_t*)(data);
-  return (a);
+  return a;
 };
 
 int main () {
@@ -406,5 +407,6 @@ int main () {
   free(result);
   // this frees the thread-pool in case futures are not needed anymore in the process or before exit
   future_deinit();
+  return 0;
 }
 ```
