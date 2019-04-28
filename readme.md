@@ -11,7 +11,7 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 * mi-list: a minimal, macro-based linked list
 * queue: a minimal queue for any data type
 * status: return-status and error handling with a tiny status object with status id and source library id
-* thread-pool: a pthread thread-pool that uses wait conditions to pause inactive threads
+* thread-pool: a task queue with pthread threads and wait conditions to pause inactive threads
 * experimental
   * one: miscellaneous helpers
   * guile: a few helpers for working with guile
@@ -324,9 +324,9 @@ typedef struct mi_list_name_prefix##_struct {
 ```
 
 # queue
-a fifo queue with the operations enqueue and dequeue that can enqueue any struct type and a mix of types.
+a fifo queue with the operations enqueue and dequeue that can enqueue structs of mixed types.
 for elements what is needed is a struct with a queue_node_t field with a custom name. a queue_node_t object to be added must not already be in the queue.
-the queue does not need to allocate memory. depends on queue.c.
+the queue does not need to allocate memory. depends on queue.c
 
 
 ## example usage
@@ -365,16 +365,16 @@ int main () {
   if (!task) return(1);
   task->f = work;
   thread_pool_enqueue(a, task);
-  // when the thread pool is not needed anymore all threads can be closed.
+  // when the thread pool is not needed anymore then all threads can be closed.
   // arguments: thread_pool, no_wait, discard_queue
   thread_pool_finish(&pool, 0, 0);
 }
 ```
 
 # futures
-provides task objects with functions that are executed in a thread-pool.
+provides task objects with functions that are executed in parallel with a thread-pool.
 calling touch on an object waits for its completion and returns its result.
-depends on thread-pool.c.
+depends on thread-pool.c
 
 ```c
 #include "queue.c"

@@ -71,6 +71,6 @@
         (free a)
         (return result))
       (begin
-        (sc-comment "poll five times per second")
+        (sc-comment "poll five times per second. maybe condition variables can be used here")
         (usleep 20000)
         (goto loop)))))

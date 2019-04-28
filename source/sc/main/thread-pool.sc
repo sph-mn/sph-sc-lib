@@ -1,5 +1,5 @@
 (sc-comment
-  "thread-pool that uses wait-conditions to pause unused threads.
+  "thread-pool that uses pthread condition variables to pause unused threads.
    based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing.
    queue.c must be included beforehand")
 
@@ -35,6 +35,10 @@
       (struct
         thread-pool-task-t*))))
 
+(define (thread-pool-destroy a) (void thread-pool-t*)
+  (pthread-cond-destroy &a:queue-not-empty)
+  (pthread-mutex-destroy &a:queue-mutex))
+
 (define (thread-finish task) (void thread-pool-task-t*)
   "if enqueued call pthread-exit to end the thread it was dequeued in"
   (free task)
@@ -49,9 +53,10 @@
   (pthread-mutex-unlock &a:queue-mutex))
 
 (define (thread-pool-finish a no-wait discard-queue) (int thread-pool-t* uint8-t uint8-t)
-  "let threads complete all currently enqueued tasks and exit.
+  "let threads complete all currently enqueued tasks, close the threads and free resources unless no_wait is true.
   if no_wait is true then the call is non-blocking and threads might still be running until they finish the queue after this call.
-  thread_pool_finish can be called again without no_wait.
+  thread_pool_finish can be called again without no_wait. with only no_wait thread_pool_destroy will not be called
+  and it is unclear when it can be used to free some final resources.
   if discard_queue is true then the current queue is emptied, but note
   that if enqueued tasks free their task object these tasks wont get called anymore"
   status-declare
@@ -74,7 +79,10 @@
     (thread-pool-enqueue a task))
   (if (not no-wait)
     (for ((set i 0) (< i size) (set i (+ 1 i)))
-      (if (= 0 (pthread-join (array-get a:threads i) &exit-value)) (set a:size (- a:size 1)))))
+      (if (= 0 (pthread-join (array-get a:threads i) &exit-value))
+        (begin
+          (set a:size (- a:size 1))
+          (if (= 0 a:size) (thread-pool-destroy a))))))
   (return 0))
 
 (define (thread-pool-worker a) (void* thread-pool-t*)
@@ -121,7 +129,3 @@
   (label exit
     (pthread-attr-destroy &attr)
     (return rc)))
-
-(define (thread-pool-destroy a) (void thread-pool-t*)
-  (pthread-cond-destroy &a:queue-not-empty)
-  (pthread-mutex-destroy &a:queue-mutex))

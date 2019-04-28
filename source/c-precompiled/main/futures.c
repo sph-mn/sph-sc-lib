@@ -69,7 +69,7 @@ loop:
     free(a);
     return (result);
   } else {
-    /* poll five times per second */
+    /* poll five times per second. maybe condition variables can be used here */
     usleep(20000);
     goto loop;
   };

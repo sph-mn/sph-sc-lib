@@ -1,4 +1,4 @@
-/* thread-pool that uses wait-conditions to pause unused threads.
+/* thread-pool that uses pthread condition variables to pause unused threads.
    based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing.
    queue.c must be included beforehand */
 #include <inttypes.h>
@@ -23,6 +23,10 @@ typedef struct thread_pool_task_t {
   void* data;
 } thread_pool_task_t;
 typedef void (*thread_pool_task_f_t)(struct thread_pool_task_t*);
+void thread_pool_destroy(thread_pool_t* a) {
+  pthread_cond_destroy((&(a->queue_not_empty)));
+  pthread_mutex_destroy((&(a->queue_mutex)));
+};
 /** if enqueued call pthread-exit to end the thread it was dequeued in */
 void thread_finish(thread_pool_task_t* task) {
   free(task);
@@ -36,9 +40,10 @@ void thread_pool_enqueue(thread_pool_t* a, thread_pool_task_t* task) {
   pthread_cond_signal((&(a->queue_not_empty)));
   pthread_mutex_unlock((&(a->queue_mutex)));
 };
-/** let threads complete all currently enqueued tasks and exit.
+/** let threads complete all currently enqueued tasks, close the threads and free resources unless no_wait is true.
   if no_wait is true then the call is non-blocking and threads might still be running until they finish the queue after this call.
-  thread_pool_finish can be called again without no_wait.
+  thread_pool_finish can be called again without no_wait. with only no_wait thread_pool_destroy will not be called
+  and it is unclear when it can be used to free some final resources.
   if discard_queue is true then the current queue is emptied, but note
   that if enqueued tasks free their task object these tasks wont get called anymore */
 int thread_pool_finish(thread_pool_t* a, uint8_t no_wait, uint8_t discard_queue) {
@@ -66,6 +71,9 @@ int thread_pool_finish(thread_pool_t* a, uint8_t no_wait, uint8_t discard_queue)
     for (i = 0; (i < size); i = (1 + i)) {
       if (0 == pthread_join(((a->threads)[i]), (&exit_value))) {
         a->size = (a->size - 1);
+        if (0 == a->size) {
+          thread_pool_destroy(a);
+        };
       };
     };
   };
@@ -114,8 +122,4 @@ int thread_pool_new(thread_pool_size_t size, thread_pool_t* a) {
 exit:
   pthread_attr_destroy((&attr));
   return (rc);
-};
-void thread_pool_destroy(thread_pool_t* a) {
-  pthread_cond_destroy((&(a->queue_not_empty)));
-  pthread_mutex_destroy((&(a->queue_mutex)));
 };
