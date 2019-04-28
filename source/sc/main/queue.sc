@@ -1,5 +1,5 @@
 (sc-comment
-  "a fifo queue with the operations enqueue, dequeue and is-empty that can enqueue any struct type and even a mix of types.
+  "a fifo queue with the operations enqueue and dequeue that can enqueue any struct type and a mix of types.
   # example usage
   typedef struct {
     // custom field definitions ...
@@ -17,7 +17,8 @@
   queue-size-t uint32-t
   (queue-get node type field)
   (begin
-    "returns a pointer to the enqueued struct"
+    "returns a pointer to the enqueued struct based on the offset of the queue-node-t field in the struct.
+    because of this queue nodes dont have to be allocated separate from user data"
     (convert-type (- (convert-type node char*) (offsetof type field)) type*)))
 
 (declare
@@ -53,7 +54,7 @@
     a:size (+ 1 a:size)))
 
 (define (queue-deq a) (queue-node-t* queue-t*)
-  "queue must not be empty"
+  "queue must not be empty. a.size can be checked to see if the queue is empty"
   (declare n queue-node-t*)
   (set n a:first)
   (if (not n:next) (set a:last 0))

@@ -1,9 +1,6 @@
 /* thread-pool that uses wait-conditions to pause unused threads.
    based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing.
-   # notes
-   * queue.c must be loaded first
-   * if a task returns false then the thread it was called in exits. this allows cancellation of threads without other more obscure means
-   * all threads can be ended with thread-pool-finish, which enqueues number-of-threads tasks that return false and waits/joins threads */
+   queue.c must be included beforehand */
 #include <inttypes.h>
 #include <pthread.h>
 #ifndef thread_pool_size_t
@@ -22,14 +19,17 @@ typedef struct {
 struct thread_pool_task_t;
 typedef struct thread_pool_task_t {
   queue_node_t q;
-  uint8_t (*f)(struct thread_pool_task_t*);
+  void (*f)(struct thread_pool_task_t*);
   void* data;
 } thread_pool_task_t;
-uint8_t thread_finish(thread_pool_task_t* task) {
+typedef void (*thread_pool_task_f_t)(struct thread_pool_task_t*);
+/** if enqueued call pthread-exit to end the thread it was dequeued in */
+void thread_finish(thread_pool_task_t* task) {
   free(task);
-  return (0);
+  pthread_exit(0);
 };
-/** add a task to be processed by the next free thread */
+/** add a task to be processed by the next free thread.
+  mutexes are used so that the queue is only ever accessed by a single thread */
 void thread_pool_enqueue(thread_pool_t* a, thread_pool_task_t* task) {
   pthread_mutex_lock((&(a->queue_mutex)));
   queue_enq((&(a->queue)), (&(task->q)));
@@ -73,13 +73,10 @@ wait:
     goto wait;
   };
   pthread_mutex_unlock((&(a->queue_mutex)));
-  if ((task->f)(task)) {
-    goto get_task;
-  } else {
-    pthread_exit(0);
-  };
+  (task->f)(task);
+  goto get_task;
 };
-/** returns zero when successful and a pthread error code otherwise */
+/** returns zero when successful and a non-zero pthread error code otherwise */
 int thread_pool_new(thread_pool_size_t size, thread_pool_t* a) {
   thread_pool_size_t i;
   pthread_attr_t attr;

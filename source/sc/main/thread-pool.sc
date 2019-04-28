@@ -1,10 +1,7 @@
 (sc-comment
   "thread-pool that uses wait-conditions to pause unused threads.
    based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing.
-   # notes
-   * queue.c must be loaded first
-   * if a task returns false then the thread it was called in exits. this allows cancellation of threads without other more obscure means
-   * all threads can be ended with thread-pool-finish, which enqueues number-of-threads tasks that return false and waits/joins threads")
+   queue.c must be included beforehand")
 
 (pre-include "inttypes.h" "pthread.h")
 
@@ -28,17 +25,24 @@
       thread-pool-task-t
       (q queue-node-t)
       (f
-        (function-pointer uint8-t
+        (function-pointer void
           (struct
             thread-pool-task-t*)))
-      (data void*))))
+      (data void*)))
+  thread-pool-task-f-t
+  (type
+    (function-pointer void
+      (struct
+        thread-pool-task-t*))))
 
-(define (thread-finish task) (uint8-t thread-pool-task-t*)
+(define (thread-finish task) (void thread-pool-task-t*)
+  "if enqueued call pthread-exit to end the thread it was dequeued in"
   (free task)
-  (return #f))
+  (pthread-exit 0))
 
 (define (thread-pool-enqueue a task) (void thread-pool-t* thread-pool-task-t*)
-  "add a task to be processed by the next free thread"
+  "add a task to be processed by the next free thread.
+  mutexes are used so that the queue is only ever accessed by a single thread"
   (pthread-mutex-lock &a:queue-mutex)
   (queue-enq &a:queue &task:q)
   (pthread-cond-signal &a:queue-not-empty)
@@ -71,19 +75,16 @@
     (pthread-mutex-lock &a:queue-mutex)
     (label wait
       (sc-comment "considers so-called spurious wakeups")
-      (if a:queue.size
-        (begin
-          (set task (queue-get (queue-deq &a:queue) thread-pool-task-t q)))
+      (if a:queue.size (set task (queue-get (queue-deq &a:queue) thread-pool-task-t q))
         (begin
           (pthread-cond-wait &a:queue-not-empty &a:queue-mutex)
           (goto wait))))
     (pthread-mutex-unlock &a:queue-mutex)
-    (if (task:f task) (goto get-task)
-      (begin
-        (pthread-exit 0)))))
+    (task:f task)
+    (goto get-task)))
 
 (define (thread-pool-new size a) (int thread-pool-size-t thread-pool-t*)
-  "returns zero when successful and a pthread error code otherwise"
+  "returns zero when successful and a non-zero pthread error code otherwise"
   (declare
     i thread-pool-size-t
     attr pthread-attr-t

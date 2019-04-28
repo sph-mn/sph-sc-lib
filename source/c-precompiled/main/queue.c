@@ -1,4 +1,4 @@
-/* a fifo queue with the operations enqueue, dequeue and is-empty that can enqueue any struct type and even a mix of types.
+/* a fifo queue with the operations enqueue and dequeue that can enqueue any struct type and a mix of types.
   # example usage
   typedef struct {
     // custom field definitions ...
@@ -13,7 +13,8 @@
 #include <inttypes.h>
 #include <stddef.h>
 #define queue_size_t uint32_t
-/** returns a pointer to the enqueued struct */
+/** returns a pointer to the enqueued struct based on the offset of the queue-node-t field in the struct.
+    because of this queue nodes dont have to be allocated separate from user data */
 #define queue_get(node, type, field) ((type*)((((char*)(node)) - offsetof(type, field))))
 struct queue_node_t;
 typedef struct queue_node_t {
@@ -41,7 +42,7 @@ void queue_enq(queue_t* a, queue_node_t* node) {
   node->next = 0;
   a->size = (1 + a->size);
 };
-/** queue must not be empty */
+/** queue must not be empty. a.size can be checked to see if the queue is empty */
 queue_node_t* queue_deq(queue_t* a) {
   queue_node_t* n;
   n = a->first;
