@@ -1,0 +1,16 @@
+#!/bin/sh
+
+root="$PWD"
+target_dir=temp
+c=source/c-precompiled
+warnings="-Wunused-label -Wunused-value -Wunused-variable"
+gcc_options="-Wfatal-errors -O0 -ggdb"
+
+compile_test_sph_sc_lib() {
+  gcc "$c/test/mi-list.c" -o temp/test-mi-list $gcc_options
+  gcc "$c/test/imht-set.c" -o temp/test-imht-set $gcc_options
+  gcc "$c/test/quicksort.c" -o temp/test-quicksort $gcc_options
+}
+
+mkdir -p "$target_dir" &&
+compile_test_sph_sc_lib

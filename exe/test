@@ -1,0 +1,9 @@
+#!/bin/sh -e
+# the shared library must have already been compiled,
+# the compiled one from the temp directory is used
+
+export MALLOC_CHECK_=3
+export LD_LIBRARY_PATH="$PWD/temp"
+#./temp/test-mi-list
+#./temp/test-imht-set
+./temp/test-quicksort

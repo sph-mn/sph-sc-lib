@@ -10,8 +10,7 @@ compile_sc() {
   cd "$s" &&
   find -type f -name "*.sc" -exec sc --parents '{}' "$c" \; &&
   cd "$root" &&
-  find "$c" -type f -exec ./exe/format-c -i '{}' \; &&
-  mv "$c/sph/helper.c" "$c/sph/helper.h"
+  find "$c" -type f -exec ./exe/format-c -i '{}' \;
 }
 
 mkdir -p "$c" &&
