@@ -11,7 +11,7 @@
   queue_enq(&q, &e.queue_node);
   queue_get(queue_deq(&q), element_t, queue_node);")
 
-(pre-include "stdlib.h" "inttypes.h")
+(pre-include "stdlib.h" "inttypes.h" "stddef.h")
 
 (pre-define
   queue-size-t uint32-t
@@ -25,9 +25,10 @@
   queue-node-t
   (type
     (struct
-      next
-      (struct
-        queue-node-t*)))
+      queue-node-t
+      (next
+        (struct
+          queue-node-t*))))
   queue-t
   (type
     (struct
@@ -43,6 +44,7 @@
     a:size 0))
 
 (define (queue-enq a node) (void queue-t* queue-node-t*)
+  "enqueue a node. the node must not already be in the queue"
   (if a:first (set a:last:next node)
     (set a:first node))
   (set
@@ -54,7 +56,7 @@
   "queue must not be empty"
   (declare n queue-node-t*)
   (set n a:first)
-  (if (!n:next) (set a:last 0))
+  (if (not n:next) (set a:last 0))
   (set
     a:first n:next
     a:size (- a:size 1))

@@ -10,6 +10,8 @@ compile_test_sph_sc_lib() {
   gcc "$c/test/mi-list.c" -o temp/test-mi-list $gcc_options
   gcc "$c/test/imht-set.c" -o temp/test-imht-set $gcc_options
   gcc "$c/test/quicksort.c" -o temp/test-quicksort $gcc_options
+  gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
+  gcc "$c/test/thread-pool.c" -o temp/test-thread-pool $gcc_options -lpthread
 }
 
 mkdir -p "$target_dir" &&

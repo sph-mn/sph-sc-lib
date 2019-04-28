@@ -11,12 +11,13 @@
   queue_get(queue_deq(&q), element_t, queue_node); */
 #include <stdlib.h>
 #include <inttypes.h>
+#include <stddef.h>
 #define queue_size_t uint32_t
 /** returns a pointer to the enqueued struct */
 #define queue_get(node, type, field) ((type*)((((char*)(node)) - offsetof(type, field))))
 struct queue_node_t;
-typedef struct next {
-  queue_node_t* struct;
+typedef struct queue_node_t {
+  struct queue_node_t* next;
 } queue_node_t;
 typedef struct {
   queue_size_t size;
@@ -29,6 +30,7 @@ void queue_init(queue_t* a) {
   a->last = 0;
   a->size = 0;
 };
+/** enqueue a node. the node must not already be in the queue */
 void queue_enq(queue_t* a, queue_node_t* node) {
   if (a->first) {
     a->last->next = node;
@@ -43,7 +45,7 @@ void queue_enq(queue_t* a, queue_node_t* node) {
 queue_node_t* queue_deq(queue_t* a) {
   queue_node_t* n;
   n = a->first;
-  if ((!n->next)()) {
+  if (!n->next) {
     a->last = 0;
   };
   a->first = n->next;
