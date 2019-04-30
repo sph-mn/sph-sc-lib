@@ -1,6 +1,8 @@
 (sc-comment
   "\"iteration array\" - an array with variable length content that makes iteration easier to code.
-  most bindings are generic macros that will work on all i-array types. i-array-add and i-array-forward go from left to right.
+  saves the size argument that usually has to be passed with arrays and saves the declaration of index counter variables.
+  the data structure consists of only 4 pointers in a struct.
+  most bindings are generic macros that will work on any i-array type. i-array-add and i-array-forward go from left to right.
   examples:
     i_array_declare_type(my_type, int);
     my_type a;
@@ -67,4 +69,18 @@
   (i-array-remove a) (set a.unused (- a.unused 1))
   (i-array-length a) (- a.unused a.start)
   (i-array-max-length a) (- a.end a.start)
-  (i-array-free a) (free a.start))
+  (i-array-free a) (free a.start)
+  (i-array-take a source size count)
+  (begin
+    "create an i-array from a standard array.
+     sets source as data array to use, with the first count number of slots used.
+     source will not be copied but used as is, and will i-array-free frees is.
+     # example
+     int other_array[4] = {1, 2, 0, 0};
+     my_type a;
+     i_array_take(a, other_array, 4 2);"
+    (set
+      a:start source
+      a:current source
+      a:unused (+ count source)
+      a:end (+ size source))))
