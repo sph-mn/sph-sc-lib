@@ -7,7 +7,6 @@ void quicksort(uint8_t (*less_p)(void*, void*), void (*swap)(void*, void*), uint
   char* a;
   size_t i;
   size_t j;
-  char* temp;
   if (array_len < 2) {
     return;
   };

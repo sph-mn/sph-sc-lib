@@ -2,10 +2,7 @@
 
 (define (test-thread-pool) status-t
   status-declare
-  (declare
-    pool thread-pool-t
-    task thread-pool-task-t
-    i size-t)
+  (declare pool thread-pool-t)
   (test-helper-assert "thread-pool new" (not (thread-pool-new 10 &pool)))
   (test-helper-assert "thread-pool finish" (not (thread-pool-finish &pool 0 0)))
   (label exit

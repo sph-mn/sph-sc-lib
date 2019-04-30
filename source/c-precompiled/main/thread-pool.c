@@ -47,9 +47,7 @@ void thread_pool_enqueue(thread_pool_t* a, thread_pool_task_t* task) {
   if discard_queue is true then the current queue is emptied, but note
   that if enqueued tasks free their task object these tasks wont get called anymore */
 int thread_pool_finish(thread_pool_t* a, uint8_t no_wait, uint8_t discard_queue) {
-  status_declare;
   void* exit_value;
-  int error;
   thread_pool_size_t i;
   thread_pool_size_t size;
   thread_pool_task_t* task;
@@ -79,9 +77,9 @@ int thread_pool_finish(thread_pool_t* a, uint8_t no_wait, uint8_t discard_queue)
   };
   return (0);
 };
+/** internal worker routine */
 void* thread_pool_worker(thread_pool_t* a) {
   thread_pool_task_t* task;
-  "internal worker routine";
 get_task:
   pthread_mutex_lock((&(a->queue_mutex)));
 wait:
@@ -100,16 +98,16 @@ wait:
 int thread_pool_new(thread_pool_size_t size, thread_pool_t* a) {
   thread_pool_size_t i;
   pthread_attr_t attr;
-  int rc;
-  rc = 0;
+  int error;
+  error = 0;
   queue_init((&(a->queue)));
   pthread_mutex_init((&(a->queue_mutex)), 0);
   pthread_cond_init((&(a->queue_not_empty)), 0);
   pthread_attr_init((&attr));
   pthread_attr_setdetachstate((&attr), PTHREAD_CREATE_JOINABLE);
   for (i = 0; (i < size); i = (1 + i)) {
-    rc = pthread_create((i + a->threads), (&attr), ((void* (*)(void*))(thread_pool_worker)), ((void*)(a)));
-    if (rc) {
+    error = pthread_create((i + a->threads), (&attr), ((void* (*)(void*))(thread_pool_worker)), ((void*)(a)));
+    if (error) {
       if (0 < i) {
         /* try to finish previously created threads */
         a->size = i;
@@ -121,5 +119,5 @@ int thread_pool_new(thread_pool_size_t size, thread_pool_t* a) {
   a->size = size;
 exit:
   pthread_attr_destroy((&attr));
-  return (rc);
+  return (error);
 };

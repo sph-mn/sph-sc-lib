@@ -11,8 +11,7 @@
     pivot char*
     a char*
     i size-t
-    j size-t
-    temp char*)
+    j size-t)
   (if (< array-len 2) return)
   (set
     a array

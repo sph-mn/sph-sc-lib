@@ -59,10 +59,8 @@
   and it is unclear when it can be used to free some final resources.
   if discard_queue is true then the current queue is emptied, but note
   that if enqueued tasks free their task object these tasks wont get called anymore"
-  status-declare
   (declare
     exit-value void*
-    error int
     i thread-pool-size-t
     size thread-pool-size-t
     task thread-pool-task-t*)
@@ -86,8 +84,8 @@
   (return 0))
 
 (define (thread-pool-worker a) (void* thread-pool-t*)
-  (declare task thread-pool-task-t*)
   "internal worker routine"
+  (declare task thread-pool-task-t*)
   (label get-task
     (pthread-mutex-lock &a:queue-mutex)
     (label wait
@@ -105,19 +103,19 @@
   (declare
     i thread-pool-size-t
     attr pthread-attr-t
-    rc int)
-  (set rc 0)
+    error int)
+  (set error 0)
   (queue-init &a:queue)
   (pthread-mutex-init &a:queue-mutex 0)
   (pthread-cond-init &a:queue-not-empty 0)
   (pthread-attr-init &attr)
   (pthread-attr-setdetachstate &attr PTHREAD-CREATE-JOINABLE)
   (for ((set i 0) (< i size) (set i (+ 1 i)))
-    (set rc
+    (set error
       (pthread-create
         (+ i a:threads)
         &attr (convert-type thread-pool-worker (function-pointer void* void*)) (convert-type a void*)))
-    (if rc
+    (if error
       (begin
         (if (< 0 i)
           (begin
@@ -128,4 +126,4 @@
   (set a:size size)
   (label exit
     (pthread-attr-destroy &attr)
-    (return rc)))
+    (return error)))

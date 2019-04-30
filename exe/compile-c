@@ -4,7 +4,7 @@ root="$PWD"
 target_dir=temp
 c=source/c-precompiled
 warnings="-Wunused-label -Wunused-value -Wunused-variable"
-gcc_options="-Wfatal-errors -O0 -ggdb"
+gcc_options="$warnings -Wfatal-errors -O0 -ggdb"
 
 compile_test_sph_sc_lib() {
   gcc "$c/test/mi-list.c" -o temp/test-mi-list $gcc_options
