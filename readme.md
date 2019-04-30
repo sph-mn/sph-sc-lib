@@ -5,12 +5,13 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 
 # included libraries
 * futures: fine-grained parallelism with objects that can be waited on for results
-* i-array: a fixed size array with variable length content that makes iteration easier to code
+* i-array: a fixed size array type with variable length content that makes iteration easier to code
 * imht-set: a minimal, macro-based fixed size hash-table data structure for sets of integers
 * memreg: track heap memory allocations in function scope
 * mi-list: a minimal, macro-based linked list
 * queue: a minimal queue for any data type
-* a generic quicksort implementation for arrays of any type
+* quicksort: a generic implementation for arrays of any type
+* spline-path: interpolated 2d paths between some given points
 * status: return-status and error handling with a tiny status object with status id and source library id
 * thread-pool: a task queue with pthread threads and wait conditions to pause inactive threads
 * experimental
@@ -78,7 +79,7 @@ status_is_success
 track memory allocations locally on the stack and free all allocations up to point easily
 
 ```c
-#include "sph/memreg.c"
+#include "memreg.c"
 
 int main() {
   memreg_init(2);
@@ -102,20 +103,20 @@ introduces two local variables: memreg_register, an array for addresses, and mem
 memreg_init size must be a static value
 
 ## memreg_named
-``sph/memreg.c`` also contains a *_named variant that supports multiple concurrent registers identified by name
+``memreg.c`` also contains a *_named variant that supports multiple concurrent registers identified by name
 
 ```c
-memreg_init_named(testname, 4);
+memreg_init_named(testname, 1);
 memreg_add_named(testname, &variable);
 memreg_free_named(testname);
 ```
 
 ## memreg_heap
-``sph/memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables for example
+``memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables for example
 
 ```c
 memreg_heap_declare(allocations);
-if(memreg_heap_allocate(4, allocations)) {
+if(memreg_heap_allocate(2, allocations)) {
   // allocation error
 }
 memreg_heap_add(allocations, &variable-1);
@@ -413,11 +414,90 @@ int main() {
 }
 ```
 
+# spline-path
+spline-path creates discrete 2d paths with segments that interpolate between some given points.
+paths can be composed to construct more complex paths.
+
+currently implemented segment types and interpolation methods
+* linear: draws lines between points
+* bezier: 4 point cubic bezier interpolation
+* move: gap, moves the point the next segment starts on
+* constant: repeats the last value. a flat line to infinity
+* path: another spline path as a segment
+
+features
+* extremely fast through only supporting 2d, with only selected and optimised interpolators, limited segment count and sampling portions of paths instead of only single points
+* paths are stateless and the same path object can be used by multiple threads
+* maps from one independent discrete value to one dependent continuous value and only the dependent value is returned
+* multidimensional interpolation could be archieved with separate calls for additional dimensions
+* originally developed for dsp and the sampling of many paths 96000 times per second in parallel
+
+## example
+example of a path that begins at x 10, draws a line to x 20, a bezier curve to x 40 and any y value after that will be 25.
+paths start at (0, 0) and every segment gives the target point to draw to, like lineTo and similar in svg paths.
+
+```c
+int main() {
+  // declaration
+  spline_path_value_t out[50];
+  spline_path_time_t i;
+  spline_path_t path;
+  spline_path_point_t p;
+  spline_path_segment_t s;
+  spline_path_segment_t segments[4];
+  spline_path_segment_count_t segments_len;
+  // path segment configuration.
+  s.interpolator = spline_path_i_move;
+  p.x = 10;
+  p.y = 5;
+  (s.points)[0] = p;
+  segments[0] = s;
+  s.interpolator = spline_path_i_line;
+  p.x = 20;
+  p.y = 10;
+  (s.points)[0] = p;
+  segments[1] = s;
+  s.interpolator = spline_path_i_bezier;
+  p.x = 25;
+  p.y = 15;
+  (s.points)[0] = p;
+  p.x = 30;
+  p.y = 20;
+  (s.points)[1] = p;
+  p.x = 40;
+  p.y = 25;
+  (s.points)[2] = p;
+  segments[2] = s;
+  s.interpolator = spline_path_i_constant;
+  segments[3] = s;
+  segments_len = 4;
+
+  // path object creation
+  if(spline_path_new(segments_len, segments, &path)) return 1;
+
+  // get points on the path, a range of points at once
+  spline_path_get(path, 5, 25, out);
+  spline_path_get(path, 25, 55, 20 + out);
+
+  // display the extracted points
+  for (i = 0; (i < 50); i = (1 + i)) {
+    printf("%lu %f\n", i, (out[i]));
+  };
+
+  spline_path_free(path);
+}
+```
+
 # quicksort
 also works with arrays of structs and any other array type.
 
 ```c
-quicksort(uint8_t (*less_p)(void*, void*), void (*swap)(void*, void*), uint8_t element_size, void* array, size_t array_len);
+quicksort(
+  uint8_t (*less_p)(void*, void*),
+  void (*swap)(void*, void*),
+  uint8_t element_size,
+  void* array,
+  size_t array_len);
 ```
 
 ```c

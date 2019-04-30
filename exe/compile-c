@@ -12,6 +12,7 @@ compile_test_sph_sc_lib() {
   gcc "$c/test/quicksort.c" -o temp/test-quicksort $gcc_options
   gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
   gcc "$c/test/thread-pool.c" -o temp/test-thread-pool $gcc_options -lpthread
+  gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options -lpthread
 }
 
 mkdir -p "$target_dir" &&

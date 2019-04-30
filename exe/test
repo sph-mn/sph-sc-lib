@@ -9,3 +9,4 @@ export LD_LIBRARY_PATH="$PWD/temp"
 ./temp/test-quicksort
 ./temp/test-queue
 ./temp/test-thread-pool
+./temp/test-spline-path
