@@ -6,8 +6,8 @@
 double error_margin = 0.1;
 status_t test_spline_path() {
   status_declare;
-  spline_path_value_t out[50];
-  spline_path_value_t out_new_get[50];
+  spline_path_value_t out[100];
+  spline_path_value_t out_new_get[100];
   spline_path_time_t i;
   spline_path_t path;
   spline_path_point_t p;
@@ -18,14 +18,34 @@ status_t test_spline_path() {
   uint8_t log_path_new_1;
   uint8_t log_path_new_get_0;
   uint8_t log_path_new_get_1;
-  log_path_new_0 = 0;
-  log_path_new_1 = 0;
+  log_path_new_0 = 1;
+  log_path_new_1 = 1;
   log_path_new_get_0 = 0;
   log_path_new_get_1 = 0;
   for (i = 0; (i < 50); i = (1 + i)) {
     out[i] = 999;
     out_new_get[i] = 999;
   };
+  /* path 2 */
+  s.interpolator = spline_path_i_move;
+  p.x = 0;
+  p.y = 6;
+  (s.points)[0] = p;
+  segments[0] = s;
+  s.interpolator = spline_path_i_line;
+  p.x = 24;
+  p.y = 18;
+  (s.points)[0] = p;
+  segments[1] = s;
+  s.interpolator = spline_path_i_line;
+  p.x = 96;
+  p.y = 24;
+  (s.points)[0] = p;
+  segments[2] = s;
+  s.interpolator = spline_path_i_constant;
+  segments[3] = s;
+  segments_len = 4;
+  status_id_require((spline_path_new_get(segments_len, segments, 0, 100, out_new_get)));
   /* path 0 */
   s.interpolator = spline_path_i_move;
   p.x = 10;

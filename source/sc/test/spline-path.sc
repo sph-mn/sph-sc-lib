@@ -4,8 +4,8 @@
 (define (test-spline-path) status-t
   status-declare
   (declare
-    out (array spline-path-value-t 50)
-    out-new-get (array spline-path-value-t 50)
+    out (array spline-path-value-t 100)
+    out-new-get (array spline-path-value-t 100)
     i spline-path-time-t
     path spline-path-t
     p spline-path-point-t
@@ -17,14 +17,35 @@
     log-path-new-get-0 uint8-t
     log-path-new-get-1 uint8-t)
   (set
-    log-path-new-0 #f
-    log-path-new-1 #f
+    log-path-new-0 #t
+    log-path-new-1 #t
     log-path-new-get-0 #f
     log-path-new-get-1 #f)
   (for ((set i 0) (< i 50) (set i (+ 1 i)))
     (set
       (array-get out i) 999
       (array-get out-new-get i) 999))
+  (sc-comment "path 2")
+  (set
+    s.interpolator spline-path-i-move
+    p.x 0
+    p.y 6
+    (array-get s.points 0) p
+    (array-get segments 0) s
+    s.interpolator spline-path-i-line
+    p.x 24
+    p.y 18
+    (array-get s.points 0) p
+    (array-get segments 1) s
+    s.interpolator spline-path-i-line
+    p.x 96
+    p.y 24
+    (array-get s.points 0) p
+    (array-get segments 2) s
+    s.interpolator spline-path-i-constant
+    (array-get segments 3) s
+    segments-len 4)
+  (status-id-require (spline-path-new-get segments-len segments 0 100 out-new-get))
   (sc-comment "path 0")
   (set
     s.interpolator spline-path-i-move

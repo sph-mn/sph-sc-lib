@@ -34,7 +34,7 @@
   spline-path-point-t
   (type
     (struct
-      (x spline-path-value-t)
+      (x spline-path-time-t)
       (y spline-path-value-t)))
   spline-path-interpolator-t
   (type
@@ -56,23 +56,25 @@
       (segments-len spline-path-segment-count-t)
       (segments spline-path-segment-t*))))
 
-(define (spline-path-i-move start size p-start p-rest options out)
+(define (spline-path-i-move start end p-start p-rest options out)
   (void
     spline-path-time-t
     spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 1"
-  (memset out 0 (* (sizeof spline-path-value-t) size)))
+  (memset out 0 (* (sizeof spline-path-value-t) (- end start))))
 
-(define (spline-path-i-constant start size p-start p-rest options out)
+(define (spline-path-i-constant start end p-start p-rest options out)
   (void
     spline-path-time-t
     spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 0"
   (declare i spline-path-time-t)
-  (for ((set i 0) (< i size) (set i (+ 1 i)))
-    (set (array-get out i) p-start.y)))
+  (for ((set i start) (< i end) (set i (+ 1 i)))
+    (set (array-get out (- i start)) p-start.y)))
 
-(define (spline-path-i-line start size p-start p-rest options out)
+(pre-include "stdio.h")
+
+(define (spline-path-i-line start end p-start p-rest options out)
   (void
     spline-path-time-t
     spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
@@ -81,18 +83,16 @@
     i spline-path-time-t
     p-end spline-path-point-t
     s-size spline-path-value-t
-    s-relative-start spline-path-time-t
     t spline-path-value-t)
   (set
     p-end (array-get p-rest 0)
-    s-size (- p-end.x p-start.x)
-    s-relative-start (- start p-start.x))
-  (for ((set i 0) (< i size) (set i (+ 1 i)))
+    s-size (- p-end.x p-start.x))
+  (for ((set i start) (< i end) (set i (+ 1 i)))
     (set
-      t (/ (+ s-relative-start i) s-size)
-      (array-get out i) (+ (* p-end.y t) (* p-start.y (- 1 t))))))
+      t (/ (- i p-start.x) s-size)
+      (array-get out (- i start)) (+ (* p-end.y t) (* p-start.y (- 1 t))))))
 
-(define (spline-path-i-bezier start size p-start p-rest options out)
+(define (spline-path-i-bezier start end p-start p-rest options out)
   (void
     spline-path-time-t
     spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
@@ -102,17 +102,15 @@
     mt spline-path-value-t
     p-end spline-path-point-t
     s-size spline-path-value-t
-    s-relative-start spline-path-time-t
     t spline-path-value-t)
   (set
     p-end (array-get p-rest 2)
-    s-size (- p-end.x p-start.x)
-    s-relative-start (- start p-start.x))
-  (for ((set i 0) (< i size) (set i (+ 1 i)))
+    s-size (- p-end.x p-start.x))
+  (for ((set i start) (< i end) (set i (+ 1 i)))
     (set
-      t (/ (+ s-relative-start i) s-size)
+      t (/ (- i p-start.x) s-size)
       mt (- 1 t)
-      (array-get out i)
+      (array-get out (- i start))
       (+
         (* p-start.y mt mt mt)
         (* (struct-get (array-get p-rest 0) y) 3 mt mt t)
@@ -121,47 +119,41 @@
 (define (spline-path-get path start end out)
   (void spline-path-t spline-path-time-t spline-path-time-t spline-path-value-t*)
   "get values on path between start (inclusive) and end (exclusive)"
-  (sc-comment "write segment start first, then the segment such that it ends before the next start")
+  (sc-comment
+    "write segment start first, then the segment such that it ends before the next start.
+    gets all points from t start to t end minus one")
   (declare
     i spline-path-segment-count-t
     s spline-path-segment-t
     s-start spline-path-time-t
     s-end spline-path-time-t
-    t spline-path-segment-count-t)
-  (set t start)
+    out-start spline-path-time-t)
   (for ((set i 0) (< i path.segments-len) (set i (+ 1 i)))
     (set
       s (array-get path.segments i)
-      s-start s._start.x)
-    (if (< end s-start) break)
-    (set s-end (struct-get (array-get s.points (- s._points-len 1)) x))
-    (if (> t s-end) continue)
-    (if (= t s-start)
-      (set
-        (array-get out (- t start)) s._start.y
-        t (+ 1 t)))
-    (s.interpolator
-      t
-      (-
-        (if* (> end s-end) s-end
-          end)
-        t)
-      s._start s.points s.options (+ (- t start) out))
-    (set t s-end))
-  (if (<= t end)
-    (begin
-      (s.interpolator t 1 s._start s.points s.options (+ (- t start) out))
-      (set t (+ 1 t))
-      (if (<= t end) (memset (+ (- t start) out) 0 (* (sizeof spline-path-value-t) (- end t)))))))
+      s-start s._start.x
+      s-end (struct-get (array-get s.points (- s._points-len 1)) x))
+    (if (> s-start end) break)
+    (if (< s-end start) continue)
+    (set
+      out-start
+      (if* (> s-start start) (- s-start start)
+        0)
+      s-start
+      (if* (> s-start start) s-start
+        start)
+      s-end
+      (if* (< s-end end) s-end
+        end))
+    (s.interpolator s-start s-end s._start s.points s.options (+ out-start out))))
 
-(define (spline-path-i-path start size p-start p-rest options out)
+(define (spline-path-i-path start end p-start p-rest options out)
   (void
     spline-path-time-t
     spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 0. options is one spline-path-t"
   (spline-path-get
-    (pointer-get (convert-type options spline-path-t*))
-    (- start p-start.x) (+ (- start p-start.x) size) out))
+    (pointer-get (convert-type options spline-path-t*)) (- start p-start.x) (- end p-start.x) out))
 
 (define (spline-path-start path) (spline-path-point-t spline-path-t)
   (declare
