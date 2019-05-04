@@ -129,9 +129,35 @@ status_t test_spline_path() {
 exit:
   return (status);
 };
+status_t test_spline_path_helpers() {
+  status_declare;
+  spline_path_value_t out[50];
+  spline_path_t path;
+  spline_path_time_t i;
+  spline_path_segment_t segments[4];
+  spline_path_segment_t segments2[2];
+  for (i = 0; (i < 50); i = (1 + i)) {
+    out[i] = 999;
+  };
+  segments[0] = spline_path_move(1, 5);
+  segments[1] = spline_path_line(10, 10);
+  segments[2] = spline_path_bezier(20, 15, 30, 5, 40, 15);
+  segments[3] = spline_path_constant();
+  spline_path_new(4, segments, (&path));
+  spline_path_get(path, 0, 50, out);
+  test_helper_assert("helper path 0", (f64_nearly_equal(0, (out[0]), error_margin)));
+  test_helper_assert("helper path 49", (f64_nearly_equal(15, (out[49]), error_margin)));
+  segments2[0] = spline_path_line(5, 10);
+  segments2[1] = spline_path_path((&path));
+  /* note that the first point leaves a gap */
+  spline_path_new_get(2, segments2, 0, 50, out);
+  spline_path_free(path);
+exit:
+  return (status);
+};
 int main() {
   status_declare;
-  test_helper_test_one(test_spline_path);
+  test_helper_test_one(test_spline_path_helpers);
 exit:
   test_helper_display_summary();
   return ((status.id));

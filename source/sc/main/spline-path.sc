@@ -119,7 +119,8 @@
 (define (spline-path-get path start end out)
   (void spline-path-t spline-path-time-t spline-path-time-t spline-path-value-t*)
   "get values on path between start (inclusive) and end (exclusive).
-  since x values are integers, a path from (0 0) to (10 20) for example will have reached 20 only at the 11th point"
+  since x values are integers, a path from (0 0) to (10 20) for example will have reached 20 only at the 11th point.
+  out memory is managed by the caller. the size required for out is end minus start"
   (sc-comment "find all segments that overlap with requested range")
   (declare
     i spline-path-segment-count-t
@@ -145,7 +146,9 @@
       (if* (< s-end end) s-end
         end))
     (s.interpolator s-start s-end s._start s.points s.options (+ out-start out)))
-  (sc-comment "outside points zero except first outside point")
+  (sc-comment
+    "outside points zero. set the last segment point which would be set by a following segment."
+    "can only be true for the last segment")
   (if (> end s-end)
     (begin
       (set
@@ -225,3 +228,49 @@
   (spline-path-get path start end out)
   (spline-path-free path)
   (return 0))
+
+(define (spline-path-move x y) (spline-path-segment-t spline-path-time-t spline-path-value-t)
+  (declare s spline-path-segment-t)
+  "returns a move segment for the specified point"
+  (set
+    s.interpolator spline-path-i-move
+    s.points:x x
+    s.points:y y)
+  (return s))
+
+(define (spline-path-line x y) (spline-path-segment-t spline-path-time-t spline-path-value-t)
+  (declare s spline-path-segment-t)
+  (set
+    s.interpolator spline-path-i-line
+    s.points:x x
+    s.points:y y)
+  (return s))
+
+(define (spline-path-bezier x1 y1 x2 y2 x3 y3)
+  (spline-path-segment-t
+    spline-path-time-t
+    spline-path-value-t spline-path-time-t spline-path-value-t spline-path-time-t spline-path-value-t)
+  (declare s spline-path-segment-t)
+  (set
+    s.interpolator spline-path-i-bezier
+    s.points:x x1
+    s.points:y y1
+    (: (+ 1 s.points) x) x2
+    (: (+ 1 s.points) y) y2
+    (: (+ 2 s.points) x) x3
+    (: (+ 2 s.points) y) y3)
+  (return s))
+
+(define (spline-path-constant) (spline-path-segment-t)
+  (declare s spline-path-segment-t)
+  (set s.interpolator spline-path-i-constant)
+  (return s))
+
+(define (spline-path-path path) (spline-path-segment-t spline-path-t*)
+  "return a segment that is another spline-path. length is the full length of the path.
+  the path does not necessarily connect and is drawn as it would be on its own starting from the preceding segment"
+  (declare s spline-path-segment-t)
+  (set
+    s.interpolator spline-path-i-path
+    s.options path)
+  (return s))

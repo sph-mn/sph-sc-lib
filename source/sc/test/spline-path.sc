@@ -127,9 +127,40 @@
   (label exit
     (return status)))
 
+(define (test-spline-path-helpers) status-t
+  status-declare
+  (declare
+    out (array spline-path-value-t 50)
+    path spline-path-t
+    i spline-path-time-t
+    segments (array spline-path-segment-t 4)
+    segments2 (array spline-path-segment-t 2))
+  (for ((set i 0) (< i 50) (set i (+ 1 i)))
+    (set (array-get out i) 999))
+  (set
+    (array-get segments 0) (spline-path-move 1 5)
+    (array-get segments 1) (spline-path-line 10 10)
+    (array-get segments 2) (spline-path-bezier 20 15 30 5 40 15)
+    (array-get segments 3) (spline-path-constant))
+  (spline-path-new 4 segments &path)
+  (spline-path-get path 0 50 out)
+  (test-helper-assert "helper path 0" (f64-nearly-equal 0 (array-get out 0) error-margin))
+  (test-helper-assert "helper path 49" (f64-nearly-equal 15 (array-get out 49) error-margin))
+  (set
+    (array-get segments2 0) (spline-path-line 5 10)
+    (array-get segments2 1) (spline-path-path &path))
+  (sc-comment "note that the first point leaves a gap")
+  (spline-path-new-get 2 segments2 0 50 out)
+  #;(for ((set i 0) (< i 50) (set i (+ 1 i)))
+    (printf "%lu %f\n" i (array-get out i)))
+  (spline-path-free path)
+  (label exit
+    (return status)))
+
 (define (main) int
   status-declare
-  (test-helper-test-one test-spline-path)
+  (test-helper-test-one test-spline-path-helpers)
+  ;(test-helper-test-one test-spline-path)
   (label exit
     (test-helper-display-summary)
     (return status.id)))

@@ -88,7 +88,8 @@ void spline_path_i_bezier(spline_path_time_t start, spline_path_time_t end, spli
   };
 };
 /** get values on path between start (inclusive) and end (exclusive).
-  since x values are integers, a path from (0 0) to (10 20) for example will have reached 20 only at the 11th point */
+  since x values are integers, a path from (0 0) to (10 20) for example will have reached 20 only at the 11th point.
+  out memory is managed by the caller. the size required for out is end minus start */
 void spline_path_get(spline_path_t path, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out) {
   /* find all segments that overlap with requested range */
   spline_path_segment_count_t i;
@@ -111,7 +112,8 @@ void spline_path_get(spline_path_t path, spline_path_time_t start, spline_path_t
     s_end = ((s_end < end) ? s_end : end);
     (s.interpolator)(s_start, s_end, (s._start), (s.points), (s.options), (out_start + out));
   };
-  /* outside points zero except first outside point */
+  /* outside points zero. set the last segment point which would be set by a following segment.
+can only be true for the last segment */
   if (end > s_end) {
     out[s_end] = ((s.points)[(s._points_len - 1)]).y;
     s_end = (1 + s_end);
@@ -183,4 +185,43 @@ uint8_t spline_path_new_get(spline_path_segment_count_t segments_len, spline_pat
   spline_path_get(path, start, end, out);
   spline_path_free(path);
   return (0);
+};
+spline_path_segment_t spline_path_move(spline_path_time_t x, spline_path_value_t y) {
+  spline_path_segment_t s;
+  "returns a move segment for the specified point";
+  s.interpolator = spline_path_i_move;
+  (s.points)->x = x;
+  (s.points)->y = y;
+  return (s);
+};
+spline_path_segment_t spline_path_line(spline_path_time_t x, spline_path_value_t y) {
+  spline_path_segment_t s;
+  s.interpolator = spline_path_i_line;
+  (s.points)->x = x;
+  (s.points)->y = y;
+  return (s);
+};
+spline_path_segment_t spline_path_bezier(spline_path_time_t x1, spline_path_value_t y1, spline_path_time_t x2, spline_path_value_t y2, spline_path_time_t x3, spline_path_value_t y3) {
+  spline_path_segment_t s;
+  s.interpolator = spline_path_i_bezier;
+  (s.points)->x = x1;
+  (s.points)->y = y1;
+  (1 + s.points)->x = x2;
+  (1 + s.points)->y = y2;
+  (2 + s.points)->x = x3;
+  (2 + s.points)->y = y3;
+  return (s);
+};
+spline_path_segment_t spline_path_constant() {
+  spline_path_segment_t s;
+  s.interpolator = spline_path_i_constant;
+  return (s);
+};
+/** return a segment that is another spline-path. length is the full length of the path.
+  the path does not necessarily connect and is drawn as it would be on its own starting from the preceding segment */
+spline_path_segment_t spline_path_path(spline_path_t* path) {
+  spline_path_segment_t s;
+  s.interpolator = spline_path_i_path;
+  s.options = path;
+  return (s);
 };
