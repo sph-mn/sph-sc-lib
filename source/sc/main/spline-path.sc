@@ -118,10 +118,9 @@
 
 (define (spline-path-get path start end out)
   (void spline-path-t spline-path-time-t spline-path-time-t spline-path-value-t*)
-  "get values on path between start (inclusive) and end (exclusive)"
-  (sc-comment
-    "write segment start first, then the segment such that it ends before the next start.
-    gets all points from t start to t end minus one")
+  "get values on path between start (inclusive) and end (exclusive).
+  since x values are integers, a path from (0 0) to (10 20) for example will have reached 20 only at the 11th point"
+  (sc-comment "find all segments that overlap with requested range")
   (declare
     i spline-path-segment-count-t
     s spline-path-segment-t
@@ -145,7 +144,14 @@
       s-end
       (if* (< s-end end) s-end
         end))
-    (s.interpolator s-start s-end s._start s.points s.options (+ out-start out))))
+    (s.interpolator s-start s-end s._start s.points s.options (+ out-start out)))
+  (sc-comment "outside points zero except first outside point")
+  (if (> end s-end)
+    (begin
+      (set
+        (array-get out s-end) (struct-get (array-get s.points (- s._points-len 1)) y)
+        s-end (+ 1 s-end))
+      (if (> end s-end) (memset (+ s-end out) 0 (* (- end s-end) (sizeof spline-path-value-t)))))))
 
 (define (spline-path-i-path start end p-start p-rest options out)
   (void

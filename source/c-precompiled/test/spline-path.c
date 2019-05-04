@@ -18,15 +18,15 @@ status_t test_spline_path() {
   uint8_t log_path_new_1;
   uint8_t log_path_new_get_0;
   uint8_t log_path_new_get_1;
-  log_path_new_0 = 1;
-  log_path_new_1 = 1;
+  log_path_new_0 = 0;
+  log_path_new_1 = 0;
   log_path_new_get_0 = 0;
   log_path_new_get_1 = 0;
   for (i = 0; (i < 50); i = (1 + i)) {
     out[i] = 999;
     out_new_get[i] = 999;
   };
-  /* path 2 */
+  /* path 2 - a special case that lead to errors */
   s.interpolator = spline_path_i_move;
   p.x = 0;
   p.y = 6;
@@ -46,7 +46,7 @@ status_t test_spline_path() {
   segments[3] = s;
   segments_len = 4;
   status_id_require((spline_path_new_get(segments_len, segments, 0, 100, out_new_get)));
-  /* path 0 */
+  /* path 0 - will be written to output starting at offset 5 */
   s.interpolator = spline_path_i_move;
   p.x = 10;
   p.y = 5;
@@ -96,7 +96,12 @@ status_t test_spline_path() {
     };
   };
   test_helper_assert("path 0 new-get equal", (!memcmp(out, out_new_get, (sizeof(spline_path_value_t) * 50))));
-  /* path 1 - test last point */
+  /* path 1 - path that ends at 10 */
+  for (i = 0; (i < 50); i = (1 + i)) {
+    /* reset output arrays */
+    out[i] = 999;
+    out_new_get[i] = 999;
+  };
   s.interpolator = spline_path_i_line;
   p.x = 10;
   p.y = 5;
@@ -110,8 +115,8 @@ status_t test_spline_path() {
       printf("%lu %f\n", i, (out[i]));
     };
   };
-  test_helper_assert(("path 1.30"), (f64_nearly_equal(5, (out[10]), error_margin)));
-  test_helper_assert(("path 1.31"), (f64_nearly_equal(0, (out[11]), error_margin)));
+  test_helper_assert(("path 1.10 - should reach maximum at 10"), (f64_nearly_equal(5, (out[10]), error_margin)));
+  test_helper_assert(("path 1.11 - should be zero after segments"), (f64_nearly_equal(0, (out[11]), error_margin)));
   spline_path_free(path);
   /* path 1 new-get */
   status_id_require((spline_path_new_get(segments_len, segments, 0, 12, out_new_get)));

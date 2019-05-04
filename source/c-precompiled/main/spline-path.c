@@ -87,10 +87,10 @@ void spline_path_i_bezier(spline_path_time_t start, spline_path_time_t end, spli
     out[(i - start)] = ((p_start.y * mt * mt * mt) + ((p_rest[0]).y * 3 * mt * mt * t) + ((p_rest[1]).y * 3 * mt * t * t) + (p_end.y * t * t * t));
   };
 };
-/** get values on path between start (inclusive) and end (exclusive) */
+/** get values on path between start (inclusive) and end (exclusive).
+  since x values are integers, a path from (0 0) to (10 20) for example will have reached 20 only at the 11th point */
 void spline_path_get(spline_path_t path, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out) {
-  /* write segment start first, then the segment such that it ends before the next start.
-    gets all points from t start to t end minus one */
+  /* find all segments that overlap with requested range */
   spline_path_segment_count_t i;
   spline_path_segment_t s;
   spline_path_time_t s_start;
@@ -110,6 +110,14 @@ void spline_path_get(spline_path_t path, spline_path_time_t start, spline_path_t
     s_start = ((s_start > start) ? s_start : start);
     s_end = ((s_end < end) ? s_end : end);
     (s.interpolator)(s_start, s_end, (s._start), (s.points), (s.options), (out_start + out));
+  };
+  /* outside points zero except first outside point */
+  if (end > s_end) {
+    out[s_end] = ((s.points)[(s._points_len - 1)]).y;
+    s_end = (1 + s_end);
+    if (end > s_end) {
+      memset((s_end + out), 0, ((end - s_end) * sizeof(spline_path_value_t)));
+    };
   };
 };
 /** p-rest length 0. options is one spline-path-t */
