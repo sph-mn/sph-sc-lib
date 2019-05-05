@@ -230,8 +230,8 @@
   (return 0))
 
 (define (spline-path-move x y) (spline-path-segment-t spline-path-time-t spline-path-value-t)
-  (declare s spline-path-segment-t)
   "returns a move segment for the specified point"
+  (declare s spline-path-segment-t)
   (set
     s.interpolator spline-path-i-move
     s.points:x x
