@@ -48,7 +48,8 @@
       (return ((pre-concat i-array-allocate-custom_ name) length malloc a))))
   (i-array-declare a type)
   (begin
-    "define so that in-range is false, length is zero and free doesnt fail"
+    "define so that in-range is false, length is zero and free doesnt fail.
+     can be used to create empty/null i-arrays"
     (define a type (struct-literal 0 0 0 0)))
   (i-array-add a value)
   (set
@@ -74,8 +75,8 @@
   (begin
     "create an i-array from a standard array.
      sets source as data array to use, with the first count number of slots used.
-     source will not be copied but used as is, and will i-array-free frees is.
-     # example
+     source will not be copied but used as is, and i-array-free would free it.
+     # example with a stack allocated array
      int other_array[4] = {1, 2, 0, 0};
      my_type a;
      i_array_take(a, other_array, 4 2);"
