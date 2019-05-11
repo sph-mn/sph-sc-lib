@@ -18,14 +18,13 @@
 (define (test-futures) status-t
   status-declare
   (declare
-    future future-t*
+    future future-t
     data uint8-t
     result uint8-t*)
   (set data 8)
-  (test-helper-assert "future-init new" (not (future-init 10)))
-  (set future (future-new future-work &data))
-  (test-helper-assert "future-init new" future)
-  (set result (convert-type (touch future) uint8-t*))
+  (test-helper-assert "future-init" (not (future-init 10)))
+  (future-new future-work &data &future)
+  (set result (convert-type (touch &future) uint8-t*))
   (test-helper-assert "touch result" (= (+ 2 data) *result))
   (free result)
   (future-deinit)

@@ -40,7 +40,8 @@
     return (0); \
   }; \
   uint8_t i_array_allocate_##name(size_t length, name* a) { return ((i_array_allocate_custom_##name(length, malloc, a))); }
-/** define so that in-range is false, length is zero and free doesnt fail */
+/** define so that in-range is false, length is zero and free doesnt fail.
+     can be used to create empty/null i-arrays */
 #define i_array_declare(a, type) type a = { 0, 0, 0, 0 }
 #define i_array_add(a, value) \
   *(a.unused) = value; \
@@ -61,8 +62,8 @@
 #define i_array_free(a) free((a.start))
 /** create an i-array from a standard array.
      sets source as data array to use, with the first count number of slots used.
-     source will not be copied but used as is, and will i-array-free frees is.
-     # example
+     source will not be copied but used as is, and i-array-free would free it.
+     # example with a stack allocated array
      int other_array[4] = {1, 2, 0, 0};
      my_type a;
      i_array_take(a, other_array, 4 2); */

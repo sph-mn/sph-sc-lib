@@ -19,14 +19,13 @@ void* future_work(void* data) {
 };
 status_t test_futures() {
   status_declare;
-  future_t* future;
+  future_t future;
   uint8_t data;
   uint8_t* result;
   data = 8;
-  test_helper_assert("future-init new", (!future_init(10)));
-  future = future_new(future_work, (&data));
-  test_helper_assert("future-init new", future);
-  result = ((uint8_t*)(touch(future)));
+  test_helper_assert("future-init", (!future_init(10)));
+  future_new(future_work, (&data), (&future));
+  result = ((uint8_t*)(touch((&future))));
   test_helper_assert("touch result", ((2 + data) == *result));
   free(result);
   future_deinit();

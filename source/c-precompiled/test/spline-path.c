@@ -1,5 +1,6 @@
 #include <inttypes.h>
 #include <string.h>
+#include "../main/spline-path-h.c"
 #include "../main/spline-path.c"
 #include "../main/float.c"
 #include "./test.c"

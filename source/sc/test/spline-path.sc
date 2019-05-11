@@ -1,4 +1,7 @@
-(pre-include "inttypes.h" "string.h" "../main/spline-path.c" "../main/float.c" "./test.c")
+(pre-include
+  "inttypes.h"
+  "string.h" "../main/spline-path-h.c" "../main/spline-path.c" "../main/float.c" "./test.c")
+
 (define error-margin double 0.1)
 
 (define (test-spline-path) status-t
