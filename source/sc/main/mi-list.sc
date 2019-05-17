@@ -10,28 +10,18 @@
 (sc-comment
   "there does not seem to be a simpler way for identifier concatenation in c in this case")
 
-(pre-if-not-defined
-  mi-list-name-concat
+(pre-if-not-defined mi-list-name-concat
   (begin
     (pre-define (mi-list-name-concat a b) (pre-concat a _ b))
     (pre-define (mi-list-name-concatenator a b) (mi-list-name-concat a b))
     (pre-define (mi-list-name name) (mi-list-name-concatenator mi-list-name-prefix name))))
 
-(pre-define
-  mi-list-struct-name (mi-list-name struct)
-  mi-list-t (mi-list-name t))
+(pre-define mi-list-struct-name (mi-list-name struct) mi-list-t (mi-list-name t))
 
 (declare mi-list-t
-  (type
-    (struct
-      mi-list-struct-name
-      (link
-        (struct
-          mi-list-struct-name*))
-      (data mi-list-element-t))))
+  (type (struct mi-list-struct-name (link (struct mi-list-struct-name*)) (data mi-list-element-t))))
 
-(pre-if-not-defined
-  mi-list-first
+(pre-if-not-defined mi-list-first
   (begin
     (pre-define (mi-list-first a) a:data)
     (pre-define (mi-list-first-address a) &a:data)
@@ -46,25 +36,17 @@
 (define ((mi-list-name destroy) a) (void mi-list-t*)
   "it would be nice to set the pointer to zero, but that would require more indirection with a pointer-pointer"
   (define a-next mi-list-t* 0)
-  (while a
-    (set a-next a:link)
-    (free a)
-    (set a a-next)))
+  (while a (set a-next a:link) (free a) (set a a-next)))
 
 (define ((mi-list-name add) a value) (mi-list-t* mi-list-t* mi-list-element-t)
   (define element mi-list-t* (calloc 1 (sizeof mi-list-t)))
   (if (not element) (return 0))
-  (set
-    element:data value
-    element:link a)
+  (set element:data value element:link a)
   (return element))
 
 (define ((mi-list-name length) a) (size-t mi-list-t*)
   (define result size-t 0)
-  (while a
-    (set
-      result (+ 1 result)
-      a (mi-list-rest a)))
+  (while a (set result (+ 1 result) a (mi-list-rest a)))
   (return result))
 
 (pre-undefine mi-list-name-prefix mi-list-element-t mi-list-struct-name mi-list-t)

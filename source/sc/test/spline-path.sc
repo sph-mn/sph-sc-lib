@@ -1,6 +1,5 @@
-(pre-include
-  "inttypes.h"
-  "string.h" "../main/spline-path-h.c" "../main/spline-path.c" "../main/float.c" "./test.c")
+(pre-include "inttypes.h" "string.h"
+  "../main/spline-path-h.c" "../main/spline-path.c" "../main/float.c" "./test.c")
 
 (define error-margin double 0.1)
 
@@ -19,15 +18,9 @@
     log-path-new-1 uint8-t
     log-path-new-get-0 uint8-t
     log-path-new-get-1 uint8-t)
-  (set
-    log-path-new-0 #f
-    log-path-new-1 #f
-    log-path-new-get-0 #f
-    log-path-new-get-1 #f)
+  (set log-path-new-0 #f log-path-new-1 #f log-path-new-get-0 #f log-path-new-get-1 #f)
   (for ((set i 0) (< i 50) (set i (+ 1 i)))
-    (set
-      (array-get out i) 999
-      (array-get out-new-get i) 999))
+    (set (array-get out i) 999 (array-get out-new-get i) 999))
   (sc-comment "path 2 - a special case that lead to errors")
   (set
     s.interpolator spline-path-i-move
@@ -79,8 +72,7 @@
   (spline-path-get path 5 25 out)
   (spline-path-get path 25 55 (+ 20 out))
   (if log-path-new-0
-    (for ((set i 0) (< i 50) (set i (+ 1 i)))
-      (printf "%lu %f\n" i (array-get out i))))
+    (for ((set i 0) (< i 50) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out i))))
   (test-helper-assert "path 0.0" (f64-nearly-equal 0 (array-get out 0) error-margin))
   (test-helper-assert "path 0.4" (f64-nearly-equal 0 (array-get out 4) error-margin))
   (test-helper-assert "path 0.5" (f64-nearly-equal 5 (array-get out 5) error-margin))
@@ -93,16 +85,13 @@
   (sc-comment "path 0 new-get")
   (status-id-require (spline-path-new-get segments-len segments 5 55 out-new-get))
   (if log-path-new-get-0
-    (for ((set i 0) (< i 50) (set i (+ 1 i)))
-      (printf "%lu %f\n" i (array-get out-new-get i))))
-  (test-helper-assert
-    "path 0 new-get equal" (not (memcmp out out-new-get (* (sizeof spline-path-value-t) 50))))
+    (for ((set i 0) (< i 50) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out-new-get i))))
+  (test-helper-assert "path 0 new-get equal"
+    (not (memcmp out out-new-get (* (sizeof spline-path-value-t) 50))))
   (sc-comment "path 1 - path that ends at 10")
   (for ((set i 0) (< i 50) (set i (+ 1 i)))
     (sc-comment "reset output arrays")
-    (set
-      (array-get out i) 999
-      (array-get out-new-get i) 999))
+    (set (array-get out i) 999 (array-get out-new-get i) 999))
   (set
     s.interpolator spline-path-i-line
     p.x 10
@@ -113,22 +102,19 @@
   (status-id-require (spline-path-new segments-len segments &path))
   (spline-path-get path 0 12 out)
   (if log-path-new-1
-    (for ((set i 0) (< i 12) (set i (+ 1 i)))
-      (printf "%lu %f\n" i (array-get out i))))
-  (test-helper-assert
-    "path 1.10 - should reach maximum at 10" (f64-nearly-equal 5 (array-get out 10) error-margin))
-  (test-helper-assert
-    "path 1.11 - should be zero after segments" (f64-nearly-equal 0 (array-get out 11) error-margin))
+    (for ((set i 0) (< i 12) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out i))))
+  (test-helper-assert "path 1.10 - should reach maximum at 10"
+    (f64-nearly-equal 5 (array-get out 10) error-margin))
+  (test-helper-assert "path 1.11 - should be zero after segments"
+    (f64-nearly-equal 0 (array-get out 11) error-margin))
   (spline-path-free path)
   (sc-comment "path 1 new-get")
   (status-id-require (spline-path-new-get segments-len segments 0 12 out-new-get))
   (if log-path-new-get-1
-    (for ((set i 0) (< i 12) (set i (+ 1 i)))
-      (printf "%lu %f\n" i (array-get out-new-get i))))
-  (test-helper-assert
-    "path 1 new-get equal" (not (memcmp out out-new-get (* (sizeof spline-path-value-t) 12))))
-  (label exit
-    (return status)))
+    (for ((set i 0) (< i 12) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out-new-get i))))
+  (test-helper-assert "path 1 new-get equal"
+    (not (memcmp out out-new-get (* (sizeof spline-path-value-t) 12))))
+  (label exit (return status)))
 
 (define (test-spline-path-helpers) status-t
   status-declare
@@ -138,8 +124,7 @@
     i spline-path-time-t
     segments (array spline-path-segment-t 4)
     segments2 (array spline-path-segment-t 2))
-  (for ((set i 0) (< i 50) (set i (+ 1 i)))
-    (set (array-get out i) 999))
+  (for ((set i 0) (< i 50) (set i (+ 1 i))) (set (array-get out i) 999))
   (set
     (array-get segments 0) (spline-path-move 1 5)
     (array-get segments 1) (spline-path-line 10 10)
@@ -157,13 +142,10 @@
   #;(for ((set i 0) (< i 50) (set i (+ 1 i)))
     (printf "%lu %f\n" i (array-get out i)))
   (spline-path-free path)
-  (label exit
-    (return status)))
+  (label exit (return status)))
 
 (define (main) int
   status-declare
   (test-helper-test-one test-spline-path-helpers)
   ;(test-helper-test-one test-spline-path)
-  (label exit
-    (test-helper-display-summary)
-    (return status.id)))
+  (label exit (test-helper-display-summary) (return status.id)))

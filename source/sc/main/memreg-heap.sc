@@ -1,5 +1,4 @@
-(sc-comment
-  "depends on i_array.c."
+(sc-comment "depends on i_array.c."
   "similar to memreg.c but uses a specialised heap allocated array for the memory register
   that can be passed between functions"
   "usage:
@@ -25,9 +24,7 @@
   (memreg-heap-free-pointers reg)
   (begin
     "free only the registered memory"
-    (while (i-array-in-range reg)
-      (free (i-array-get reg))
-      (i-array-forward reg)))
+    (while (i-array-in-range reg) (free (i-array-get reg)) (i-array-forward reg)))
   (memreg-heap-free reg)
   (begin
     "memreg-register-t -> unspecified

@@ -18,38 +18,20 @@
   (begin
     "like status declare but with a default group"
     (define status status-t (struct-literal status-id-success group)))
-  (status-set-both group-id status-id)
-  (set
-    status.group group-id
-    status.id status-id)
+  (status-set-both group-id status-id) (set status.group group-id status.id status-id)
   (status-require expression)
   (begin
     "update status with the result of expression and goto error on failure"
     (set status expression)
     (if status-is-failure status-goto))
   (status-set-id-goto status-id)
-  (begin
-    "set the status id and goto error"
-    (set status.id status-id)
-    status-goto)
-  (status-set-group-goto group-id)
-  (begin
-    (set status.group group-id)
-    status-goto)
-  (status-set-both-goto group-id status-id)
-  (begin
-    (status-set-both group-id status-id)
-    status-goto)
+  (begin "set the status id and goto error" (set status.id status-id) status-goto)
+  (status-set-group-goto group-id) (begin (set status.group group-id) status-goto)
+  (status-set-both-goto group-id status-id) (begin (status-set-both group-id status-id) status-goto)
   (status-id-require expression)
   (begin
     "like status-require but expression returns only status.id"
     (set status.id expression)
     (if status-is-failure status-goto)))
 
-(declare
-  status-id-t (type int32-t)
-  status-t
-  (type
-    (struct
-      (id status-id-t)
-      (group uint8-t*))))
+(declare status-id-t (type int32-t) status-t (type (struct (id status-id-t) (group uint8-t*))))
