@@ -1,13 +1,14 @@
-/* a generic quicksort implementation that works with any array type */
-/** less should return true if the first argument is < than the second.
-   swap should exchange the values of the two arguments it receives */
-void quicksort(uint8_t (*less_p)(void*, size_t, size_t), void (*swap)(void*, size_t, size_t), void* array, size_t left, size_t right) {
+/** a generic quicksort implementation that works with any array type.
+   less should return true if the first argument is < than the second.
+   swap should exchange the values of the two arguments it receives.
+   quicksort(less, swap, array, 0, array-size - 1) */
+void quicksort(uint8_t (*less_p)(void*, ssize_t, ssize_t), void (*swap)(void*, ssize_t, ssize_t), void* array, ssize_t left, ssize_t right) {
   if (right <= left) {
     return;
   };
-  size_t pivot = (left + ((right - left) / 2));
-  size_t l = left;
-  size_t r = right;
+  ssize_t pivot = (left + ((right - left) / 2));
+  ssize_t l = left;
+  ssize_t r = right;
   while (1) {
     while (less_p(array, l, pivot)) {
       l = (1 + l);
