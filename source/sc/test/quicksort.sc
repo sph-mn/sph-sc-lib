@@ -30,27 +30,34 @@
   (declare
     i uint32-t
     struct-element test-struct-t
-    struct-array (array test-struct-t test-element-count)
-    uint32-array (array uint32-t test-element-count))
+    struct-array (array test-struct-t ((* 2 test-element-count)))
+    uint32-array (array uint32-t ((* 2 test-element-count))))
   (for ((set i 0) (< i test-element-count) (set i (+ 1 i)))
     (set
       struct-element.value (- test-element-count i)
       (array-get struct-array i) struct-element
-      (array-get uint32-array i) struct-element.value))
-  (quicksort struct-less? struct-swapper struct-array test-element-count 0)
-  (quicksort uint32-less? uint32-swapper uint32-array test-element-count 0)
-  #;(for ((set i 0) (< i test-element-count) (set i (+ 1 i)))
+      (array-get uint32-array i) struct-element.value
+      struct-element.value i
+      (array-get struct-array (+ test-element-count i)) struct-element
+      (array-get uint32-array (+ test-element-count i)) struct-element.value))
+  (quicksort struct-less? struct-swapper struct-array 0 (- (* 2 test-element-count) 1))
+  (quicksort uint32-less? uint32-swapper uint32-array 0 (- (* 2 test-element-count) 1))
+  #;(for ((set i 0) (< i (* 2 test-element-count)) (set i (+ 1 i)))
     (printf "%lu " (array-get uint32-array i)))
-  #;(for ((set i 0) (< i test-element-count) (set i (+ 1 i)))
-    (printf "%lu " (struct-get (array-get struct-array i) value)))
   (test-helper-assert "quicksort uint32"
-    (and (= 1 (array-get uint32-array 0))
-      (= (+ 1 (/ test-element-count 2)) (array-get uint32-array (/ test-element-count 2)))
-      (= test-element-count (array-get uint32-array (- test-element-count 1)))))
+    (and (= 0 (array-get uint32-array 0)) (= 5 (array-get uint32-array test-element-count))
+      (= 10 (array-get uint32-array (- (* 2 test-element-count) 1)))))
+  (for ((set i 1) (< i (* 2 test-element-count)) (set i (+ 1 i)))
+    (test-helper-assert "quicksort uint32 relative"
+      (>= (array-get uint32-array i) (array-get uint32-array (- i 1)))))
   (test-helper-assert "quicksort struct"
-    (and (= 1 struct-array:value)
-      (= (+ 1 (/ test-element-count 2)) (: (+ struct-array (/ test-element-count 2)) value))
-      (= test-element-count (: (+ struct-array (- test-element-count 1)) value))))
+    (and (= 0 (struct-get (array-get struct-array 0) value))
+      (= 5 (struct-get (array-get struct-array test-element-count) value))
+      (= 10 (struct-get (array-get struct-array (- (* 2 test-element-count) 1)) value))))
+  (for ((set i 1) (< i (* 2 test-element-count)) (set i (+ 1 i)))
+    (test-helper-assert "quicksort struct relative"
+      (>= (struct-get (array-get struct-array i) value)
+        (struct-get (array-get struct-array (- i 1)) value))))
   (label exit (return status)))
 
 (define (main) int

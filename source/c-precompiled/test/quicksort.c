@@ -24,17 +24,26 @@ status_t test_quicksort() {
   status_declare;
   uint32_t i;
   test_struct_t struct_element;
-  test_struct_t struct_array[test_element_count];
-  uint32_t uint32_array[test_element_count];
+  test_struct_t struct_array[(2 * test_element_count)];
+  uint32_t uint32_array[(2 * test_element_count)];
   for (i = 0; (i < test_element_count); i = (1 + i)) {
     struct_element.value = (test_element_count - i);
     struct_array[i] = struct_element;
     uint32_array[i] = struct_element.value;
+    struct_element.value = i;
+    struct_array[(test_element_count + i)] = struct_element;
+    uint32_array[(test_element_count + i)] = struct_element.value;
   };
-  quicksort(struct_less_p, struct_swapper, struct_array, test_element_count, 0);
-  quicksort(uint32_less_p, uint32_swapper, uint32_array, test_element_count, 0);
-  test_helper_assert("quicksort uint32", ((1 == uint32_array[0]) && ((1 + (test_element_count / 2)) == uint32_array[(test_element_count / 2)]) && (test_element_count == uint32_array[(test_element_count - 1)])));
-  test_helper_assert("quicksort struct", ((1 == struct_array->value) && ((1 + (test_element_count / 2)) == (struct_array + (test_element_count / 2))->value) && (test_element_count == (struct_array + (test_element_count - 1))->value)));
+  quicksort(struct_less_p, struct_swapper, struct_array, 0, ((2 * test_element_count) - 1));
+  quicksort(uint32_less_p, uint32_swapper, uint32_array, 0, ((2 * test_element_count) - 1));
+  test_helper_assert("quicksort uint32", ((0 == uint32_array[0]) && (5 == uint32_array[test_element_count]) && (10 == uint32_array[((2 * test_element_count) - 1)])));
+  for (i = 1; (i < (2 * test_element_count)); i = (1 + i)) {
+    test_helper_assert("quicksort uint32 relative", (uint32_array[i] >= uint32_array[(i - 1)]));
+  };
+  test_helper_assert("quicksort struct", ((0 == (struct_array[0]).value) && (5 == (struct_array[test_element_count]).value) && (10 == (struct_array[((2 * test_element_count) - 1)]).value)));
+  for (i = 1; (i < (2 * test_element_count)); i = (1 + i)) {
+    test_helper_assert("quicksort struct relative", ((struct_array[i]).value >= (struct_array[(i - 1)]).value));
+  };
 exit:
   return (status);
 };
