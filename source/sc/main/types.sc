@@ -15,17 +15,17 @@
   i16-fast int-fast16-t
   i32-fast int-fast32-t
   i64-fast int-fast64-t
-  ui8 uint8-t
-  ui16 uint16-t
-  ui32 uint32-t
-  ui64 uint64-t
-  ui8-least uint-least8-t
-  ui16-least uint-least16-t
-  ui32-least uint-least32-t
-  ui64-least uint-least64-t
-  ui8-fast uint-fast8-t
-  ui16-fast uint-fast16-t
-  ui32-fast uint-fast32-t
-  ui64-fast uint-fast64-t
+  u8 uint8-t
+  u16 uint16-t
+  u32 uint32-t
+  u64 uint64-t
+  u8-least uint-least8-t
+  u16-least uint-least16-t
+  u32-least uint-least32-t
+  u64-least uint-least64-t
+  u8-fast uint-fast8-t
+  u16-fast uint-fast16-t
+  u32-fast uint-fast32-t
+  u64-fast uint-fast64-t
   f32 float
   f64 double)

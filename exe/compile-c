@@ -7,12 +7,13 @@ c=source/c-precompiled
 gcc_options="$warnings -Wfatal-errors -O0 -ggdb"
 
 compile_test_sph_sc_lib() {
+  gcc "$c/test/random.c" -o temp/test-random $gcc_options
   gcc "$c/test/mi-list.c" -o temp/test-mi-list $gcc_options
   gcc "$c/test/imht-set.c" -o temp/test-imht-set $gcc_options
   gcc "$c/test/quicksort.c" -o temp/test-quicksort $gcc_options
   gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
   gcc "$c/test/thread-pool.c" -o temp/test-thread-pool $gcc_options -lpthread
-  gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options -lpthread
+  gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options
 }
 
 mkdir -p "$target_dir" &&
