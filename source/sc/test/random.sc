@@ -1,5 +1,5 @@
-(pre-include "stdio.h" "inttypes.h"
-  "./test.c" "../main/float.c" "../main/types.c" "../main/random.c")
+(pre-include "stdio.h" "../main/types.c"
+  "./test.c" "../main/float.c" "../main/random-h.c" "../main/random.c")
 
 (define (test-random) status-t
   status-declare

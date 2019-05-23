@@ -1,12 +1,5 @@
-(declare random-state-t (type (struct (data (array u64 4)))))
-
-(pre-define
-  (f64-from-u64 a)
-  (begin
-    "guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely. this conversion prefers the high bits of x.
-     from http://xoshiro.di.unimi.it/"
-    (* (bit-shift-right a 11) (/ 1.0 (bit-shift-left (UINT64_C 1) 53))))
-  (rotl x k) (bit-or (bit-shift-left x k) (bit-shift-right x (- 64 k))))
+(sc-comment "depends on random-h.c")
+(pre-define (rotl x k) (bit-or (bit-shift-left x k) (bit-shift-right x (- 64 k))))
 
 (define (random-state-new seed) (random-state-t u64)
   "use the given u64 as a seed and set state with splitmix64 results.
