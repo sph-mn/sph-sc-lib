@@ -30,11 +30,11 @@ status_t test_queue() {
   };
 exit:
   return (status);
-};
+}
 int main() {
   status_declare;
   test_helper_test_one(test_queue);
 exit:
   test_helper_display_summary();
   return ((status.id));
-};
+}

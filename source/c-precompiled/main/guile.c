@@ -20,10 +20,10 @@
 void scm_debug_log(SCM value) {
   scm_call_2((scm_variable_ref((scm_c_lookup("write")))), value, (scm_current_output_port()));
   scm_newline((scm_current_output_port()));
-};
+}
 /** creates a new bytevector of size-octects that contains the given bytevector */
 SCM scm_c_bytevector_take(size_t size_octets, uint8_t* a) {
   SCM r = scm_c_make_bytevector(size_octets);
   memcpy((SCM_BYTEVECTOR_CONTENTS(r)), a, size_octets);
   return (r);
-};
+}

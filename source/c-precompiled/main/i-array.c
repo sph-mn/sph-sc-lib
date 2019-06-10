@@ -38,7 +38,7 @@
     a->unused = start; \
     a->end = (length + start); \
     return (0); \
-  }; \
+  } \
   uint8_t i_array_allocate_##name(size_t length, name* a) { return ((i_array_allocate_custom_##name(length, malloc, a))); }
 /** define so that in-range is false, length is zero and free doesnt fail.
      can be used to create empty/null i-arrays */

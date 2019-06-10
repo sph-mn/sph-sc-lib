@@ -10,13 +10,13 @@ status_t test_thread_pool() {
   test_helper_assert("thread-pool finish", (!thread_pool_finish((&pool), 0, 0)));
 exit:
   return (status);
-};
+}
 void* future_work(void* data) {
   uint8_t* a;
   a = malloc((sizeof(uint8_t)));
   *a = (2 + *((uint8_t*)(data)));
   return (a);
-};
+}
 status_t test_futures() {
   status_declare;
   future_t future;
@@ -31,7 +31,7 @@ status_t test_futures() {
   future_deinit();
 exit:
   return (status);
-};
+}
 int main() {
   status_declare;
   test_helper_test_one(test_futures);
@@ -39,4 +39,4 @@ int main() {
 exit:
   test_helper_display_summary();
   return ((status.id));
-};
+}

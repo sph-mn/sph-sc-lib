@@ -1,25 +1,26 @@
 #include <stdio.h>
 #include <inttypes.h>
+#include <sys/types.h>
 #include "./test.c"
 #include "../main/quicksort.c"
 #define test_element_count 10
 typedef struct {
   uint32_t value;
 } test_struct_t;
-uint8_t struct_less_p(void* a, ssize_t b, ssize_t c) { return (((b + ((test_struct_t*)(a)))->value < (c + ((test_struct_t*)(a)))->value)); };
+uint8_t struct_less_p(void* a, ssize_t b, ssize_t c) { return (((b + ((test_struct_t*)(a)))->value < (c + ((test_struct_t*)(a)))->value)); }
 void struct_swapper(void* a, ssize_t b, ssize_t c) {
   test_struct_t d;
   d = *(b + ((test_struct_t*)(a)));
   *(b + ((test_struct_t*)(a))) = *(c + ((test_struct_t*)(a)));
   *(c + ((test_struct_t*)(a))) = d;
-};
-uint8_t uint32_less_p(void* a, ssize_t b, ssize_t c) { return ((((uint32_t*)(a))[b] < ((uint32_t*)(a))[c])); };
+}
+uint8_t uint32_less_p(void* a, ssize_t b, ssize_t c) { return ((((uint32_t*)(a))[b] < ((uint32_t*)(a))[c])); }
 void uint32_swapper(void* a, ssize_t b, ssize_t c) {
   uint32_t d;
   d = ((uint32_t*)(a))[b];
   ((uint32_t*)(a))[b] = ((uint32_t*)(a))[c];
   ((uint32_t*)(a))[c] = d;
-};
+}
 status_t test_quicksort() {
   status_declare;
   uint32_t i;
@@ -49,11 +50,11 @@ status_t test_quicksort() {
   test_helper_assert("uint32-short", ((0 == uint32_array_short[0]) && (12 == uint32_array_short[1])));
 exit:
   return (status);
-};
+}
 int main() {
   status_declare;
   test_helper_test_one(test_quicksort);
 exit:
   test_helper_display_summary();
   return ((status.id));
-};
+}

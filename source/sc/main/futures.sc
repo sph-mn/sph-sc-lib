@@ -53,6 +53,7 @@
   (label loop
     (if a:finished (return a:task.data)
       (begin
-        (sc-comment "poll five times per second. maybe condition variables can be used here")
-        (nanosleep sleep-time 0)
+        (sc-comment
+          "poll five times per second. maybe using condition variables would be more efficient")
+        (nanosleep &sleep-time 0)
         (goto loop)))))

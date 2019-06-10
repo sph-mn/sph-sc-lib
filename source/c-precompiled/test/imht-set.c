@@ -9,7 +9,7 @@ void print_contents(imht_set_t* set) {
     printf("%lu\n", ((set->content)[index]));
     index = (index - 1);
   };
-};
+}
 status_t test_imht_set() {
   status_declare;
   imht_set_t* a;
@@ -31,11 +31,11 @@ status_t test_imht_set() {
   imht_set_destroy(a);
 exit:
   return (status);
-};
+}
 int main() {
   status_declare;
   test_helper_test_one(test_imht_set);
 exit:
   test_helper_display_summary();
   return ((status.id));
-};
+}

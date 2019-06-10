@@ -224,7 +224,7 @@ the "imht_set_t" type is a structure with the two fields "size" and "content". "
 the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can be implemented by adding new "add" and "remove" routines and rewriting the content data.
 
 # i-array
-a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list.
+a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list. the overhead is small because it is only four pointers.
 most bindings are generic macros that will work on all i-array types. i_array_add and i_array_forward go from left to right
 
 ## dependencies
@@ -348,6 +348,7 @@ if(0 = q.size) { printf("it's empty\n"); }
 
 # thread-pool
 ```c
+#include <inttypes.h>
 #include "queue.c"
 #include "thread-pool.c"
 
@@ -380,6 +381,7 @@ calling touch on an object waits for its completion and returns its result.
 depends on thread-pool.c
 
 ```c
+#include <inttypes.h>
 #include "queue.c"
 #include "thread-pool.c"
 #include "futures.c"
@@ -412,6 +414,10 @@ int main() {
   future_deinit();
   return 0;
 }
+```
+
+```
+gcc "$c/test/thread-pool.c" -o temp/test-thread-pool -lpthread -D _DEFAULT_SOURCE
 ```
 
 # spline-path
@@ -489,40 +495,69 @@ int main() {
 ```
 
 # quicksort
-also works with arrays of structs and any other array type.
+works with arrays of structs and any array type.
 
 ```c
-quicksort(
-  uint8_t (*less_p)(void*, void*),
-  void (*swap)(void*, void*),
-  uint8_t element_size,
+void quicksort(
+  uint8_t (*less_p)(void*, ssize_t, ssize_t),
+  void (*swap)(void*, ssize_t, ssize_t),
   void* array,
-  size_t array_len);
+  ssize_t left,
+  ssize_t right);
 ```
 
 ```c
-uint8_t uint32_less_p(void* a, void* b) {
-  return *((uint32_t*)(a)) < *((uint32_t*)(b));
-};
-void uint32_swapper(void* a, void* b) {
-  uint32_t c;
-  c = *((uint32_t*)(a));
-  *((uint32_t*)(a)) = *((uint32_t*)(b));
-  *((uint32_t*)(b)) = c;
-};
+#include <stdio.h>
+#include <inttypes.h>
+#include <sys/types.h>
+#include "quicksort.c"
+
+uint8_t uint32_less_p(void* a, ssize_t b, ssize_t c) {
+  // typecast "a" to the right pointer type and compare elements at indices b and c
+  return (((uint32_t*)(a))[b] < ((uint32_t*)(a))[c]);
+}
+
+void uint32_swapper(void* a, ssize_t b, ssize_t c) {
+  uint32_t d;
+  d = ((uint32_t*)(a))[b];
+  ((uint32_t*)(a))[b] = ((uint32_t*)(a))[c];
+  ((uint32_t*)(a))[c] = d;
+}
+
 #define test_element_count 100;
+
 int main() {
+  // prepare input
   size_t i;
   uint32_t uint32_array[test_element_count];
   for (i = 0; (i < test_element_count); i = 1 + i) {
     uint32_array[i] = test_element_count - i;
   };
 
-  quicksort(uint32_less_p, uint32_swapper, 4, uint32_array, test_element_count);
+  // sort
+  quicksort(uint32_less_p, uint32_swapper, uint32_array, 0, test_element_count - 1);
 
+  // display results
   for (i = 0; (i < test_element_count); i = 1 + i) {
     printf("%u", uint32_array[i]);
   };
   return 0;
 };
+```
+
+# random
+[xoshiro256plus](http://xoshiro.di.unimi.it/) implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/)). fills an array with random values. also includes a macro to define custom-type random functions.
+
+```c
+sph_random_state_t sph_random_state_new(u64 seed);
+void sph_random(sph_random_state_t* state, u32 size, f64* out);
+#define define_sph_random(name, size_type, data_type, transfer)
+```
+```c
+#include "types.c"
+#include "random-h.c"
+#include "random.c"
+```
+```c
+define_sph_random(sph_random, u32, f64, (f64_from_u64(result_plus)));
 ```

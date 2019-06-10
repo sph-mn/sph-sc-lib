@@ -129,7 +129,7 @@ status_t test_spline_path() {
   test_helper_assert("path 1 new-get equal", (!memcmp(out, out_new_get, (sizeof(spline_path_value_t) * 12))));
 exit:
   return (status);
-};
+}
 status_t test_spline_path_helpers() {
   status_declare;
   spline_path_value_t out[50];
@@ -155,11 +155,11 @@ status_t test_spline_path_helpers() {
   spline_path_free(path);
 exit:
   return (status);
-};
+}
 int main() {
   status_declare;
   test_helper_test_one(test_spline_path_helpers);
 exit:
   test_helper_display_summary();
   return ((status.id));
-};
+}
