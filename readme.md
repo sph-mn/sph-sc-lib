@@ -495,7 +495,7 @@ int main() {
 ```
 
 # quicksort
-works with arrays of structs and any array type.
+works with arrays of structs and any other array type.
 
 ```c
 void quicksort(
@@ -546,18 +546,25 @@ int main() {
 ```
 
 # random
-[xoshiro256plus](http://xoshiro.di.unimi.it/) implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/)). fills an array with random values. also includes a macro to define custom-type random functions.
+[xoshiro256plus](http://xoshiro.di.unimi.it/) implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/)). fills an array with random values. also includes a macro to define custom-type random functions. the sph_ prefix was added because "random" is defined in the standard library
 
 ```c
 sph_random_state_t sph_random_state_new(u64 seed);
 void sph_random(sph_random_state_t* state, u32 size, f64* out);
 #define define_sph_random(name, size_type, data_type, transfer)
 ```
+
 ```c
 #include "types.c"
 #include "random-h.c"
 #include "random.c"
+
+sph_random_state_t s;
+f64 out[100];
+s = sph_random_state_new(11223344);
+sph_random((&s), 100, out);
 ```
+
 ```c
 define_sph_random(sph_random, u32, f64, (f64_from_u64(result_plus)));
 ```
