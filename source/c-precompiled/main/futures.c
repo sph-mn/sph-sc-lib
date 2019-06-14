@@ -60,7 +60,7 @@ loop:
   if (a->finished) {
     return ((a->task.data));
   } else {
-    /* poll five times per second. maybe using condition variables would be more efficient */
+    /* poll several times per second. maybe using condition variables would be more efficient */
     nanosleep((&sleep_time), 0);
     goto loop;
   };
