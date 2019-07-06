@@ -32,8 +32,8 @@ s_t sph_helper_primitive_malloc(size_t size, void** result) {
   if (a) {
     *result = a;
   } else {
-    status.group = sph_helper_status_group;
-    status.id = sph_helper_status_id_memory;
+    s_current.group = sph_helper_status_group;
+    s_current.id = sph_helper_status_id_memory;
   };
   s_return;
 }
@@ -41,7 +41,7 @@ s_t sph_helper_primitive_malloc(size_t size, void** result) {
 s_t sph_helper_primitive_malloc_string(size_t length, uint8_t** result) {
   s_declare;
   uint8_t* a;
-  status_require((sph_helper_malloc((1 + length), (&a))));
+  s((sph_helper_malloc((1 + length), (&a))));
   a[length] = 0;
   *result = a;
 exit:
@@ -54,8 +54,8 @@ s_t sph_helper_primitive_calloc(size_t size, void** result) {
   if (a) {
     *result = a;
   } else {
-    status.group = sph_helper_status_group;
-    status.id = sph_helper_status_id_memory;
+    s_current.group = sph_helper_status_group;
+    s_current.id = sph_helper_status_id_memory;
   };
   s_return;
 }
@@ -66,8 +66,8 @@ s_t sph_helper_primitive_realloc(size_t size, void** block) {
   if (a) {
     *block = a;
   } else {
-    status.group = sph_helper_status_group;
-    status.id = sph_helper_status_id_memory;
+    s_current.group = sph_helper_status_group;
+    s_current.id = sph_helper_status_id_memory;
   };
   s_return;
 }

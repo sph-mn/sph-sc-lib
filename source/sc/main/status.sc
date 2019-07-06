@@ -1,10 +1,10 @@
 (sc-comment "return status as integer code with group identifier"
   "for exception handling with a local variable and a goto label"
   "status id 0 is success, everything else can be considered a special case or failure"
-  "status ids are 32 bit signed integers for compatibility with error return codes from other existing libraries"
+  "status ids are signed integers for compatibility with error return codes from other existing libraries"
   "group ids are strings used to categorise sets of errors codes from different libraries for example")
 
-(declare s-t (type (struct (id int32-t) (group uint8-t*))))
+(declare s-t (type (struct (id int) (group uint8-t*))))
 
 (pre-define
   s-success 0
