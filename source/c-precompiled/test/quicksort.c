@@ -21,8 +21,8 @@ void uint32_swapper(void* a, ssize_t b, ssize_t c) {
   ((uint32_t*)(a))[b] = ((uint32_t*)(a))[c];
   ((uint32_t*)(a))[c] = d;
 }
-status_t test_quicksort() {
-  status_declare;
+s_t test_quicksort() {
+  s_declare;
   uint32_t i;
   test_struct_t struct_element;
   test_struct_t struct_array[(2 * test_element_count)];
@@ -49,12 +49,12 @@ status_t test_quicksort() {
   quicksort(uint32_less_p, uint32_swapper, uint32_array_short, 0, 1);
   test_helper_assert("uint32-short", ((0 == uint32_array_short[0]) && (12 == uint32_array_short[1])));
 exit:
-  return (status);
+  s_return;
 }
 int main() {
-  status_declare;
+  s_declare;
   test_helper_test_one(test_quicksort);
 exit:
   test_helper_display_summary();
-  return ((status.id));
+  return ((s_current.id));
 }

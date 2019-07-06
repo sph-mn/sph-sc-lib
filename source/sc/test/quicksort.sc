@@ -25,8 +25,8 @@
     (array-get (convert-type a uint32-t*) b) (array-get (convert-type a uint32-t*) c)
     (array-get (convert-type a uint32-t*) c) d))
 
-(define (test-quicksort) status-t
-  status-declare
+(define (test-quicksort) s-t
+  s-declare
   (declare
     i uint32-t
     struct-element test-struct-t
@@ -62,9 +62,9 @@
   (quicksort uint32-less? uint32-swapper uint32-array-short 0 1)
   (test-helper-assert "uint32-short"
     (and (= 0 (array-get uint32-array-short 0)) (= 12 (array-get uint32-array-short 1))))
-  (label exit (return status)))
+  (label exit s-return))
 
 (define (main) int
-  status-declare
+  s-declare
   (test-helper-test-one test-quicksort)
-  (label exit (test-helper-display-summary) (return status.id)))
+  (label exit (test-helper-display-summary) (return s-current.id)))

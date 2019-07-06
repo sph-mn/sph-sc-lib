@@ -5,8 +5,8 @@
   (printf "print-contents\n")
   (while a (printf "%lu\n" (mi-list-first a)) (set a (mi-list-rest a))))
 
-(define (test-mi-list) status-t
-  status-declare
+(define (test-mi-list) s-t
+  s-declare
   (declare a mi-list-64-t* i uint32-t)
   (set a 0)
   (sc-comment "insert values")
@@ -17,9 +17,9 @@
   (for ((set i (- test-element-count 1)) (> i 0) (set i (- i 1) a (mi-list-rest a)))
     (test-helper-assert "value equal" (= i (mi-list-first a))))
   (mi-list-64-destroy a)
-  (label exit (return status)))
+  (label exit s-return))
 
 (define (main) int
-  status-declare
+  s-declare
   (test-helper-test-one test-mi-list)
-  (label exit (test-helper-display-summary) (return status.id)))
+  (label exit (test-helper-display-summary) (return s-current.id)))

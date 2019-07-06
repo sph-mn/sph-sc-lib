@@ -10,8 +10,8 @@ void print_contents(imht_set_t* set) {
     index = (index - 1);
   };
 }
-status_t test_imht_set() {
-  status_declare;
+s_t test_imht_set() {
+  s_declare;
   imht_set_t* a;
   uint32_t i;
   imht_set_create(test_element_count, (&a));
@@ -30,12 +30,12 @@ status_t test_imht_set() {
   };
   imht_set_destroy(a);
 exit:
-  return (status);
+  s_return;
 }
 int main() {
-  status_declare;
+  s_declare;
   test_helper_test_one(test_imht_set);
 exit:
   test_helper_display_summary();
-  return ((status.id));
+  return ((s_current.id));
 }
