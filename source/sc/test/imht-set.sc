@@ -5,8 +5,8 @@
   (define index size-t (- set:size 1))
   (while index (printf "%lu\n" (array-get set:content index)) (set index (- index 1))))
 
-(define (test-imht-set) s-t
-  s-declare
+(define (test-imht-set) status-t
+  status-declare
   (declare a imht-set-t* i uint32-t)
   (imht-set-create test-element-count &a)
   (sc-comment "test zero")
@@ -20,9 +20,9 @@
   (for ((set i 0) (< i test-element-count) (set i (+ 1 i)))
     (test-helper-assert "find value" (not (= 0 (imht-set-find a i)))))
   (imht-set-destroy a)
-  (label exit s-return))
+  (label exit status-return))
 
 (define (main) int
-  s-declare
+  status-declare
   (test-helper-test-one test-imht-set)
-  (label exit (test-helper-display-summary) (return s-current.id)))
+  (label exit (test-helper-display-summary) (return status.id)))

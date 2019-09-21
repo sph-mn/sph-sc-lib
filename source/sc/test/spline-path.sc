@@ -3,8 +3,8 @@
 
 (define error-margin double 0.1)
 
-(define (test-spline-path) s-t
-  s-declare
+(define (test-spline-path) status-t
+  status-declare
   (declare
     out (array spline-path-value-t 100)
     out-new-get (array spline-path-value-t 100)
@@ -41,7 +41,7 @@
     s.interpolator spline-path-i-constant
     (array-get segments 3) s
     segments-len 4)
-  (si (spline-path-new-get segments-len segments 0 100 out-new-get))
+  (status-i-require (spline-path-new-get segments-len segments 0 100 out-new-get))
   (sc-comment "path 0 - will be written to output starting at offset 5")
   (set
     s.interpolator spline-path-i-move
@@ -68,7 +68,7 @@
     s.interpolator spline-path-i-constant
     (array-get segments 3) s
     segments-len 4)
-  (si (spline-path-new segments-len segments &path))
+  (status-i-require (spline-path-new segments-len segments &path))
   (spline-path-get path 5 25 out)
   (spline-path-get path 25 55 (+ 20 out))
   (if log-path-new-0
@@ -83,7 +83,7 @@
   (test-helper-assert "path 0.49" (f64-nearly-equal 25 (array-get out 49) error-margin))
   (spline-path-free path)
   (sc-comment "path 0 new-get")
-  (si (spline-path-new-get segments-len segments 5 55 out-new-get))
+  (status-i-require (spline-path-new-get segments-len segments 5 55 out-new-get))
   (if log-path-new-get-0
     (for ((set i 0) (< i 50) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out-new-get i))))
   (test-helper-assert "path 0 new-get equal"
@@ -99,7 +99,7 @@
     (array-get s.points 0) p
     (array-get segments 0) s
     segments-len 1)
-  (si (spline-path-new segments-len segments &path))
+  (status-i-require (spline-path-new segments-len segments &path))
   (spline-path-get path 0 12 out)
   (if log-path-new-1
     (for ((set i 0) (< i 12) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out i))))
@@ -109,15 +109,15 @@
     (f64-nearly-equal 0 (array-get out 11) error-margin))
   (spline-path-free path)
   (sc-comment "path 1 new-get")
-  (si (spline-path-new-get segments-len segments 0 12 out-new-get))
+  (status-i-require (spline-path-new-get segments-len segments 0 12 out-new-get))
   (if log-path-new-get-1
     (for ((set i 0) (< i 12) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out-new-get i))))
   (test-helper-assert "path 1 new-get equal"
     (not (memcmp out out-new-get (* (sizeof spline-path-value-t) 12))))
-  (label exit s-return))
+  (label exit status-return))
 
-(define (test-spline-path-helpers) s-t
-  s-declare
+(define (test-spline-path-helpers) status-t
+  status-declare
   (declare
     out (array spline-path-value-t 50)
     path spline-path-t
@@ -142,10 +142,10 @@
   #;(for ((set i 0) (< i 50) (set i (+ 1 i)))
     (printf "%lu %f\n" i (array-get out i)))
   (spline-path-free path)
-  (label exit s-return))
+  (label exit status-return))
 
 (define (main) int
-  s-declare
+  status-declare
   (test-helper-test-one test-spline-path-helpers)
   ;(test-helper-test-one test-spline-path)
-  (label exit (test-helper-display-summary) (return s-current.id)))
+  (label exit (test-helper-display-summary) (return status.id)))

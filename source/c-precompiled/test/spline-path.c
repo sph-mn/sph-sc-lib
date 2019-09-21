@@ -5,8 +5,8 @@
 #include "../main/float.c"
 #include "./test.c"
 double error_margin = 0.1;
-s_t test_spline_path() {
-  s_declare;
+status_t test_spline_path() {
+  status_declare;
   spline_path_value_t out[100];
   spline_path_value_t out_new_get[100];
   spline_path_time_t i;
@@ -46,7 +46,7 @@ s_t test_spline_path() {
   s.interpolator = spline_path_i_constant;
   segments[3] = s;
   segments_len = 4;
-  si((spline_path_new_get(segments_len, segments, 0, 100, out_new_get)));
+  status_i_require((spline_path_new_get(segments_len, segments, 0, 100, out_new_get)));
   /* path 0 - will be written to output starting at offset 5 */
   s.interpolator = spline_path_i_move;
   p.x = 10;
@@ -72,7 +72,7 @@ s_t test_spline_path() {
   s.interpolator = spline_path_i_constant;
   segments[3] = s;
   segments_len = 4;
-  si((spline_path_new(segments_len, segments, (&path))));
+  status_i_require((spline_path_new(segments_len, segments, (&path))));
   spline_path_get(path, 5, 25, out);
   spline_path_get(path, 25, 55, (20 + out));
   if (log_path_new_0) {
@@ -90,7 +90,7 @@ s_t test_spline_path() {
   test_helper_assert(("path 0.49"), (f64_nearly_equal(25, (out[49]), error_margin)));
   spline_path_free(path);
   /* path 0 new-get */
-  si((spline_path_new_get(segments_len, segments, 5, 55, out_new_get)));
+  status_i_require((spline_path_new_get(segments_len, segments, 5, 55, out_new_get)));
   if (log_path_new_get_0) {
     for (i = 0; (i < 50); i = (1 + i)) {
       printf("%lu %f\n", i, (out_new_get[i]));
@@ -109,7 +109,7 @@ s_t test_spline_path() {
   (s.points)[0] = p;
   segments[0] = s;
   segments_len = 1;
-  si((spline_path_new(segments_len, segments, (&path))));
+  status_i_require((spline_path_new(segments_len, segments, (&path))));
   spline_path_get(path, 0, 12, out);
   if (log_path_new_1) {
     for (i = 0; (i < 12); i = (1 + i)) {
@@ -120,7 +120,7 @@ s_t test_spline_path() {
   test_helper_assert(("path 1.11 - should be zero after segments"), (f64_nearly_equal(0, (out[11]), error_margin)));
   spline_path_free(path);
   /* path 1 new-get */
-  si((spline_path_new_get(segments_len, segments, 0, 12, out_new_get)));
+  status_i_require((spline_path_new_get(segments_len, segments, 0, 12, out_new_get)));
   if (log_path_new_get_1) {
     for (i = 0; (i < 12); i = (1 + i)) {
       printf("%lu %f\n", i, (out_new_get[i]));
@@ -128,10 +128,10 @@ s_t test_spline_path() {
   };
   test_helper_assert("path 1 new-get equal", (!memcmp(out, out_new_get, (sizeof(spline_path_value_t) * 12))));
 exit:
-  s_return;
+  status_return;
 }
-s_t test_spline_path_helpers() {
-  s_declare;
+status_t test_spline_path_helpers() {
+  status_declare;
   spline_path_value_t out[50];
   spline_path_t path;
   spline_path_time_t i;
@@ -154,12 +154,12 @@ s_t test_spline_path_helpers() {
   spline_path_new_get(2, segments2, 0, 50, out);
   spline_path_free(path);
 exit:
-  s_return;
+  status_return;
 }
 int main() {
-  s_declare;
+  status_declare;
   test_helper_test_one(test_spline_path_helpers);
 exit:
   test_helper_display_summary();
-  return ((s_current.id));
+  return ((status.id));
 }

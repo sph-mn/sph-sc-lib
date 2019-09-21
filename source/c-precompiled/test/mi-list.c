@@ -9,8 +9,8 @@ void print_contents(mi_list_64_t* a) {
     a = mi_list_rest(a);
   };
 }
-s_t test_mi_list() {
-  s_declare;
+status_t test_mi_list() {
+  status_declare;
   mi_list_64_t* a;
   uint32_t i;
   a = 0;
@@ -25,12 +25,12 @@ s_t test_mi_list() {
   };
   mi_list_64_destroy(a);
 exit:
-  s_return;
+  status_return;
 }
 int main() {
-  s_declare;
+  status_declare;
   test_helper_test_one(test_mi_list);
 exit:
   test_helper_display_summary();
-  return ((s_current.id));
+  return ((status.id));
 }

@@ -6,8 +6,8 @@ typedef struct {
   uint32_t data;
   queue_node_t q;
 } test_element_t;
-s_t test_queue() {
-  s_declare;
+status_t test_queue() {
+  status_declare;
   queue_t a;
   test_element_t* e;
   test_element_t elements[test_element_count];
@@ -29,12 +29,12 @@ s_t test_queue() {
     test_helper_assert("size 2", (0 == a.size));
   };
 exit:
-  s_return;
+  status_return;
 }
 int main() {
-  s_declare;
+  status_declare;
   test_helper_test_one(test_queue);
 exit:
   test_helper_display_summary();
-  return ((s_current.id));
+  return ((status.id));
 }
