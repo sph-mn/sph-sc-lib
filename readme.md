@@ -8,7 +8,7 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 * i-array: a fixed size array type with variable length content that makes iteration easier to code
 * imht-set: a minimal, macro-based fixed size hash-table data structure for sets of integers
 * memreg: track heap memory allocations in function scope
-* mi-list: a minimal, macro-based linked list
+* mi-list: a basic, macro-based linked list
 * queue: a minimal queue for any data type
 * quicksort: a generic implementation for arrays of any type
 * spline-path: interpolated 2d paths between given points
@@ -112,15 +112,15 @@ memreg_free_named(testname);
 ```
 
 ## memreg_heap
-``memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables for example
+``memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables.
 
 ```c
 memreg_heap_declare(allocations);
 if(memreg_heap_allocate(2, allocations)) {
   // allocation error
 }
-memreg_heap_add(allocations, &variable-1);
-memreg_heap_add(allocations, &variable-2);
+memreg_heap_add(allocations, &variable1);
+memreg_heap_add(allocations, &variable2);
 memreg_heap_free(allocations);
 ```
 
