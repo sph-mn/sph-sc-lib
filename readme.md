@@ -11,8 +11,8 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 * mi-list: a minimal, macro-based linked list
 * queue: a minimal queue for any data type
 * quicksort: a generic implementation for arrays of any type
-* spline-path: interpolated 2d paths between some given points
-* status: return-status and error handling with a tiny status object with status id and source library id
+* spline-path: interpolated 2d paths between given points
+* status: return-status and error handling using a tiny object with status/error id and source library id
 * thread-pool: a task queue with pthread threads and wait conditions to pause inactive threads
 * experimental
   * one: miscellaneous helpers
@@ -224,7 +224,7 @@ the "imht_set_t" type is a structure with the two fields "size" and "content". "
 the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can be implemented by adding new "add" and "remove" routines and rewriting the content data.
 
 # i-array
-a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list. the overhead is small because it is only four pointers.
+a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list and can replace linked lists in many instances. the overhead is small because it is only four pointers.
 most bindings are generic macros that will work on all i-array types. i_array_add and i_array_forward go from left to right
 
 ## dependencies
@@ -424,18 +424,18 @@ gcc "$c/test/thread-pool.c" -o temp/test-thread-pool -lpthread -D _DEFAULT_SOURC
 spline-path creates discrete 2d paths with segments that interpolate between some given points.
 paths can be composed to construct more complex paths.
 
-currently implemented segment types and interpolation methods
+implemented segment types and interpolation methods
 * linear: draws lines between points
 * bezier: 4 point cubic bezier interpolation
 * move: gap, moves the point the next segment starts on
-* constant: repeats the last value. a flat line to infinity
+* constant: repeats the last value as a flat line to infinity
 * path: another spline path as a segment
 
 features
-* extremely fast through only supporting 2d, with only selected and optimised interpolators, limited segment count and sampling portions of paths instead of only single points
-* paths are stateless and the same path object can be used by multiple threads
+* extremely fast through only supporting 2d, with only selected and optimised interpolators, limited segment count and sampling portions of paths at once instead of only single points
 * maps from one independent discrete value to one dependent continuous value and only the dependent value is returned
-* multidimensional interpolation could be archieved with separate calls for additional dimensions
+* paths are stateless and the same path object can be used by multiple threads
+* multidimensional interpolation can be archieved with separate calls for additional dimensions
 * originally developed for dsp and the sampling of many paths 96000 times per second in parallel
 
 ## example
