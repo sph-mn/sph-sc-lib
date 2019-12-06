@@ -56,16 +56,6 @@
     (set status.group sph-helper-status-group status.id sph-helper-status-id-memory))
   status-return)
 
-(define (sph-helper-status-description a) (uint8-t* status-t)
-  (declare b uint8-t*)
-  (case = a.id
-    (sph-helper-status-id-memory (set b "not enough memory or other memory allocation error"))
-    (else (set b ""))))
-
-(define (sph-helper-status-name a) (uint8-t* status-t)
-  (declare b uint8-t*)
-  (case = a.id (sph-helper-status-id-memory (set b "memory")) (else (set b "unknown"))))
-
 (define (sph-helper-display-bits-u8 a) (void uint8-t)
   "display the bits of an octet"
   (declare i uint8-t)

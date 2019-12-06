@@ -72,22 +72,6 @@ status_t sph_helper_primitive_realloc(size_t size, void** block) {
   };
   status_return;
 }
-uint8_t* sph_helper_status_description(status_t a) {
-  uint8_t* b;
-  if (sph_helper_status_id_memory == a.id) {
-    b = "not enough memory or other memory allocation error";
-  } else {
-    b = "";
-  };
-}
-uint8_t* sph_helper_status_name(status_t a) {
-  uint8_t* b;
-  if (sph_helper_status_id_memory == a.id) {
-    b = "memory";
-  } else {
-    b = "unknown";
-  };
-}
 /** display the bits of an octet */
 void sph_helper_display_bits_u8(uint8_t a) {
   uint8_t i;
