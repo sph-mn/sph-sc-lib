@@ -34,6 +34,7 @@
           (end element-type*)
           (start element-type*))))
     (define ((pre-concat i-array-allocate-custom_ name) length alloc a)
+      ; to use a custom allocator
       (uint8-t size-t (function-pointer void* size-t) name*)
       (declare start element-type*)
       (set start (alloc (* length (sizeof element-type))))
@@ -41,7 +42,17 @@
       (set a:start start a:current start a:unused start a:end (+ length start))
       (return 0))
     (define ((pre-concat i-array-allocate_ name) length a) (uint8-t size-t name*)
-      (return ((pre-concat i-array-allocate-custom_ name) length malloc a))))
+      (return ((pre-concat i-array-allocate-custom_ name) length malloc a)))
+    (define ((pre-concat i-array-resize_ name) a new-length) (uint8-t name* size-t)
+      (declare start element-type*)
+      (set start (realloc a:start (* new-length (sizeof element-type))))
+      (if (not start) (return 1))
+      (set
+        a:current (+ start (- a:current a:start))
+        a:unused (+ start (- a:unused a:start))
+        a:start start
+        a:end (+ new-length start))
+      (return 0)))
   (i-array-declare a type)
   (begin
     "define so that in-range is false, length is zero and free doesnt fail.
@@ -70,5 +81,5 @@
      # example with a stack allocated array
      int other_array[4] = {1, 2, 0, 0};
      my_type a;
-     i_array_take(a, other_array, 4 2);"
+     i_array_take(a, other_array, 4, 2);"
     (set a:start source a:current source a:unused (+ count source) a:end (+ size source))))

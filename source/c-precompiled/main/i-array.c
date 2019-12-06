@@ -39,7 +39,19 @@
     a->end = (length + start); \
     return (0); \
   } \
-  uint8_t i_array_allocate_##name(size_t length, name* a) { return ((i_array_allocate_custom_##name(length, malloc, a))); }
+  uint8_t i_array_allocate_##name(size_t length, name* a) { return ((i_array_allocate_custom_##name(length, malloc, a))); } \
+  uint8_t i_array_resize_##name(name* a, size_t new_length) { \
+    element_type* start; \
+    start = realloc((a->start), (new_length * sizeof(element_type))); \
+    if (!start) { \
+      return (1); \
+    }; \
+    a->current = (start + (a->current - a->start)); \
+    a->unused = (start + (a->unused - a->start)); \
+    a->start = start; \
+    a->end = (new_length + start); \
+    return (0); \
+  }
 /** define so that in-range is false, length is zero and free doesnt fail.
      can be used to create empty/null i-arrays */
 #define i_array_declare(a, type) type a = { 0, 0, 0, 0 }
@@ -66,7 +78,7 @@
      # example with a stack allocated array
      int other_array[4] = {1, 2, 0, 0};
      my_type a;
-     i_array_take(a, other_array, 4 2); */
+     i_array_take(a, other_array, 4, 2); */
 #define i_array_take(a, source, size, count) \
   a->start = source; \
   a->current = source; \
