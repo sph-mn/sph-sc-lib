@@ -91,7 +91,7 @@
             (return (+ i a.values)))))
       (return 0))
     (define ((pre-concat name _remove) a key) (uint8-t (pre-concat name _t) key-type)
-      "returns 1 if the element was removed, 0 if it was not found.
+      "returns 0 if the element was removed, 1 if it was not found.
        only needs to set flag to zero"
       (define value value-type* ((pre-concat name _get) a key))
-      (if value (begin (set (array-get a.flags (- value a.values)) 0) (return 1)) (return 0)))))
+      (if value (begin (set (array-get a.flags (- value a.values)) 0) (return 0)) (return 1)))))

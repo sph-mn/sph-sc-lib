@@ -139,14 +139,14 @@ size_t hashtable_calculate_size(size_t min_size) {
     return (0); \
   } \
 \
-  /** returns 1 if the element was removed, 0 if it was not found. \
+  /** returns 0 if the element was removed, 1 if it was not found. \
          only needs to set flag to zero */ \
   uint8_t name##_remove(name##_t a, key_type key) { \
     value_type* value = name##_get(a, key); \
     if (value) { \
       (a.flags)[(value - a.values)] = 0; \
-      return (1); \
-    } else { \
       return (0); \
+    } else { \
+      return (1); \
     }; \
   }

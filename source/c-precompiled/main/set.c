@@ -17,7 +17,7 @@ compared to hashtable.c, this uses less than half of the space and operations ar
 #define sph_set_equal sph_set_equal_integer
 #endif
 #ifndef sph_set_allow_empty_value
-#define sph_set_allow_empty_value 1
+#define sph_set_allow_empty_value 0
 #endif
 #ifndef sph_set_empty_value
 #define sph_set_empty_value 0
@@ -56,11 +56,13 @@ size_t sph_set_calculate_size(size_t min_size) {
   }; \
   hash_i = (1 + sph_set_hash(value, (a.size - 1)));
 #define sph_set_add_part_2 i = 1
+#define sph_set_new_part_1 min_size += 1
 #else
 #define sph_set_get_part_1 hash_i = sph_set_hash(value, (a.size))
 #define sph_set_get_part_2 i = 0
 #define sph_set_add_part_1 hash_i = sph_set_hash(value, (a.size))
 #define sph_set_add_part_2 i = 0
+#define sph_set_new_part_1 0
 #endif
 #define sph_set_declare_type(name, value_type) \
   typedef struct { \
@@ -70,7 +72,8 @@ size_t sph_set_calculate_size(size_t min_size) {
   uint8_t name##_new(size_t min_size, name##_t* result) { \
     value_type* values; \
     min_size = sph_set_calculate_size(min_size); \
-    values = calloc(min_size, 1); \
+    values = calloc(min_size, (sizeof(value_type))); \
+    sph_set_new_part_1; \
     if (!values) { \
       return (1); \
     }; \
@@ -105,7 +108,7 @@ size_t sph_set_calculate_size(size_t min_size) {
   } \
 \
   /** returns the address of the value or 0 if no space is left */ \
-  uint32_t* name##_add(name##_t a, value_type value) { \
+  value_type* name##_add(name##_t a, value_type value) { \
     size_t i; \
     size_t hash_i; \
     sph_set_add_part_1; \
@@ -129,13 +132,13 @@ size_t sph_set_calculate_size(size_t min_size) {
     return (0); \
   } \
 \
-  /** returns 1 if the element was removed, 0 if it was not found */ \
+  /** returns 0 if the element was removed, 1 if it was not found */ \
   uint8_t name##_remove(name##_t a, value_type value) { \
     value_type* v = name##_get(a, value); \
     if (v) { \
       *v = sph_set_empty_value; \
-      return (1); \
-    } else { \
       return (0); \
+    } else { \
+      return (1); \
     }; \
   }

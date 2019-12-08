@@ -15,7 +15,7 @@
   sph-set-size-factor 2
   sph-set-hash sph-set-hash-integer
   sph-set-equal sph-set-equal-integer
-  sph-set-allow-empty-value #t
+  sph-set-allow-empty-value 0
   sph-set-empty-value 0
   sph-set-true-value 1)
 
@@ -54,12 +54,14 @@
       (if (sph-set-equal sph-set-empty-value value)
         (begin (set *a.values sph-set-true-value) (return a.values)))
       (set hash-i (+ 1 (sph-set-hash value (- a.size 1)))))
-    sph-set-add-part-2 (set i 1))
+    sph-set-add-part-2 (set i 1)
+    sph-set-new-part-1 (set+ min-size 1))
   (pre-define
     sph-set-get-part-1 (set hash-i (sph-set-hash value a.size))
     sph-set-get-part-2 (set i 0)
     sph-set-add-part-1 (set hash-i (sph-set-hash value a.size))
-    sph-set-add-part-2 (set i 0)))
+    sph-set-add-part-2 (set i 0)
+    sph-set-new-part-1 0))
 
 (pre-define (sph-set-declare-type name value-type)
   (begin
@@ -67,8 +69,8 @@
     (define ((pre-concat name _new) min-size result) (uint8-t size-t (pre-concat name _t*))
       ; returns 0 on success or 1 if the memory allocation failed
       (declare values value-type*)
-      (set min-size (sph-set-calculate-size min-size))
-      (set values (calloc min-size 1))
+      (set min-size (sph-set-calculate-size min-size) values (calloc min-size (sizeof value-type)))
+      sph-set-new-part-1
       (if (not values) (return 1))
       (struct-set *result values values size min-size)
       (return 0))
@@ -88,7 +90,7 @@
         (if (sph-set-equal value (array-get a.values i)) (return (+ i a.values)))
         (set+ i 1))
       (return 0))
-    (define ((pre-concat name _add) a value) (uint32-t* (pre-concat name _t) value-type)
+    (define ((pre-concat name _add) a value) (value-type* (pre-concat name _t) value-type)
       "returns the address of the value or 0 if no space is left"
       (declare i size-t hash-i size-t)
       sph-set-add-part-1
@@ -105,6 +107,6 @@
         (set+ i 1))
       (return 0))
     (define ((pre-concat name _remove) a value) (uint8-t (pre-concat name _t) value-type)
-      "returns 1 if the element was removed, 0 if it was not found"
+      "returns 0 if the element was removed, 1 if it was not found"
       (define v value-type* ((pre-concat name _get) a value))
-      (if v (begin (set *v sph-set-empty-value) (return 1)) (return 0)))))
+      (if v (begin (set *v sph-set-empty-value) (return 0)) (return 1)))))

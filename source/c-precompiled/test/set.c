@@ -2,9 +2,9 @@
 #include <inttypes.h>
 #include "./test.c"
 #include "../main/set.c"
-#define test_element_count 10000
-sph_set_declare_type(set32, uint32_t);
-void print_contents(set32_t a) {
+#define test_element_count 100
+sph_set_declare_type(set64, uint64_t);
+void print_contents(set64_t a) {
   size_t i = 0;
   printf("------\n");
   while ((i < a.size)) {
@@ -14,27 +14,31 @@ void print_contents(set32_t a) {
 }
 status_t test_sph_set() {
   status_declare;
-  set32_t a;
-  uint32_t i;
-  uint32_t* value;
-  set32_new(test_element_count, (&a));
+  set64_t a;
+  uint64_t i;
+  uint64_t* value;
+  set64_new(test_element_count, (&a));
   /* insert values */
+  printf("insert\n");
   for (i = 0; (i < test_element_count); i += 1) {
-    set32_add(a, i);
+    set64_add(a, i);
   };
+  printf("test insert\n");
   for (i = 0; (i < test_element_count); i += 1) {
-    value = set32_get(a, i);
+    value = set64_get(a, i);
     test_helper_assert("insert value", (value && ((0 == i) ? *value : (i == *value))));
   };
+  printf("remove\n");
   /* remove values */
   for (i = 0; (i < test_element_count); i += 1) {
-    set32_remove(a, i);
+    set64_remove(a, i);
   };
+  printf("test remove\n");
   for (i = 0; (i < test_element_count); i += 1) {
-    value = set32_get(a, i);
+    value = set64_get(a, i);
     test_helper_assert("remove value", !value);
   };
-  set32_destroy(a);
+  set64_destroy(a);
 exit:
   status_return;
 }
