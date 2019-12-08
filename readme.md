@@ -7,7 +7,6 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 * futures: fine-grained parallelism with objects that can be waited on for results
 * hashtable: hash-tables for any key/value type
 * i-array: a fixed size array type with variable length content that makes iteration easier to code
-* imht-set: integer sets
 * memreg: track heap memory allocations in function scope
 * mi-list: a basic, macro-based linked list
 * queue: a queue for any data type
@@ -208,6 +207,8 @@ hashtable_declare_type(mytypename2, mystruct_t, uint32_t);
 ```
 
 # imht-set
+*imht-set has been removed in favor of set.sc, which is currently work in progress*
+
 a data structure for storing a set of integers.
 can easily deal with millions of values. a benchmark on an "amd phenom 2" with 3ghz wrote and read 100 million entries in 4 seconds.
 insert/delete/search should all be o(1). space usage is roughly double the size of elements. the maximum number of elements a set can store is defined on creation and does not automatically increase.
