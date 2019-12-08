@@ -1,5 +1,5 @@
-(pre-include "stdio.h" "inttypes.h" "./test.c" "../main/sph-set.c")
-(pre-define test-element-count 10)
+(pre-include "stdio.h" "inttypes.h" "./test.c" "../main/set.c")
+(pre-define test-element-count 10000)
 (sph-set-declare-type set32 uint32-t)
 
 (define (print-contents a) (void set32-t)
@@ -15,7 +15,7 @@
   (for ((set i 0) (< i test-element-count) (set+ i 1)) (set32-add a i))
   (for ((set i 0) (< i test-element-count) (set+ i 1))
     (set value (set32-get a i))
-    (test-helper-assert "insert value" (and value (= (+ 2 i) *value))))
+    (test-helper-assert "insert value" (and value (if* (= 0 i) *value (= i *value)))))
   (sc-comment "remove values")
   (for ((set i 0) (< i test-element-count) (set+ i 1)) (set32-remove a i))
   (for ((set i 0) (< i test-element-count) (set+ i 1))

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include "./test.c"
-#include "../main/sph-set.c"
-#define test_element_count 10
+#include "../main/set.c"
+#define test_element_count 10000
 sph_set_declare_type(set32, uint32_t);
 void print_contents(set32_t a) {
   size_t i = 0;
@@ -24,7 +24,7 @@ status_t test_sph_set() {
   };
   for (i = 0; (i < test_element_count); i += 1) {
     value = set32_get(a, i);
-    test_helper_assert("insert value", (value && ((2 + i) == *value)));
+    test_helper_assert("insert value", (value && ((0 == i) ? *value : (i == *value))));
   };
   /* remove values */
   for (i = 0; (i < test_element_count); i += 1) {

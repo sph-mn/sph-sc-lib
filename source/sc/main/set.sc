@@ -16,7 +16,8 @@
   sph-set-hash sph-set-hash-integer
   sph-set-equal sph-set-equal-integer
   sph-set-allow-empty-value #t
-  sph-set-empty-value 0)
+  sph-set-empty-value 0
+  sph-set-true-value 1)
 
 (declare sph-set-primes
   (array uint32-t ()
@@ -40,6 +41,26 @@
   ; if no prime has been found, use size-factor times size made odd as a best guess
   (return (bit-or 1 min-size)))
 
+(pre-if sph-set-allow-empty-value
+  (pre-define
+    sph-set-get-part-1
+    (begin
+      (if (sph-set-equal sph-set-empty-value value)
+        (return (if* (sph-set-equal sph-set-true-value *a.values) a.values 0)))
+      (set hash-i (+ 1 (sph-set-hash value (- a.size 1)))))
+    sph-set-get-part-2 (set i 1)
+    sph-set-add-part-1
+    (begin
+      (if (sph-set-equal sph-set-empty-value value)
+        (begin (set *a.values sph-set-true-value) (return a.values)))
+      (set hash-i (+ 1 (sph-set-hash value (- a.size 1)))))
+    sph-set-add-part-2 (set i 1))
+  (pre-define
+    sph-set-get-part-1 (set hash-i (sph-set-hash value a.size))
+    sph-set-get-part-2 (set i 0)
+    sph-set-add-part-1 (set hash-i (sph-set-hash value a.size))
+    sph-set-add-part-2 (set i 0)))
+
 (pre-define (sph-set-declare-type name value-type)
   (begin
     (declare (pre-concat name _t) (type (struct (size size-t) (values value-type*))))
@@ -52,46 +73,38 @@
       (struct-set *result values values size min-size)
       (return 0))
     (define ((pre-concat name _destroy) a) (void (pre-concat name _t)) (begin (free a.values)))
-    (define ((pre-concat name _get) a value) (uint8-t* (pre-concat name _t) value-type)
-      "returns the address of the value or 0 if it was not found"
+    (define ((pre-concat name _get) a value) (value-type* (pre-concat name _t) value-type)
+      "returns the address of the value or 0 if it was not found.
+      if sph-set-allow-empty-value is true and the value is included, then address points to a sph-set-true-value"
       (declare i size-t hash-i size-t)
-      (pre-if sph-set-allow-empty-value
-        (begin
-          (if (sph-set-equal sph-set-empty-value value) (return *a.values))
-          (set hash-i (+ 1 (sph-set-hash value (- a.size 1)))))
-        (set hash-i (sph-set-hash value a.size)))
+      sph-set-get-part-1
       (set i hash-i)
       (while (< i a.size)
-        (if (sph-set-equal value (array-get a.value i)) (return (+ i a.values)))
+        (if (sph-set-equal value (array-get a.values i)) (return (+ i a.values)))
         (set+ i 1))
       (sc-comment "wraps over")
-      (pre-if sph-set-allow-empty-value (set i 1) (set i 0))
+      sph-set-get-part-2
       (while (< i hash-i)
-        (if (sph-set-equal value (array-get a.value i)) (return (+ i a.values)))
+        (if (sph-set-equal value (array-get a.values i)) (return (+ i a.values)))
         (set+ i 1))
       (return 0))
-    (define ((pre-concat name _add) a value) (uint8-t* (pre-concat name _t) value-type)
+    (define ((pre-concat name _add) a value) (uint32-t* (pre-concat name _t) value-type)
       "returns the address of the value or 0 if no space is left"
       (declare i size-t hash-i size-t)
-      (pre-if sph-set-allow-empty-value
-        (begin
-          (if (sph-set-equal sph-set-empty-value value)
-            (begin (set *a.values #t) (return a.values)))
-          (set hash-i (+ 1 (sph-set-hash value (- a.size 1)))))
-        (set hash-i (sph-set-hash value a.size)))
+      sph-set-add-part-1
       (set i hash-i)
       (while (< i a.size)
         (if (sph-set-equal sph-set-empty-value (array-get a.values i))
           (begin (set (array-get a.values i) value) (return (+ i a.values))))
         (set+ i 1))
       (sc-comment "wraps over")
-      (pre-if sph-set-allow-empty-value (set i 1) (set i 0))
+      sph-set-add-part-2
       (while (< i hash-i)
         (if (sph-set-equal sph-set-empty-value (array-get a.values i))
           (begin (set (array-get a.values i) value) (return (+ i a.values))))
         (set+ i 1))
       (return 0))
-    (define ((pre-concat name _remove) a key) (uint8-t (pre-concat name _t) key-type)
+    (define ((pre-concat name _remove) a value) (uint8-t (pre-concat name _t) value-type)
       "returns 1 if the element was removed, 0 if it was not found"
-      (define value value-type* ((pre-concat name _get) a key))
-      (if value (begin (set *value 0) (return 1)) (return 0)))))
+      (define v value-type* ((pre-concat name _get) a value))
+      (if v (begin (set *v sph-set-empty-value) (return 1)) (return 0)))))
