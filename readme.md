@@ -1,15 +1,16 @@
 # sph-sc-lib
 
-various utility c libraries.
+various minimalistic standalone c utility libraries.
 c versions are in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then compiled to normal, readable c formatted with clang-format
 
 # included libraries
 * futures: fine-grained parallelism with objects that can be waited on for results
+* hashtable: hash-tables for any key/value type
 * i-array: a fixed size array type with variable length content that makes iteration easier to code
-* imht-set: a minimal, macro-based fixed size hash-table data structure for sets of integers
+* imht-set: integer sets
 * memreg: track heap memory allocations in function scope
 * mi-list: a basic, macro-based linked list
-* queue: a minimal queue for any data type
+* queue: a queue for any data type
 * quicksort: a generic implementation for arrays of any type
 * spline-path: interpolated 2d paths between given points
 * status: return-status and error handling using a tiny object with status/error id and source library id
@@ -124,6 +125,88 @@ memreg_heap_add(allocations, &variable2);
 memreg_heap_free(allocations);
 ```
 
+# hashtable
+hash-table data structures for custom key and value types, created by a macro that declares hash-table types and corresponding functions.
+
+## dependencies
+* the c standard library (stdlib.h and inttypes.h)
+
+## implementation
+* linear probing for resolving collisions
+* three arrays (flags, keys, values)
+* no empty key needed, because the flags array is used to check existence
+* no null value needed, because hashtable_get returns addresses
+* hashtable-equal and hashtable-hash are macros for inline code
+* first version under 150 lines
+
+## usage examples
+```
+#include "hashtable.c";
+```
+
+where the file is in the load path or the same directory.
+
+### declaration
+```
+hashtable_declare_type(mytypename, uint64_t, uint32_t);
+```
+
+the default hash functions use integers
+
+### creation
+```
+mytype_t ht;
+mytype_new(200, &ht);
+```
+
+returns 1 on success or 0 if the memory allocation failed.
+
+size does not automatically grow, so a new hash-table would need to be created should the specified size later turn out to be insufficient.
+
+### insert
+```c
+mytype_set(ht, 44, 5);
+```
+
+returns the address of the added or already included element, 0 if there is no space left in the set.
+
+### search
+```c
+mytype_get(ht, 44);
+```
+
+### removal
+```c
+mytype_remove(ht, 44);
+```
+
+returns 1 if the element was removed, 0 if it was not found.
+
+### deallocation
+```c
+mytype_destroy(ht);
+```
+
+## configuration options
+configuration is done by defining certain macro variables before including the hashtable source code. multiple configurations can be used by including hashtable.c multiple times, each time setting configuration macro variables beforehand and calling the corresponding type declares afterwards.
+the following macro variables can be set, here shown with their default values:
+
+```c
+#define hashtable_equal(key_a, key_b) (key_a == key_b)
+#define hashtable_hash(key, hashtable) (key % hashtable.size)
+#define hashtable_size_factor 2
+```
+
+example of declaring typse with different equality functions
+```c
+#define hashtable_equal(key_a, key_b) (key_a == key_b)
+#include "hashtable.c";
+hashtable_declare_type(mytypename, uint64_t, uint32_t);
+#define hashtable_equal(key_a, key_b) (key_a.member == key_b.member)
+#include "hashtable.c";
+hashtable_declare_type(mytypename2, mystruct_t, uint32_t);
+```
+
 # imht-set
 a data structure for storing a set of integers.
 can easily deal with millions of values. a benchmark on an "amd phenom 2" with 3ghz wrote and read 100 million entries in 4 seconds.
@@ -140,12 +223,12 @@ the name "imht-set" is derived from "integer modulo hash table set".
 #include "imht_set.c";
 ```
 
-the file needs to be in the load path or the same directory.
+where the file is in the load path or the same directory.
 
 ### creation
 ```
 imht_set_t* set;
-imht_set_create(200, &set);
+imht_set_new(200, &set);
 ```
 
 returns 1 on success or 0 if the memory allocation failed.
@@ -164,14 +247,6 @@ returns the address of the added or already included element, 0 if there is no s
 imht_set_contains(set, 4) ? 1 : 0;
 ```
 
-```c
-uint64_t* value_address = imht_set_find(set, 4);
-```
-
-returns the address of the element in the set, 0 if it was not found.
-
-caveat: if "imht_set_can_contain_zero" is defined, which is the default, dereferencing the memory address for the value 0, if it was found, will give 1 instead.
-
 ### removal
 ```c
 imht_set_remove(set, 4);
@@ -184,7 +259,7 @@ returns 1 if the element was removed, 0 if it was not found.
 imht_set_destroy(set);
 ```
 
-this is an important call for when the set is no longer needed, since its memory is otherwise not deallocated until the process ends.
+this is to be called when the set is no longer needed, since its memory is otherwise not deallocated until the process ends.
 
 ## configuration options
 configuration can be done by defining certain macro variables before including the imht-set source code.

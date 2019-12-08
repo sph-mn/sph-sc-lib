@@ -1,11 +1,13 @@
 (pre-include "stdlib.h" "inttypes.h")
 
+(sc-comment "a macro that defines hash-table data types for arbitrary key/value types and values,"
+  "using linear probing for collision resolve,"
+  "with hash and equal functions customisable by defining macros and re-including the source.")
+
 (pre-define
   ; example hashing code
-  (hashtable-hash-integer key hashtable) (if* key (+ 1 (modulo value (- hash-table.size 1))) 0)
-  (hashtable-hash-integer-nozero key hashtable) (modulo key hashtable.size)
-  (hashtable-equal-integer key-a key-b) (= key-a key-b)
-  hashtable-null-is-zero #f)
+  (hashtable-hash-integer key hashtable) (modulo key hashtable.size)
+  (hashtable-equal-integer key-a key-b) (= key-a key-b))
 
 (pre-define-if-not-defined
   hashtable-size-factor 2
@@ -51,42 +53,45 @@
       (struct-set *result flags flags keys keys values values size min-size)
       (return 0))
     (define ((pre-concat name _destroy) a) (void (pre-concat name _t))
-      (begin (free a:values) (free a:keys) (free a:flags)))
-    (define ((pre-concat name _remove) a key) (uint8-t (pre-concat name _t) key-type)
-      "returns 1 if the element was removed, 0 if it was not found"
-      (define address key-type* ((pre-concat name _find) a key))
-      (if address (begin (set *address 0) (return #t)) (return #f)))
-    (define ((pre-concat name _find) a key) (key-type* (pre-concat name _t) key-type-t)
-      "returns the address of the element in the hash table, 0 if it was not found"
+      (begin (free a.values) (free a.keys) (free a.flags)))
+    (define ((pre-concat name _get) a key) (value-type* (pre-concat name _t) key-type)
+      "returns the address of the value in the hash table, 0 if it was not found"
       (declare i size-t hash-i size-t)
       (set hash-i (hashtable-hash key a) i hash-i)
       (while (< i a.size)
-        (if (array-get a.flags i) (if (hashtable-equal key (array-get a.keys i)) (+ i a.values))
+        (if (array-get a.flags i)
+          (if (hashtable-equal key (array-get a.keys i)) (return (+ i a.values)))
           (return 0))
-        (set+ 1 i))
+        (set+ i 1))
       (sc-comment "wraps over")
       (set i 0)
       (while (< i hash-i)
-        (if (array-get a.flags i) (if (hashtable-equal key (array-get a.keys i)) (+ i a.values))
+        (if (array-get a.flags i)
+          (if (hashtable-equal key (array-get a.keys i)) (return (+ i a.values)))
           (return 0))
-        (set+ 1 i))
+        (set+ i 1))
       (return 0))
     (define ((pre-concat name _set) a key value)
       (value-type* (pre-concat name _t) key-type value-type)
-      "returns the address of the added or already included element, 0 if there is no space left in the set"
+      "returns the address of the added or already included value, 0 if there is no space left in the hash table"
       (declare i size-t hash-i size-t)
       (set hash-i (hashtable-hash key a) i hash-i)
       (while (< i a.size)
         (if (array-get a.flags i)
-          (if (hashtable-equal key (array-get a.keys i)) (return (+ i a.values)) (set+ 1 i))
+          (if (hashtable-equal key (array-get a.keys i)) (return (+ i a.values)) (set+ i 1))
           (begin
             (set (array-get a.flags i) #t (array-get a.keys i) key (array-get a.values i) value)
             (return (+ i a.values)))))
       (set i 0)
       (while (< i hash-i)
         (if (array-get a.flags i)
-          (if (hashtable-equal key (array-get a.keys i)) (return (+ i a.values)) (set+ 1 i))
+          (if (hashtable-equal key (array-get a.keys i)) (return (+ i a.values)) (set+ i 1))
           (begin
             (set (array-get a.flags i) #t (array-get a.keys i) key (array-get a.values i) value)
             (return (+ i a.values)))))
-      (return 0))))
+      (return 0))
+    (define ((pre-concat name _remove) a key) (uint8-t (pre-concat name _t) key-type)
+      "returns 1 if the element was removed, 0 if it was not found.
+       only needs to set flag to zero"
+      (define value value-type* ((pre-concat name _get) a key))
+      (if value (begin (set (array-get a.flags (- value a.values)) 0) (return 1)) (return 0)))))

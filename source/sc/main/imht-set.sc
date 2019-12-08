@@ -1,4 +1,6 @@
-; a small fixed size data structure for sets of integers.
+;-- !!  deprecated in favor of set.sc  !! --!
+
+; a fixed size data structure for sets of integers.
 ; Copyright (C) 2016-2018 sph <sph@posteo.eu>
 ; This program is free software; you can redistribute it and/or modify it
 ; under the terms of the GNU General Public License as published by
@@ -42,7 +44,7 @@
   ; if no prime has been found, use size-factor times size made odd as a best guess
   (return (bit-or 1 min-size)))
 
-(define (imht-set-create min-size result) (uint8-t size-t imht-set-t**)
+(define (imht-set-new min-size result) (uint8-t size-t imht-set-t**)
   ; returns 0 on success or 1 if the memory allocation failed
   (set *result (malloc (sizeof imht-set-t)))
   (if (not *result) (return 1))
