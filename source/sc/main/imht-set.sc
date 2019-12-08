@@ -1,4 +1,4 @@
-; a small fixed size hash table based data structure for sets of integers.
+; a small fixed size data structure for sets of integers.
 ; Copyright (C) 2016-2018 sph <sph@posteo.eu>
 ; This program is free software; you can redistribute it and/or modify it
 ; under the terms of the GNU General Public License as published by
@@ -18,38 +18,24 @@
 ; the minimum memory usage is size times imht-set-size-factor
 (pre-if-not-defined imht-set-size-factor (pre-define imht-set-size-factor 2))
 
-(declare imht-set-primes
-  (array uint16-t ()
-    ; performance can be optimised for bigger sets by adding additional primes nearer to the desired set size times set-size-factor
-    #f 3 7
-    13 19 29
-    37 43 53
-    61 71 79
-    89 101 107
-    113 131 139
-    151 163 173
-    181 193 199
-    223 229 239
-    251 263 271
-    281 293 311
-    317 337 349
-    359 373 383
-    397 409 421
-    433 443 457
-    463 479 491
-    503 521 541
-    557 569 577
-    593 601 613
-    619 641 647
-    659 673 683
-    701 719 733 743 757 769 787 809 821 827 839 857 863 881 887 911 929 941 953 971 983 997))
+(declare
+  imht-set-primes
+  (array uint32-t ()
+    ; from https://planetmath.org/goodhashtableprimes
+    #f 53 97
+    193 389 769
+    1543 3079 6151
+    12289 24593 49157
+    98317 196613 393241
+    786433 1572869 3145739
+    6291469 12582917 25165843 50331653 100663319 201326611 402653189 805306457 1610612741)
+  imht-set-t (type (struct (size size-t) (content imht-set-key-t*))))
 
-(define imht-set-primes-end uint16-t* (+ imht-set-primes 83))
-(declare imht-set-t (type (struct (size size-t) (content imht-set-key-t*))))
+(define imht-set-primes-end uint32-t* (+ imht-set-primes 26))
 
 (define (imht-set-calculate-hash-table-size min-size) (size-t size-t)
   (set min-size (* imht-set-size-factor min-size))
-  (define primes uint16-t* imht-set-primes)
+  (define primes uint32-t* imht-set-primes)
   (while (< primes imht-set-primes-end)
     (if (<= min-size *primes) (return *primes) (set primes (+ 1 primes))))
   (if (<= min-size *primes) (return *primes))
