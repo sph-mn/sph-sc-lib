@@ -11,6 +11,7 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 * mi-list: a basic, macro-based linked list
 * queue: a queue for any data type
 * quicksort: a generic implementation for arrays of any type
+* set: sets for any key/value type
 * spline-path: interpolated 2d paths between given points
 * status: return-status and error handling using a tiny object with status/error id and source library id
 * thread-pool: a task queue with pthread threads and wait conditions to pause inactive threads
@@ -207,7 +208,7 @@ hashtable_declare_type(mytypename2, mystruct_t, uint32_t);
 ```
 
 # imht-set
-*imht-set has been removed in favor of set.sc, which is currently work in progress*
+*imht-set has been removed in favor of set.sc*. documentation of set.sc not yet added.
 
 a data structure for storing a set of integers.
 can easily deal with millions of values. a benchmark on an "amd phenom 2" with 3ghz wrote and read 100 million entries in 4 seconds.

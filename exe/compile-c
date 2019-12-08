@@ -4,17 +4,17 @@ root="$PWD"
 target_dir=temp
 c=source/c-precompiled
 #warnings="-Wunused-label -Wunused-value -Wunused-variable"
-gcc_options="-std=c11 $warnings -Wfatal-errors -O0"
+gcc_options="-std=c11 $warnings -Wfatal-errors -O3"
 
 compile_test_sph_sc_lib() {
   gcc "$c/test/set.c" -o temp/test-set $gcc_options
-  #gcc "$c/test/hashtable.c" -o temp/test-hashtable $gcc_options
-  #gcc "$c/test/random.c" -o temp/test-random $gcc_options
-  #gcc "$c/test/mi-list.c" -o temp/test-mi-list $gcc_options
-  #gcc "$c/test/quicksort.c" -o temp/test-quicksort $gcc_options
-  #gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
-  #gcc "$c/test/thread-pool.c" -o temp/test-thread-pool $gcc_options -lpthread -D _DEFAULT_SOURCE
-  #gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options
+  gcc "$c/test/hashtable.c" -o temp/test-hashtable $gcc_options
+  gcc "$c/test/random.c" -o temp/test-random $gcc_options
+  gcc "$c/test/mi-list.c" -o temp/test-mi-list $gcc_options
+  gcc "$c/test/quicksort.c" -o temp/test-quicksort $gcc_options
+  gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
+  gcc "$c/test/thread-pool.c" -o temp/test-thread-pool $gcc_options -lpthread -D _DEFAULT_SOURCE
+  gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options
 }
 
 mkdir -p "$target_dir" &&

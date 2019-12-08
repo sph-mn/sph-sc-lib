@@ -2,7 +2,7 @@
   "using linear probing for collision resolve,"
   "with hash and equal functions customisable by defining macros and re-including the source."
   "when sph-set-allow-empty-value is 1, then the empty value is stored at the first index of .values and the other values start at index 1."
-  "compared to hashtable.c, this uses less than half of the space and operations are faster")
+  "compared to hashtable.c, this uses less than half of the space and operations are faster (about 20% in first tests)")
 
 (pre-include "stdlib.h" "inttypes.h")
 
@@ -15,7 +15,7 @@
   sph-set-size-factor 2
   sph-set-hash sph-set-hash-integer
   sph-set-equal sph-set-equal-integer
-  sph-set-allow-empty-value 0
+  sph-set-allow-empty-value 1
   sph-set-empty-value 0
   sph-set-true-value 1)
 
@@ -69,8 +69,9 @@
     (define ((pre-concat name _new) min-size result) (uint8-t size-t (pre-concat name _t*))
       ; returns 0 on success or 1 if the memory allocation failed
       (declare values value-type*)
-      (set min-size (sph-set-calculate-size min-size) values (calloc min-size (sizeof value-type)))
+      (set min-size (sph-set-calculate-size min-size))
       sph-set-new-part-1
+      (set values (calloc min-size (sizeof value-type)))
       (if (not values) (return 1))
       (struct-set *result values values size min-size)
       (return 0))
@@ -82,12 +83,14 @@
       sph-set-get-part-1
       (set i hash-i)
       (while (< i a.size)
-        (if (sph-set-equal value (array-get a.values i)) (return (+ i a.values)))
+        (if (sph-set-equal sph-set-empty-value (array-get a.values i)) (return 0)
+          (if (sph-set-equal value (array-get a.values i)) (return (+ i a.values))))
         (set+ i 1))
       (sc-comment "wraps over")
       sph-set-get-part-2
       (while (< i hash-i)
-        (if (sph-set-equal value (array-get a.values i)) (return (+ i a.values)))
+        (if (sph-set-equal sph-set-empty-value (array-get a.values i)) (return 0)
+          (if (sph-set-equal value (array-get a.values i)) (return (+ i a.values))))
         (set+ i 1))
       (return 0))
     (define ((pre-concat name _add) a value) (value-type* (pre-concat name _t) value-type)

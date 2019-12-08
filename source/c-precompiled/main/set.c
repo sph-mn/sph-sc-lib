@@ -2,7 +2,7 @@
 using linear probing for collision resolve,
 with hash and equal functions customisable by defining macros and re-including the source.
 when sph-set-allow-empty-value is 1, then the empty value is stored at the first index of .values and the other values start at index 1.
-compared to hashtable.c, this uses less than half of the space and operations are faster */
+compared to hashtable.c, this uses less than half of the space and operations are faster (about 20% in first tests) */
 #include <stdlib.h>
 #include <inttypes.h>
 #define sph_set_hash_integer(value, hashtable_size) (value % hashtable_size)
@@ -17,7 +17,7 @@ compared to hashtable.c, this uses less than half of the space and operations ar
 #define sph_set_equal sph_set_equal_integer
 #endif
 #ifndef sph_set_allow_empty_value
-#define sph_set_allow_empty_value 0
+#define sph_set_allow_empty_value 1
 #endif
 #ifndef sph_set_empty_value
 #define sph_set_empty_value 0
@@ -72,8 +72,8 @@ size_t sph_set_calculate_size(size_t min_size) {
   uint8_t name##_new(size_t min_size, name##_t* result) { \
     value_type* values; \
     min_size = sph_set_calculate_size(min_size); \
-    values = calloc(min_size, (sizeof(value_type))); \
     sph_set_new_part_1; \
+    values = calloc(min_size, (sizeof(value_type))); \
     if (!values) { \
       return (1); \
     }; \
@@ -91,16 +91,24 @@ size_t sph_set_calculate_size(size_t min_size) {
     sph_set_get_part_1; \
     i = hash_i; \
     while ((i < a.size)) { \
-      if (sph_set_equal(value, ((a.values)[i]))) { \
-        return ((i + a.values)); \
+      if (sph_set_equal(sph_set_empty_value, ((a.values)[i]))) { \
+        return (0); \
+      } else { \
+        if (sph_set_equal(value, ((a.values)[i]))) { \
+          return ((i + a.values)); \
+        }; \
       }; \
       i += 1; \
     }; \
     /* wraps over */ \
     sph_set_get_part_2; \
     while ((i < hash_i)) { \
-      if (sph_set_equal(value, ((a.values)[i]))) { \
-        return ((i + a.values)); \
+      if (sph_set_equal(sph_set_empty_value, ((a.values)[i]))) { \
+        return (0); \
+      } else { \
+        if (sph_set_equal(value, ((a.values)[i]))) { \
+          return ((i + a.values)); \
+        }; \
       }; \
       i += 1; \
     }; \
