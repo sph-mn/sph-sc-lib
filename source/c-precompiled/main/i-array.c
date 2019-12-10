@@ -65,6 +65,7 @@
 #define i_array_in_range(a) (a.current < a.unused)
 #define i_array_get_at(a, index) (a.start)[index]
 #define i_array_get(a) *(a.current)
+#define i_array_get_index(a) (a.current - a.start)
 #define i_array_forward(a) a.current = (1 + a.current)
 #define i_array_rewind(a) a.current = a.start
 #define i_array_clear(a) a.unused = a.start

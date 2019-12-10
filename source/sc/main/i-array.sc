@@ -66,6 +66,7 @@
   (i-array-in-range a) (< a.current a.unused)
   (i-array-get-at a index) (array-get a.start index)
   (i-array-get a) *a.current
+  (i-array-get-index a) (- a.current a.start)
   (i-array-forward a) (set a.current (+ 1 a.current))
   (i-array-rewind a) (set a.current a.start)
   (i-array-clear a) (set a.unused a.start)
