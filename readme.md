@@ -311,8 +311,8 @@ most bindings are generic macros that will work on all i-array types. i_array_ad
 ```c
 // arguments: custom_name, element_type
 i_array_declare_type(my_type, int);
-my_type a;
-if(i_array_allocate_my_type(4, &a)) {
+my_type_t a;
+if(my_type_new(4, &a)) {
   // memory allocation error
 }
 i_array_add(a, 1);

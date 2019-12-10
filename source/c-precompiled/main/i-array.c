@@ -4,8 +4,8 @@
   most bindings are generic macros that will work on any i-array type. i-array-add and i-array-forward go from left to right.
   examples:
     i_array_declare_type(my_type, int);
-    my_type a;
-    if(i_array_allocate_my_type(4, &a)) {
+    my_type_t a;
+    if(my_type_new(4, &a)) {
       // memory allocation error
     }
     i_array_add(a, 1);
@@ -26,8 +26,8 @@
     element_type* unused; \
     element_type* end; \
     element_type* start; \
-  } name; \
-  uint8_t i_array_allocate_custom_##name(size_t length, void* (*alloc)(size_t), name* a) { \
+  } name##_t; \
+  uint8_t name##_new_custom(size_t length, void* (*alloc)(size_t), name* a) { \
     element_type* start; \
     start = alloc((length * sizeof(element_type))); \
     if (!start) { \
@@ -39,8 +39,8 @@
     a->end = (length + start); \
     return (0); \
   } \
-  uint8_t i_array_allocate_##name(size_t length, name* a) { return ((i_array_allocate_custom_##name(length, malloc, a))); } \
-  uint8_t i_array_resize_##name(name* a, size_t new_length) { \
+  uint8_t name##_new(size_t length, name* a) { return ((name##_new_custom(length, malloc, a))); } \
+  uint8_t name##_resize(name* a, size_t new_length) { \
     element_type* start; \
     start = realloc((a->start), (new_length * sizeof(element_type))); \
     if (!start) { \
