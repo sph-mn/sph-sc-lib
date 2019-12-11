@@ -22,23 +22,22 @@
 (declare sph-set-primes
   (array uint32-t ()
     ; from https://planetmath.org/goodhashtableprimes
-    #f 53 97
-    193 389 769
-    1543 3079 6151
-    12289 24593 49157
-    98317 196613 393241
-    786433 1572869 3145739
-    6291469 12582917 25165843 50331653 100663319 201326611 402653189 805306457 1610612741))
+    53 97 193
+    389 769 1543
+    3079 6151 12289
+    24593 49157 98317
+    196613 393241 786433
+    1572869 3145739 6291469
+    12582917 25165843 50331653 100663319 201326611 402653189 805306457 1610612741))
 
-(define sph-set-primes-end uint32-t* (+ sph-set-primes 26))
+(define sph-set-primes-end uint32-t* (+ sph-set-primes 25))
 
 (define (sph-set-calculate-size min-size) (size-t size-t)
   (set min-size (* sph-set-size-factor min-size))
-  (define primes uint32-t* sph-set-primes)
-  (while (< primes sph-set-primes-end)
-    (if (<= min-size *primes) (return *primes) (set primes (+ 1 primes))))
-  (if (<= min-size *primes) (return *primes))
-  ; if no prime has been found, use size-factor times size made odd as a best guess
+  (declare primes uint32-t*)
+  (for ((set primes hashtable-primes) (<= primes hashtable-primes-end) (set+ primes 1))
+    (if (<= min-size *primes) (return *primes)))
+  (sc-comment "if no prime has been found, make size at least an odd number")
   (return (bit-or 1 min-size)))
 
 (pre-if sph-set-allow-empty-value
