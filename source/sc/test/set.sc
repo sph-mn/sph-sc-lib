@@ -23,7 +23,7 @@
   (for ((set i 0) (< i test-element-count) (set+ i 1))
     (set value (set64-get a i))
     (test-helper-assert "remove check" (not value)))
-  (set64-destroy a)
+  (set64-free a)
   (label exit status-return))
 
 (define (main) int

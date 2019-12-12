@@ -27,7 +27,7 @@
     element_type* end; \
     element_type* start; \
   } name##_t; \
-  uint8_t name##_new_custom(size_t length, void* (*alloc)(size_t), name* a) { \
+  uint8_t name##_new_custom(size_t length, void* (*alloc)(size_t), name##_t* a) { \
     element_type* start; \
     start = alloc((length * sizeof(element_type))); \
     if (!start) { \
@@ -39,8 +39,8 @@
     a->end = (length + start); \
     return (0); \
   } \
-  uint8_t name##_new(size_t length, name* a) { return ((name##_new_custom(length, malloc, a))); } \
-  uint8_t name##_resize(name* a, size_t new_length) { \
+  uint8_t name##_new(size_t length, name##_t* a) { return ((name##_new_custom(length, malloc, a))); } \
+  uint8_t name##_resize(name##_t* a, size_t new_length) { \
     element_type* start; \
     start = realloc((a->start), (new_length * sizeof(element_type))); \
     if (!start) { \

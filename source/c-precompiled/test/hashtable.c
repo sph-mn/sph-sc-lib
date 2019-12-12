@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include "./test.c"
 #include "../main/hashtable.c"
-#define test_element_count 100000000
+#define test_element_count 10000
 hashtable_declare_type(testht, uint64_t, uint64_t);
 void print_contents(testht_t a) {
   size_t i = 0;
@@ -34,7 +34,7 @@ status_t test_hashtable() {
     value = testht_get(a, i);
     test_helper_assert("remove check", !value);
   };
-  testht_destroy(a);
+  testht_free(a);
 exit:
   status_return;
 }

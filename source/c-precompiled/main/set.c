@@ -25,21 +25,17 @@ compared to hashtable.c, this uses less than half of the space and operations ar
 #ifndef sph_set_true_value
 #define sph_set_true_value 1
 #endif
-uint32_t sph_set_primes[] = { 0, 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741 };
-uint32_t* sph_set_primes_end = (sph_set_primes + 26);
+uint32_t sph_set_primes[] = { 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741 };
+uint32_t* sph_set_primes_end = (sph_set_primes + 25);
 size_t sph_set_calculate_size(size_t min_size) {
   min_size = (sph_set_size_factor * min_size);
-  uint32_t* primes = sph_set_primes;
-  while ((primes < sph_set_primes_end)) {
+  uint32_t* primes;
+  for (primes = sph_set_primes; (primes <= sph_set_primes_end); primes += 1) {
     if (min_size <= *primes) {
       return ((*primes));
-    } else {
-      primes = (1 + primes);
     };
   };
-  if (min_size <= *primes) {
-    return ((*primes));
-  };
+  /* if no prime has been found, make size at least an odd number */
   return ((1 | min_size));
 }
 #if sph_set_allow_empty_value
@@ -81,7 +77,7 @@ size_t sph_set_calculate_size(size_t min_size) {
     (*result).size = min_size; \
     return (0); \
   } \
-  void name##_destroy(name##_t a) { free((a.values)); } \
+  void name##_free(name##_t a) { free((a.values)); } \
 \
   /** returns the address of the value or 0 if it was not found. \
         if sph-set-allow-empty-value is true and the value is included, then address points to a sph-set-true-value */ \

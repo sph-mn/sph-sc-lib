@@ -9,7 +9,6 @@ export LD_LIBRARY_PATH="$PWD/temp"
 ./temp/test-random
 ./temp/test-spline-path
 ./temp/test-mi-list
-./temp/test-imht-set
 ./temp/test-quicksort
 ./temp/test-queue
 ./temp/test-thread-pool

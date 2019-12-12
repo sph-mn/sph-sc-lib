@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include "./test.c"
 #include "../main/set.c"
-#define test_element_count 100000000
+#define test_element_count 10000
 sph_set_declare_type(set64, uint64_t);
 void print_contents(set64_t a) {
   size_t i = 0;
@@ -34,7 +34,7 @@ status_t test_sph_set() {
     value = set64_get(a, i);
     test_helper_assert("remove check", !value);
   };
-  set64_destroy(a);
+  set64_free(a);
 exit:
   status_return;
 }

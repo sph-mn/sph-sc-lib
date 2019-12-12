@@ -35,7 +35,7 @@
 (define (sph-set-calculate-size min-size) (size-t size-t)
   (set min-size (* sph-set-size-factor min-size))
   (declare primes uint32-t*)
-  (for ((set primes hashtable-primes) (<= primes hashtable-primes-end) (set+ primes 1))
+  (for ((set primes sph-set-primes) (<= primes sph-set-primes-end) (set+ primes 1))
     (if (<= min-size *primes) (return *primes)))
   (sc-comment "if no prime has been found, make size at least an odd number")
   (return (bit-or 1 min-size)))
@@ -74,7 +74,7 @@
       (if (not values) (return 1))
       (struct-set *result values values size min-size)
       (return 0))
-    (define ((pre-concat name _destroy) a) (void (pre-concat name _t)) (begin (free a.values)))
+    (define ((pre-concat name _free) a) (void (pre-concat name _t)) (begin (free a.values)))
     (define ((pre-concat name _get) a value) (value-type* (pre-concat name _t) value-type)
       "returns the address of the value or 0 if it was not found.
       if sph-set-allow-empty-value is true and the value is included, then address points to a sph-set-true-value"
