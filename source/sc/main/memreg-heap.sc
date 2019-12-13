@@ -3,12 +3,12 @@
    that can be passed between functions"
   "usage:
      memreg_register_t allocations;
-     if(!memreg_heap_allocate(2, &allocations)) { return(1); }
+     if(!memreg_heap_new(2, &allocations)) { return(1); }
      memreg_heap_add(allocations, &variable-1);
      memreg_heap_add(allocations, &variable-2);
      memreg_heap_free(allocations);")
 
-(i-array-declare-type memreg-register-t void*)
+(i-array-declare-type memreg-register void*)
 
 (pre-define
   memreg-heap-add i-array-add
@@ -17,10 +17,10 @@
   (begin
     "makes sure that values are null and free succeeds even if not allocated yet"
     (i-array-declare variable-name memreg-register-t))
-  (memreg-heap-allocate register-size register-address)
+  (memreg-heap-new register-size register-address)
   (begin
     "true on success, false on failure (failed memory allocation)"
-    (i-array-allocate-memreg-register-t register-size register-address))
+    (memreg-register-new register-size register-address))
   (memreg-heap-free-pointers reg)
   (begin
     "free only the registered memory"
