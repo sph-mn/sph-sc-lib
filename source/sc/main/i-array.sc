@@ -34,7 +34,7 @@
           (end element-type*)
           (start element-type*))))
     (define ((pre-concat name _new-custom) length alloc a)
-      ; to use a custom allocator
+      ; separate function to use a custom allocator
       (uint8-t size-t (function-pointer void* size-t) (pre-concat name _t*))
       (declare start element-type*)
       (set start (alloc (* length (sizeof element-type))))
@@ -42,8 +42,10 @@
       (set a:start start a:current start a:unused start a:end (+ length start))
       (return 0))
     (define ((pre-concat name _new) length a) (uint8-t size-t (pre-concat name _t*))
+      "return 0 on success, 1 for memory allocation error"
       (return ((pre-concat name _new-custom) length malloc a)))
     (define ((pre-concat name _resize) a new-length) (uint8-t (pre-concat name _t*) size-t)
+      "return 0 on success, 1 for realloc error"
       (declare start element-type*)
       (set start (realloc a:start (* new-length (sizeof element-type))))
       (if (not start) (return 1))

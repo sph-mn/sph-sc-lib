@@ -264,8 +264,8 @@ the following shows the defaults.
 #define sph_set_hash(value, hashtable_size) (value % hashtable_size)
 #define sph_set_equal(value_a, value_b) (value_a == value_b)
 #define sph_set_allow_empty_value 1
-#define sph_set_empty_value 1
-#define sph_set_true_value 0
+#define sph_set_empty_value 0
+#define sph_set_true_value 1
 #define sph_set_size_factor 2
 ~~~
 

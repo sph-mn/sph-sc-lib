@@ -39,7 +39,11 @@
     a->end = (length + start); \
     return (0); \
   } \
+\
+  /** return 0 on success, 1 for memory allocation error */ \
   uint8_t name##_new(size_t length, name##_t* a) { return ((name##_new_custom(length, malloc, a))); } \
+\
+  /** return 0 on success, 1 for realloc error */ \
   uint8_t name##_resize(name##_t* a, size_t new_length) { \
     element_type* start; \
     start = realloc((a->start), (new_length * sizeof(element_type))); \
