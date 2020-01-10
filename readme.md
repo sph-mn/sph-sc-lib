@@ -4,17 +4,17 @@ various minimalistic standalone c utility libraries.
 c versions are in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then compiled to normal, readable c formatted with clang-format
 
 # included libraries
-* futures: fine-grained parallelism with objects that can be waited on for results
-* hashtable: hash-tables for any key/value type
-* i-array: a fixed size array type with variable length content that makes iteration easier to code
-* memreg: track heap memory allocations in function scope
-* mi-list: a basic, macro-based linked list
-* queue: a queue for any data type
-* quicksort: a generic implementation for arrays of any type
-* set: sets for any key/value type
-* spline-path: interpolated 2d paths between given points
-* status: return-status and error handling using a tiny object with status/error id and source library id
-* thread-pool: a task queue with pthread threads and wait conditions to pause inactive threads
+* [futures](#futures): fine-grained parallelism with objects that can be waited on for results
+* [hashtable](#hashtable): hash-tables for any key/value type
+* [i-array](#i-array): a fixed size array type with variable length content that makes iteration easier to code
+* [memreg](#memreg): track heap memory allocations in function scope
+* [mi-list](#mi-list): a basic, macro-based linked list
+* [queue](#queue): a queue for any data type
+* [quicksort](#quicksort): a generic implementation for arrays of any type
+* [set](#set.c): sets for any key/value type
+* [spline-path](#spline-path): interpolated 2d paths between given points
+* [status](#status): return-status and error handling using a tiny object with status/error id and source library id
+* [thread-pool](#thread-pool): a task queue with pthread threads and wait conditions to pause inactive threads
 * experimental
   * one: miscellaneous helpers
   * guile: a few helpers for working with guile
@@ -207,98 +207,91 @@ hashtable_declare_type(mytypename, uint64_t, uint32_t);
 hashtable_declare_type(mytypename2, mystruct_t, uint32_t);
 ```
 
-# imht-set
-*imht-set has been removed in favor of set.sc*. documentation of set.sc not yet added.
+# set.c
+a macro that defines set types for arbitrary value types.
 
-a data structure for storing a set of integers.
-can easily deal with millions of values. a benchmark on an "amd phenom 2" with 3ghz wrote and read 100 million entries in 4 seconds.
-insert/delete/search should all be o(1). space usage is roughly double the size of elements. the maximum number of elements a set can store is defined on creation and does not automatically increase.
-this implementation optimises maximum read and write speed and a small code size and trades a higher memory usage for it. if lower memory usage is important, there is an option to reduce memory usage, with a potential performance loss; otherwise you might want to look for a set implementation similar to google sparse hash.
-
-the name "imht-set" is derived from "integer modulo hash table set".
+* can easily deal with millions of values on common hardware
+* linear probing for collision resolve
+* compared to hashtable.c, set.c uses less than half of the space and operations are faster (about 20% in first tests)
+* insert/delete/search should all be o(1)
+* the set size does not automatically grow. a new set has to be created should the specified size later turn out to be insufficient
+* the default hash functions work with integers
 
 ## dependencies
 * the c standard library (stdlib.h and inttypes.h)
 
 ## usage examples
-```
-#include "imht_set.c";
-```
+where the file is in the load path or in the same directory.
+~~~
+#include "set.c";
+sph_set_declare_type(myset, int);
+void main() {
+  myset_t a;
+  if(myset_new(3, &a)) {
+    // memory allocation failed
+  }
+  myset_add(a, 3);
+  myset_add(a, 5);
+  myset_remove(a, 3);
+  myset_get(a, 5);
+  myset_free(a);
+}
 
-where the file is in the load path or the same directory.
+~~~
 
-### creation
-```
-imht_set_t* set;
-imht_set_new(200, &set);
-```
+sph_set_declare_type adds the following functions, where "name" is the first argument passed to sph_set_declare_type
+~~~
+// 0 on success, 1 on memory allocation error
+uint8_t name##_new(size_t min_size, name##_t* result);
 
-returns 1 on success or 0 if the memory allocation failed.
+// returns the address of the value or 0 if it was not found.
+// if sph_set_allow_empty_value is true and the value is included, then address points to a sph_set_true_value
+value_type* name##_get(name##_t a, value_type value);
 
-the set size does not automatically grow, so a new set has to be created should the specified size later turn out to be insufficient.
+// returns the address of the value or 0 if no space is left
+value_type* name##_add(name##_t a, value_type value);
 
-### insert
-```c
-imht_set_add(set, 4);
-```
+// returns 0 if the element was removed, 1 if it was not found
+uint8_t name##_remove(name##_t a, value_type value);
 
-returns the address of the added or already included element, 0 if there is no space left in the set.
-
-### search
-```c
-imht_set_contains(set, 4) ? 1 : 0;
-```
-
-### removal
-```c
-imht_set_remove(set, 4);
-```
-
-returns 1 if the element was removed, 0 if it was not found.
-
-### deallocation
-```c
-imht_set_destroy(set);
-```
-
-this is to be called when the set is no longer needed, since its memory is otherwise not deallocated until the process ends.
+void name##_free(name##_t a);
+~~~
 
 ## configuration options
-configuration can be done by defining certain macro variables before including the imht-set source code.
+before including set.c, the following macros can be defined, which must be expressions. redefine and reinclude for varying configuration.
+the following shows the defaults.
+~~~
+#define sph_set_hash(value, hashtable_size) (value % hashtable_size)
+#define sph_set_equal(value_a, value_b) (value_a == value_b)
+#define sph_set_allow_empty_value 1
+#define sph_set_empty_value 1
+#define sph_set_true_value 0
+#define sph_set_size_factor 2
+~~~
 
-### integer size
-an imht-set only stores integers of the same type. supported are all typical integer values, from char to uint64_t.
-the type that sets can take is fixed and can not be changed after inclusion of the imht-set source file.
+### exclude empty value
+by default, the empty value is a valid value to be included in a set. but as an optimisation, to make operations a tiny bit faster, this can be disabled by setting the macro variable "sph_set_allow_empty_value" to zero before inclusion.
+the empty value can then not be part of the set; it wont be found.
 
 ```c
-#define imht_set_key_t uint64_t
+#define set_allow_empty_value 0
+
 ```
-
-the default type is unsigned 64 bit.
-
-if you would like to use multiple sets with different integer sizes at the same time, include the source file multiple times with imht_set_key_t set to different values before inclusion.
-
 ### memory usage
 ```
-#define imht_set_size_factor 2
+#define sph_set_size_factor 2
 ```
-
-by default, the memory allocated for the set is at least double the number of elements it is supposed to store (rounded to the nearest prime eventually).
-this can be changed in this definition, and a lower set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
+by default, the memory allocated for the set is at least double the number of elements it is supposed to store (possibly rounded to a next higher prime).
+a lower set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
 the downside is that the insert/delete/search performance is more likely to approach and reach o(n).
 
-### zero support
-by default, the integer 0 is a valid value for a set. but as an optimisation, this can be disabled by defining the macro variable for "imht_set_can_contain_zero" with the value zero before inclusion.
-
-```c
-#define imht_set_can_contain_zero 0
-```
-
-with this definition, a zero in sets can not be found, but the set routines should work a tiny little bit faster.
-
 ## modularity and implementation
-the "imht_set_t" type is a structure with the two fields "size" and "content". "content" is a one-dimensional array that stores values at indices determined by a hash function.
-the set routines automatically adapt should the values for size and content change. therefore, automatic resizing can be implemented by adding new "add" and "remove" routines and rewriting the content data.
+declared "name##_t" set types are structures (.size, .values). "values" is a one-dimensional array that stores values at indices determined by a hash function.
+if sph_set_empty_value is true, values start at index 1 and index 0 is sph_set_true_value if the empty value is in the set.
+if sph_set_empty_value is false, values start at index 0.
+
+## possible enhancement
+* pass (hash, equal, empty-value) to the main type declaration macro
 
 # i-array
 a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list and can replace linked lists in many instances. the overhead is small because it is only four pointers.
