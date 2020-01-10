@@ -280,8 +280,8 @@ the downside is that the insert/delete/search performance is more likely to appr
 
 ## modularity and implementation
 declared "name##_t" set types are structures (.size, .values). "values" is a one-dimensional array that stores values at indices determined by a hash function.
-if sph_set_empty_value is true, values start at index 1 and index 0 is sph_set_true_value if the empty value is in the set.
-if sph_set_empty_value is false, values start at index 0.
+if sph_set_allow_empty_value is true, values start at index 1 and index 0 is sph_set_true_value if the empty value is in the set.
+if sph_set_allow_empty_value is false, values start at index 0.
 
 ## possible enhancement
 * pass (hash, equal, empty-value) to the main type declaration macro
