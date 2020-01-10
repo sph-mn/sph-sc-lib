@@ -273,14 +273,7 @@ the following shows the defaults.
 by default, the empty value is a valid value to be included in a set. but as an optimisation, to make operations a tiny bit faster, this can be disabled by setting the macro variable "sph_set_allow_empty_value" to zero before inclusion.
 the empty value can then not be part of the set; it wont be found.
 
-```c
-#define set_allow_empty_value 0
-
-```
 ### memory usage
-```
-#define sph_set_size_factor 2
-```
 by default, the memory allocated for the set is at least double the number of elements it is supposed to store (possibly rounded to a next higher prime).
 a lower set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
 the downside is that the insert/delete/search performance is more likely to approach and reach o(n).
