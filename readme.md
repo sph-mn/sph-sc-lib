@@ -11,7 +11,7 @@ c versions are in source/c-precompiled. sc versions are in source/sc. the librar
 * [mi-list](#mi-list): a basic, macro-based linked list
 * [queue](#queue): a queue for any data type
 * [quicksort](#quicksort): a generic implementation for arrays of any type
-* [set](#set.c): sets for any key/value type
+* [set](#set): sets for any key/value type
 * [spline-path](#spline-path): interpolated 2d paths between given points
 * [status](#status): return-status and error handling using a tiny object with status/error id and source library id
 * [thread-pool](#thread-pool): a task queue with pthread threads and wait conditions to pause inactive threads
@@ -207,7 +207,7 @@ hashtable_declare_type(mytypename, uint64_t, uint32_t);
 hashtable_declare_type(mytypename2, mystruct_t, uint32_t);
 ```
 
-# set.c
+# set
 a macro that defines set types for arbitrary value types.
 
 * can easily deal with millions of values on common hardware
