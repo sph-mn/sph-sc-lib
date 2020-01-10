@@ -1,7 +1,7 @@
 # sph-sc-lib
 
 various minimalistic standalone c utility libraries.
-c versions are in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then compiled to normal, readable c formatted with clang-format
+c code is in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then translated to normal, readable c formatted with clang-format
 
 # included libraries
 * [futures](#futures): fine-grained parallelism with objects that can be waited on for results
