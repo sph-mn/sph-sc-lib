@@ -1,5 +1,6 @@
 (pre-include "inttypes.h" "./test.c" "../main/mi-list.c")
 (pre-define test-element-count 100)
+(mi-list-declare-type mi-list-64 uint64-t)
 
 (define (print-contents a) (void mi-list-64-t*)
   (printf "print-contents\n")

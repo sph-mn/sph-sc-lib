@@ -340,52 +340,36 @@ a basic linked list with custom element types.
 
 ## usage example
 ```c
-// include to define a list type
-#define mi_list_name_prefix mylist
-#define mi_list_element_t uint64_t
-#include "mi_list.c"
-
-// include again for another list type with a different element type
-#define mi_list_name_prefix u32_list
-#define mi_list_element_t uint32_t
-#include mi_list.c
-
-// new empty list creation
-u32_list_t* a = 0;
-
-// add elements
-u32_list_add(a, 3);
-u32_list_add(a, 4);
-
-// iterate over all list elements
-u32_list_t* rest = a;
-while(rest) {
-  uint32_t element = mi_list_first(rest);
-  rest = mi_list_rest(rest);
-}
+mi_list_declare_type(list_64, uint64_t);
+list_64_t* a;
+a = list_64_add(a, 112);
+mi_list_first(a);
+mi_list_first_address(a);
+mi_list_rest(a);
+list_64_length(a);
+list_64_destroy(a);
 ```
 
 ## bindings
 ```c
-{prefix}_add
-{prefix}_destroy
-{prefix}_drop
-{prefix}_length
-{prefix}_struct
-{prefix}_t
+{name}_add
+{name}_destroy
+{name}_drop
+{name}_length
+{name}_struct
+{name}_t
 mi_list_first
 mi_list_first_address
 mi_list_rest
 ```
 
 ## type
-the mi-list type is defined by mi-list.c on inclusion as follows
-
+{name}_t is a struct:
 ```c
-typedef struct mi_list_name_prefix##_struct {
-  struct mi_list_name_prefix##_struct *link;
-  mi_list_element_t data;
-} mi_list_t;
+typedef struct name##_struct {
+  struct name##_struct* link;
+  element_type data;
+} name##_t;
 ```
 
 # queue

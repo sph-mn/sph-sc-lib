@@ -1,6 +1,6 @@
 /* depends on i_array.c.
-similar to memreg.c but uses a specialised heap allocated array for the memory register
-  that can be passed between functions
+similar to memreg.c but uses a heap allocated array as the memory register
+   that can be passed between functions
 usage:
      memreg_register_t allocations;
      if(!memreg_heap_new(2, &allocations)) { return(1); }

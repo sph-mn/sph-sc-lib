@@ -2,6 +2,7 @@
 #include "./test.c"
 #include "../main/mi-list.c"
 #define test_element_count 100
+mi_list_declare_type(mi_list_64, uint64_t);
 void print_contents(mi_list_64_t* a) {
   printf("print-contents\n");
   while (a) {

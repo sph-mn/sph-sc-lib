@@ -1,52 +1,45 @@
 (sc-comment
-  "a linked list with custom element types.
-   this file can be included multiple times to create differently typed versions,
-   depending the value of the preprocessor variables mi-list-name-infix and mi-list-element-t before inclusion")
+  "a linked list with custom data type. each element is a heap allocated struct
+   examples:
+     mi_list_declare_type(list_64, uint64_t);
+     list_64_t* a;
+     a = list_64_add(a, 112);
+     mi_list_first(a);
+     mi_list_first_address(a);
+     mi_list_rest(a);
+     list_64_length(a);
+     list_64_destroy(a);")
 
 (pre-include "stdlib.h" "inttypes.h")
-(pre-if-not-defined mi-list-name-prefix (pre-define mi-list-name-prefix mi-list-64))
-(pre-if-not-defined mi-list-element-t (pre-define mi-list-element-t uint64-t))
 
-(sc-comment
-  "there does not seem to be a simpler way for identifier concatenation in c in this case")
-
-(pre-if-not-defined mi-list-name-concat
+(pre-define
+  (mi-list-declare-type name element-type)
   (begin
-    (pre-define (mi-list-name-concat a b) (pre-concat a _ b))
-    (pre-define (mi-list-name-concatenator a b) (mi-list-name-concat a b))
-    (pre-define (mi-list-name name) (mi-list-name-concatenator mi-list-name-prefix name))))
-
-(pre-define mi-list-struct-name (mi-list-name struct) mi-list-t (mi-list-name t))
-
-(declare mi-list-t
-  (type (struct mi-list-struct-name (link (struct mi-list-struct-name*)) (data mi-list-element-t))))
-
-(pre-if-not-defined mi-list-first
-  (begin
-    (pre-define (mi-list-first a) a:data)
-    (pre-define (mi-list-first-address a) &a:data)
-    (pre-define (mi-list-rest a) a:link)))
-
-(define ((mi-list-name drop) a) (mi-list-t* mi-list-t*)
-  "removes and deallocates the first element"
-  (define a-next mi-list-t* (mi-list-rest a))
-  (free a)
-  (return a-next))
-
-(define ((mi-list-name destroy) a) (void mi-list-t*)
-  "it would be nice to set the pointer to zero, but that would require more indirection with a pointer-pointer"
-  (define a-next mi-list-t* 0)
-  (while a (set a-next a:link) (free a) (set a a-next)))
-
-(define ((mi-list-name add) a value) (mi-list-t* mi-list-t* mi-list-element-t)
-  (define element mi-list-t* (calloc 1 (sizeof mi-list-t)))
-  (if (not element) (return 0))
-  (set element:data value element:link a)
-  (return element))
-
-(define ((mi-list-name length) a) (size-t mi-list-t*)
-  (define result size-t 0)
-  (while a (set result (+ 1 result) a (mi-list-rest a)))
-  (return result))
-
-(pre-undefine mi-list-name-prefix mi-list-element-t mi-list-struct-name mi-list-t)
+    (declare (pre-concat name _t)
+      (type
+        (struct
+          (pre-concat name _struct)
+          (link (struct (pre-concat name _struct*)))
+          (data element-type))))
+    (define ((pre-concat name _drop) a) ((pre-concat name _t*) (pre-concat name _t*))
+      "removes and deallocates the first element"
+      (define a-next (pre-concat name _t*) (mi-list-rest a))
+      (free a)
+      (return a-next))
+    (define ((pre-concat name _destroy) a) (void (pre-concat name _t*))
+      "it would be nice to set the pointer to zero, but that would require more indirection with a pointer-pointer"
+      (define a-next (pre-concat name _t*) 0)
+      (while a (set a-next a:link) (free a) (set a a-next)))
+    (define ((pre-concat name _add) a value)
+      ((pre-concat name _t*) (pre-concat name _t*) element-type)
+      (define element (pre-concat name _t*) (calloc 1 (sizeof (pre-concat name _t))))
+      (if (not element) (return 0))
+      (set element:data value element:link a)
+      (return element))
+    (define ((pre-concat name _length) a) (size-t (pre-concat name _t*))
+      (define result size-t 0)
+      (while a (set result (+ 1 result) a (mi-list-rest a)))
+      (return result)))
+  (mi-list-first a) a:data
+  (mi-list-first-address a) &a:data
+  (mi-list-rest a) a:link)
