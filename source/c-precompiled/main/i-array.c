@@ -62,10 +62,12 @@
 #define i_array_add(a, value) \
   *(a.unused) = value; \
   a.unused = (1 + a.unused)
-/** set so that in-range is false, length is zero and free doesnt fail */
+/** set all fields to zero. in-range is false, length is zero and free doesnt fail */
 #define i_array_set_null(a) \
+  a.current = 0; \
+  a.unused = 0; \
   a.start = 0; \
-  a.unused = 0
+  a.end = 0
 #define i_array_in_range(a) (a.current < a.unused)
 #define i_array_get_at(a, index) (a.start)[index]
 #define i_array_get(a) *(a.current)

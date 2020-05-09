@@ -4,7 +4,7 @@ root="$PWD"
 target_dir=temp
 c=source/c-precompiled
 warnings="-Wunused-label -Wunused-value -Wunused-variable"
-gcc_options="-std=c11 $warnings -Wfatal-errors -O3"
+gcc_options="-std=c17 $warnings -Wfatal-errors -O3"
 
 compile_test_sph_sc_lib() {
   gcc "$c/test/set.c" -o temp/test-set $gcc_options

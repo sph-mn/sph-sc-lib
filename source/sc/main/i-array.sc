@@ -64,8 +64,8 @@
   (i-array-add a value) (set *a.unused value a.unused (+ 1 a.unused))
   (i-array-set-null a)
   (begin
-    "set so that in-range is false, length is zero and free doesnt fail"
-    (set a.start 0 a.unused 0))
+    "set all fields to zero. in-range is false, length is zero and free doesnt fail"
+    (set a.current 0 a.unused 0 a.start 0 a.end 0))
   (i-array-in-range a) (< a.current a.unused)
   (i-array-get-at a index) (array-get a.start index)
   (i-array-get a) *a.current
@@ -78,6 +78,7 @@
   (i-array-max-length a) (- a.end a.start)
   (i-array-free a) (free a.start)
   (i-array-take a source size count)
+  (i-array-full a) (= a.unused a.end)
   (begin
     "move a standard array into an i-array
      sets source as data array to use, with the first count number of slots used.
