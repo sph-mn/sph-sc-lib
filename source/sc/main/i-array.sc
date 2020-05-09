@@ -77,8 +77,8 @@
   (i-array-length a) (- a.unused a.start)
   (i-array-max-length a) (- a.end a.start)
   (i-array-free a) (free a.start)
-  (i-array-take a source size count)
   (i-array-full a) (= a.unused a.end)
+  (i-array-take a source size count)
   (begin
     "move a standard array into an i-array
      sets source as data array to use, with the first count number of slots used.

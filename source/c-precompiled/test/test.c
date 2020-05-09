@@ -1,5 +1,6 @@
 #include "../main/status.c"
 #include <stdio.h>
+#include "../main/i-array.c"
 #define test_helper_test_one(func) \
   printf("%s\n", #func); \
   status_require((func()))
