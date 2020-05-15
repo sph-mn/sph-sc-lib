@@ -78,6 +78,7 @@
   (i-array-max-length a) (- a.end a.start)
   (i-array-free a) (free a.start)
   (i-array-full a) (= a.unused a.end)
+  (i-array-space a) (< a.unused a.end)
   (i-array-take a source size count)
   (begin
     "move a standard array into an i-array
