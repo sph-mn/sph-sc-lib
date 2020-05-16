@@ -2,7 +2,7 @@
 #include "../main/types.c"
 #include "./test.c"
 #include "../main/float.c"
-#include "../main/random-h.c"
+#include "../main/random.h"
 #include "../main/random.c"
 status_t test_random() {
   status_declare;

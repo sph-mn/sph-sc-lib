@@ -80,6 +80,7 @@
 #define i_array_max_length(a) (a.end - a.start)
 #define i_array_free(a) free((a.start))
 #define i_array_full(a) (a.unused == a.end)
+#define i_array_space(a) (a.unused < a.end)
 /** move a standard array into an i-array
      sets source as data array to use, with the first count number of slots used.
      source will not be copied but used as is, and i-array-free would free it.

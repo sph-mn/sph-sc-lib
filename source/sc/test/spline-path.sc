@@ -1,5 +1,5 @@
 (pre-include "inttypes.h" "string.h"
-  "../main/spline-path-h.c" "../main/spline-path.c" "../main/float.c" "./test.c")
+  "../main/spline-path.h" "../main/spline-path.c" "../main/float.c" "./test.c")
 
 (define error-margin double 0.1)
 
