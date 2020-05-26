@@ -3,8 +3,8 @@
      from http://xoshiro.di.unimi.it/ */
 #define f64_from_u64(a) ((a >> 11) * (1.0 / (UINT64_C(1) << 53)))
 #define define_sph_random(name, size_type, data_type, transfer) \
-  /** return uniformly distributed random real numbers in the range -1 to 1. \
-       implements xoshiro256plus from http://xoshiro.di.unimi.it/ \
+  /** return uniformly distributed numbers. \
+       implements xoshiro256+ from http://xoshiro.di.unimi.it/ \
        referenced by https://nullprogram.com/blog/2017/09/21/ */ \
   void name(sph_random_state_t* state, size_type size, data_type* out) { \
     u64 result_plus; \

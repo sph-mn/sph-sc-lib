@@ -8,8 +8,8 @@
     (* (bit-shift-right a 11) (/ 1.0 (bit-shift-left (UINT64_C 1) 53))))
   (define-sph-random name size-type data-type transfer)
   (define (name state size out) (void sph-random-state-t* size-type data-type*)
-    "return uniformly distributed random real numbers in the range -1 to 1.
-     implements xoshiro256plus from http://xoshiro.di.unimi.it/
+    "return uniformly distributed numbers.
+     implements xoshiro256+ from http://xoshiro.di.unimi.it/
      referenced by https://nullprogram.com/blog/2017/09/21/"
     (declare result-plus u64 i size-type t u64 s sph-random-state-t)
     (set s *state)

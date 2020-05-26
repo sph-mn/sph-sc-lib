@@ -1,3 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
-./exe/compile-sc && ./exe/compile-c
+./exe/compile-sc
+./exe/compile-c

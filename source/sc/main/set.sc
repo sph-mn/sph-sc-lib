@@ -62,7 +62,7 @@
       (return 0))
     (define ((pre-concat name _get) a value) (value-type* (pre-concat name _t) value-type)
       "returns the address of the value or 0 if it was not found.
-       if sph_set_allow_empty_value is true and the value is included, then address points to a sph_set_true_value"
+       if value is the null value and exists, then address points to the notnull value"
       (declare i size-t hash-i size-t)
       (if (set-equal null value) (return (if* (set-equal notnull *a.values) a.values 0)))
       (set hash-i (+ 1 (set-hash value (- a.size 1))))
@@ -106,8 +106,7 @@
       (struct-set *result values values size min-size)
       (return 0))
     (define ((pre-concat name _get) a value) (value-type* (pre-concat name _t) value-type)
-      "returns the address of the value or 0 if it was not found.
-       if sph_set_allow_empty_value is true and the value is included, then address points to a sph_set_true_value"
+      "returns the address of the value or 0 if it was not found"
       (declare i size-t hash-i size-t)
       (set hash-i (set-hash value a.size) i hash-i)
       (while (< i a.size)

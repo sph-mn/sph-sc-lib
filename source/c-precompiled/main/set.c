@@ -64,7 +64,7 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
   } \
 \
   /** returns the address of the value or 0 if it was not found. \
-         if sph_set_allow_empty_value is true and the value is included, then address points to a sph_set_true_value */ \
+         if value is the null value and exists, then address points to the notnull value */ \
   value_type* name##_get(name##_t a, value_type value) { \
     size_t i; \
     size_t hash_i; \
@@ -140,8 +140,7 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
     return (0); \
   } \
 \
-  /** returns the address of the value or 0 if it was not found. \
-         if sph_set_allow_empty_value is true and the value is included, then address points to a sph_set_true_value */ \
+  /** returns the address of the value or 0 if it was not found */ \
   value_type* name##_get(name##_t a, value_type value) { \
     size_t i; \
     size_t hash_i; \

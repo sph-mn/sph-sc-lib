@@ -16,26 +16,36 @@ void print_contents(set64_t a) {
 status_t test_sph_set() {
   status_declare;
   set64_t a;
+  set64nn_t b;
   uint64_t i;
   uint64_t* value;
+  uint64_t* value_nn;
   test_helper_assert("allocation", (!set64_new(test_element_count, (&a))));
+  test_helper_assert("allocation nn", (!set64nn_new(test_element_count, (&b))));
   /* insert values */
   for (i = 0; (i < test_element_count); i += 1) {
     test_helper_assert("insert", (set64_add(a, i)));
+    test_helper_assert("insert nn", (set64nn_add(b, (1 + i))));
   };
   for (i = 0; (i < test_element_count); i += 1) {
     value = set64_get(a, i);
+    value_nn = set64nn_get(b, (1 + i));
     test_helper_assert("insert check", (value && ((0 == i) ? *value : (i == *value))));
+    test_helper_assert("insert check nn", (value_nn && ((1 + i) == *value_nn)));
   };
   /* remove values */
   for (i = 0; (i < test_element_count); i += 1) {
     test_helper_assert("remove", (!set64_remove(a, i)));
+    test_helper_assert("remove nn", (!set64nn_remove(b, (1 + i))));
   };
   for (i = 0; (i < test_element_count); i += 1) {
     value = set64_get(a, i);
+    value_nn = set64nn_get(b, (1 + i));
     test_helper_assert("remove check", !value);
+    test_helper_assert("remove check nn", !value_nn);
   };
   set64_free(a);
+  set64nn_free(b);
 exit:
   status_return;
 }
