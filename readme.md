@@ -126,89 +126,57 @@ memreg_heap_free(allocations);
 ```
 
 # hashtable
-hash-table data structures for custom key and value types, created by a macro that declares hash-table types and corresponding functions.
+macro that defines hash-table data structures for custom value types.
 
 ## dependencies
 * the c standard library (stdlib.h and inttypes.h)
 
 ## implementation
-* linear probing for resolving collisions
+* linear probing for collision resolve
 * three arrays (flags, keys, values)
 * no empty key needed, because the flags array is used to check existence
 * no null value needed, because hashtable_get returns addresses
-* hashtable-equal and hashtable-hash are macros for inline code
 * first version under 150 lines
+* the hashtable size does not automatically grow. a new hashtable has to be created should the specified size later turn out to be insufficient
 
 ## usage examples
-```
+with hashtable.c in the same directory:
+
+~~~
 #include "hashtable.c";
-```
-
-where the file is in the load path or the same directory.
-
-### declaration
-```
-hashtable_declare_type(mytypename, uint64_t, uint32_t);
-```
-
-the default hash functions use integers
-
-### creation
-```
+// name, key_type, value_type, hashtable_hash, hashtable_equal, size_factor
+hashtable_declare_type(mytypename, uint64_t, uint32_t, hashtable_hash_integer, hashtable_equal_integer, 2);
 mytype_t ht;
 mytype_new(200, &ht);
-```
-
-returns 1 on success or 0 if the memory allocation failed.
-
-size does not automatically grow, so a new hash-table would need to be created should the specified size later turn out to be insufficient.
-
-### insert
-```c
 mytype_set(ht, 44, 5);
-```
-
-returns the address of the added or already included element, 0 if there is no space left in the set.
-
-### search
-```c
 mytype_get(ht, 44);
-```
-
-### removal
-```c
 mytype_remove(ht, 44);
-```
-
-returns 1 if the element was removed, 0 if it was not found.
-
-### deallocation
-```c
 mytype_destroy(ht);
+~~~
+
+hashtable_declare_type adds these functions:
+~~~
+// returns 1 on success or 0 if the memory allocation failed.
+uint8_t name##_new(size_t min_size, name##_t* result)
+
+// returns the address of the added or already included value, 0 if there is no space left in the hash table
+value_type* name##_set(name##_t a, key_type key, value_type value)
+
+// returns the address of the value in the hash table, 0 if it was not found
+value_type* name##_get(name##_t a, key_type key)
+
+// returns 0 if the element was removed, 1 if it was not found
+uint8_t name##_remove(name##_t a, key_type key)
+~~~
+
+the provided example hash functions are:
 ```
-
-## configuration options
-configuration is done by defining certain macro variables before including the hashtable source code. multiple configurations can be used by including hashtable.c multiple times, each time setting configuration macro variables beforehand and calling the corresponding type declares afterwards.
-the following macro variables can be set, here shown with their default values:
-
-```c
-#define hashtable_equal(key_a, key_b) (key_a == key_b)
-#define hashtable_hash(key, hashtable) (key % hashtable.size)
-#define hashtable_size_factor 2
-```
-
-example of declaring types with different equality functions
-```c
-#define hashtable_equal(key_a, key_b) (key_a == key_b)
-#include "hashtable.c";
-hashtable_declare_type(mytypename, uint64_t, uint32_t);
-#define hashtable_equal(key_a, key_b) (key_a.member == key_b.member)
-#include "hashtable.c";
-hashtable_declare_type(mytypename2, mystruct_t, uint32_t);
+#define hashtable_hash_integer(key, hashtable) (key % hashtable.size)
+#define hashtable_equal_integer(key_a, key_b) (key_a == key_b)
 ```
 
 # set
-a macro that defines set types for arbitrary value types.
+macro that defines set data structures for custom value types.
 
 * can easily deal with millions of values on common hardware
 * compared to hashtable.c, set.c uses less than half of the space and operations are faster (about 20% in first tests)
@@ -221,7 +189,7 @@ a macro that defines set types for arbitrary value types.
 * the c standard library (stdlib.h and inttypes.h)
 
 ## usage examples
-with the file in the load path or the same directory:
+with set.c in the same directory:
 ~~~
 #include "set.c";
 // name, value_type, hash, equal, null, notnull, size_factor

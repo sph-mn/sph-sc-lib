@@ -3,7 +3,7 @@
 #include "./test.c"
 #include "../main/hashtable.c"
 #define test_element_count 10000
-hashtable_declare_type(testht, uint64_t, uint64_t);
+hashtable_declare_type(testht, uint64_t, uint64_t, hashtable_hash_integer, hashtable_equal_integer, 2);
 void print_contents(testht_t a) {
   size_t i = 0;
   printf("------\n");
