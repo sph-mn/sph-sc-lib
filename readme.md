@@ -197,7 +197,7 @@ the following macro variables can be set, here shown with their default values:
 #define hashtable_size_factor 2
 ```
 
-example of declaring typse with different equality functions
+example of declaring types with different equality functions
 ```c
 #define hashtable_equal(key_a, key_b) (key_a == key_b)
 #include "hashtable.c";

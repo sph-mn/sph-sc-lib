@@ -1,6 +1,7 @@
 (pre-include "stdio.h" "inttypes.h" "./test.c" "../main/set.c")
 (pre-define test-element-count 10000)
-(sph-set-declare-type set64 uint64-t)
+(sph-set-declare-type set64 uint64-t sph-set-hash-integer sph-set-equal-integer 0 1 2)
+(sph-set-declare-type-nonull set64nn uint64-t sph-set-hash-integer sph-set-equal-integer 0 1 2)
 
 (define (print-contents a) (void set64-t)
   (define i size-t 0)

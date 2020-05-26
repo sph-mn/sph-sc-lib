@@ -3,7 +3,8 @@
 #include "./test.c"
 #include "../main/set.c"
 #define test_element_count 10000
-sph_set_declare_type(set64, uint64_t);
+sph_set_declare_type(set64, uint64_t, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
+sph_set_declare_type_nonull(set64nn, uint64_t, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
 void print_contents(set64_t a) {
   size_t i = 0;
   printf("------\n");
