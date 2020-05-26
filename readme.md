@@ -221,9 +221,10 @@ a macro that defines set types for arbitrary value types.
 * the c standard library (stdlib.h and inttypes.h)
 
 ## usage examples
-where the file is in the load path or in the same directory.
+with the file in the load path or the same directory:
 ~~~
 #include "set.c";
+// name, value_type, hash, equal, null, notnull, size_factor
 sph_set_declare_type(myset, int, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
 void main() {
   myset_t a;
@@ -237,17 +238,8 @@ void main() {
   myset_free(a);
 }
 ~~~
-sph_set_declare_type takes these arguments:
-~~~
-sph_set_declare_type(name, value_type, hash, equal, null, notnull, size_factor)
-~~~
-the example hash functions are defined as:
-~~~
-#define sph_set_equal_hash(value, hashtable_size) (value % hashtable_size)
-#define sph_set_equal_integer(value_a, value_b) (value_a == value_b)
-~~~
 
-sph_set_declare_type adds the following functions, where "name" is the first argument passed to sph_set_declare_type
+sph_set_declare_type adds these functions:
 ~~~
 // 0 on success, 1 on memory allocation error
 uint8_t name##_new(size_t min_size, name##_t* result);
@@ -263,6 +255,12 @@ value_type* name##_add(name##_t a, value_type value);
 uint8_t name##_remove(name##_t a, value_type value);
 
 void name##_free(name##_t a);
+~~~
+
+the provided example hash functions are:
+~~~
+#define sph_set_equal_hash(value, hashtable_size) (value % hashtable_size)
+#define sph_set_equal_integer(value_a, value_b) (value_a == value_b)
 ~~~
 
 ### exclude empty value
