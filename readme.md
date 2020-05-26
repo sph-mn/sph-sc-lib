@@ -126,7 +126,7 @@ memreg_heap_free(allocations);
 ```
 
 # hashtable
-macro that defines hash-table data structures for custom value types.
+macro that defines hash-table data structures for custom key/value types.
 
 ## dependencies
 * the c standard library (stdlib.h and inttypes.h)
@@ -145,28 +145,30 @@ with hashtable.c in the same directory:
 ~~~
 #include "hashtable.c";
 // name, key_type, value_type, hashtable_hash, hashtable_equal, size_factor
-hashtable_declare_type(mytypename, uint64_t, uint32_t, hashtable_hash_integer, hashtable_equal_integer, 2);
+hashtable_declare_type(mytype, uint64_t, uint32_t, hashtable_hash_integer, hashtable_equal_integer, 2);
 mytype_t ht;
 mytype_new(200, &ht);
 mytype_set(ht, 44, 5);
 mytype_get(ht, 44);
 mytype_remove(ht, 44);
-mytype_destroy(ht);
+mytype_free(ht);
 ~~~
 
-hashtable_declare_type adds these functions:
+hashtable_declare_type defines these functions:
 ~~~
 // returns 1 on success or 0 if the memory allocation failed.
-uint8_t name##_new(size_t min_size, name##_t* result)
+uint8_t name##_new(size_t min_size, name##_t* result);
 
 // returns the address of the added or already included value, 0 if there is no space left in the hash table
-value_type* name##_set(name##_t a, key_type key, value_type value)
+value_type* name##_set(name##_t a, key_type key, value_type value);
 
 // returns the address of the value in the hash table, 0 if it was not found
-value_type* name##_get(name##_t a, key_type key)
+value_type* name##_get(name##_t a, key_type key);
 
 // returns 0 if the element was removed, 1 if it was not found
-uint8_t name##_remove(name##_t a, key_type key)
+uint8_t name##_remove(name##_t a, key_type key);
+
+void name##_free(name##_t a);
 ~~~
 
 the provided example hash functions are:
@@ -207,7 +209,7 @@ void main() {
 }
 ~~~
 
-sph_set_declare_type adds these functions:
+sph_set_declare_type defines these functions:
 ~~~
 // 0 on success, 1 on memory allocation error
 uint8_t name##_new(size_t min_size, name##_t* result);
