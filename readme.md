@@ -211,11 +211,11 @@ hashtable_declare_type(mytypename2, mystruct_t, uint32_t);
 a macro that defines set types for arbitrary value types.
 
 * can easily deal with millions of values on common hardware
-* linear probing for collision resolve
 * compared to hashtable.c, set.c uses less than half of the space and operations are faster (about 20% in first tests)
+* linear probing for collision resolve
 * insert/delete/search should all be o(1)
 * the set size does not automatically grow. a new set has to be created should the specified size later turn out to be insufficient
-* the default hash functions work with integers
+* example hash functions that work with integers
 
 ## dependencies
 * the c standard library (stdlib.h and inttypes.h)
@@ -224,7 +224,7 @@ a macro that defines set types for arbitrary value types.
 where the file is in the load path or in the same directory.
 ~~~
 #include "set.c";
-sph_set_declare_type(myset, int);
+sph_set_declare_type(myset, int, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
 void main() {
   myset_t a;
   if(myset_new(3, &a)) {
@@ -236,7 +236,15 @@ void main() {
   myset_get(a, 5);
   myset_free(a);
 }
-
+~~~
+sph_set_declare_type takes these arguments:
+~~~
+sph_set_declare_type(name, value_type, hash, equal, null, notnull, size_factor)
+~~~
+the example hash functions are defined as:
+~~~
+#define sph_set_equal_hash(value, hashtable_size) (value % hashtable_size)
+#define sph_set_equal_integer(value_a, value_b) (value_a == value_b)
 ~~~
 
 sph_set_declare_type adds the following functions, where "name" is the first argument passed to sph_set_declare_type
@@ -257,34 +265,20 @@ uint8_t name##_remove(name##_t a, value_type value);
 void name##_free(name##_t a);
 ~~~
 
-## configuration options
-before including set.c, the following macros can be defined, which must be expressions. redefine and reinclude for varying configuration.
-the following shows the defaults.
-~~~
-#define sph_set_hash(value, hashtable_size) (value % hashtable_size)
-#define sph_set_equal(value_a, value_b) (value_a == value_b)
-#define sph_set_allow_empty_value 1
-#define sph_set_empty_value 0
-#define sph_set_true_value 1
-#define sph_set_size_factor 2
-~~~
-
 ### exclude empty value
-by default, the empty value is a valid value to be included in a set. but as an optimisation, to make operations a tiny bit faster, this can be disabled by setting the macro variable "sph_set_allow_empty_value" to zero before inclusion.
+by default, the null value is a valid value that can be included in the set. but as an optimisation, to make operations a tiny bit faster, this can be disabled by using sph_set_declare_type_nonull in place of
+sph_set_declare_type.
 the empty value can then not be part of the set; it wont be found.
 
 ### memory usage
-by default, the memory allocated for the set is at least double the number of elements it is supposed to store (possibly rounded to a next higher prime).
-a lower set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
+the memory allocated for the set is at least the requested size times set_factor, possibly rounded to a next higher prime.
+set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
 the downside is that the insert/delete/search performance is more likely to approach and reach o(n).
 
 ## modularity and implementation
-declared "name##_t" set types are structures (.size, .values). "values" is a one-dimensional array that stores values at indices determined by a hash function.
-if sph_set_allow_empty_value is true, values start at index 1 and index 0 is sph_set_true_value if the empty value is in the set.
-if sph_set_allow_empty_value is false, values start at index 0.
-
-## possible enhancement
-* pass (hash, equal, empty-value) to the main type declaration macro
+* declared "name##_t" set types are structures (.size, .values). "values" is a one-dimensional array that stores values at indices determined by a hash function
+* for sph_set_declare_type, values start at index 1 and index 0 is notnull if the null value is in the set
+* for sph_set_declare_type_nonull, values start at index 0
 
 # i-array
 a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list and can replace linked lists in many instances. the overhead is small because it is only four pointers.
