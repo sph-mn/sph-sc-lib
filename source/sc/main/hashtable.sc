@@ -1,4 +1,4 @@
-(pre-include "stdlib.h" "inttypes.h")
+(pre-include "stdlib.h" "string.h" "inttypes.h")
 
 (sc-comment
   "a macro that defines hash-table data types for arbitrary key/value types,"
@@ -19,7 +19,7 @@
 (define hashtable-primes-end uint32-t* (+ hashtable-primes 25))
 
 (pre-define
-  (hashtable-hash-integer key hashtable) (modulo key hashtable.size)
+  (hashtable-hash-integer key hashtable-size) (modulo key hashtable-size)
   (hashtable-equal-integer key-a key-b) (= key-a key-b)
   (hashtable-declare-type name key-type value-type hashtable-hash hashtable-equal size-factor)
   (begin
@@ -48,7 +48,7 @@
     (define ((pre-concat name _get) a key) (value-type* (pre-concat name _t) key-type)
       "returns the address of the value in the hash table, 0 if it was not found"
       (declare i size-t hash-i size-t)
-      (set hash-i (hashtable-hash key a) i hash-i)
+      (set hash-i (hashtable-hash key a.size) i hash-i)
       (while (< i a.size)
         (if (array-get a.flags i)
           (if (hashtable-equal key (array-get a.keys i)) (return (+ i a.values)))
@@ -66,7 +66,7 @@
       (value-type* (pre-concat name _t) key-type value-type)
       "returns the address of the added or already included value, 0 if there is no space left in the hash table"
       (declare i size-t hash-i size-t)
-      (set hash-i (hashtable-hash key a) i hash-i)
+      (set hash-i (hashtable-hash key a.size) i hash-i)
       (while (< i a.size)
         (if (array-get a.flags i)
           (if (hashtable-equal key (array-get a.keys i)) (return (+ i a.values)) (set+ i 1))
@@ -85,4 +85,5 @@
       "returns 0 if the element was removed, 1 if it was not found.
        only needs to set flag to zero"
       (define value value-type* ((pre-concat name _get) a key))
-      (if value (begin (set (array-get a.flags (- value a.values)) 0) (return 0)) (return 1)))))
+      (if value (begin (set (array-get a.flags (- value a.values)) 0) (return 0)) (return 1)))
+    (define ((pre-concat name _clear) a) (void (pre-concat name _t)) (memset a.flags 0 a.size))))

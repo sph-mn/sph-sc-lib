@@ -15,7 +15,7 @@ uint32_t sph_set_primes[] = { 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24
 uint32_t* sph_set_primes_end = (sph_set_primes + 25);
 #define sph_set_hash_integer(value, hashtable_size) (value % hashtable_size)
 #define sph_set_equal_integer(value_a, value_b) (value_a == value_b)
-#define sph_set_declare_type_shared_1(name, value_type, set_hash, set_equal, null, notnull, size_factor) \
+#define sph_set_declare_type_shared_1(name, value_type, set_hash, set_equal, null, size_factor) \
   typedef struct { \
     size_t size; \
     value_type* values; \
@@ -31,8 +31,14 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
     /* if no prime has been found, make size at least an odd number */ \
     return ((1 | min_size)); \
   } \
+  void name##_clear(name##_t a) { \
+    size_t i; \
+    for (i = 0; (i < a.size); i = (1 + i)) { \
+      (a.values)[i] = null; \
+    }; \
+  } \
   void name##_free(name##_t a) { free((a.values)); }
-#define sph_set_declare_type_shared_2(name, value_type, set_hash, set_equal, null, notnull, size_factor) \
+#define sph_set_declare_type_shared_2(name, value_type, set_hash, set_equal, null, size_factor) \
   /** returns 0 if the element was removed, 1 if it was not found */ \
   uint8_t name##_remove(name##_t a, value_type value) { \
     value_type* v = name##_get(a, value); \
@@ -46,15 +52,14 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
 #define sph_set_declare_type_with_null(name, value_type, set_hash, set_equal, null, notnull, size_factor) \
   /** returns 0 on success or 1 if the memory allocation failed */ \
   uint8_t name##_new(size_t min_size, name##_t* result) { \
-    value_type* values; \
-    min_size = name##_calculate_size(min_size); \
-    min_size = (min_size + 1); \
-    values = calloc(min_size, (sizeof(value_type))); \
-    if (!values) { \
+    name##_t temp; \
+    temp.size = (1 + name##_calculate_size(min_size)); \
+    temp.values = calloc((temp.size), (sizeof(value_type))); \
+    if (!temp.values) { \
       return (1); \
     }; \
-    (*result).values = values; \
-    (*result).size = min_size; \
+    name##_clear(temp); \
+    *result = temp; \
     return (0); \
   } \
 \
@@ -121,7 +126,7 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
     }; \
     return (0); \
   }
-#define sph_set_declare_type_without_null(name, value_type, set_hash, set_equal, null, notnull, size_factor) \
+#define sph_set_declare_type_without_null(name, value_type, set_hash, set_equal, null, size_factor) \
   /** returns 0 on success or 1 if the memory allocation failed */ \
   uint8_t name##_new(size_t min_size, name##_t* result) { \
     value_type* values; \
@@ -191,9 +196,9 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
     }; \
     return (0); \
   }
-#define sph_set_declare_type(name, value_type, hash, equal, null, notnull, size_factor) sph_set_declare_type_shared_1(name, value_type, hash, equal, null, notnull, size_factor) \
+#define sph_set_declare_type(name, value_type, hash, equal, null, notnull, size_factor) sph_set_declare_type_shared_1(name, value_type, hash, equal, null, size_factor) \
   sph_set_declare_type_with_null(name, value_type, hash, equal, null, notnull, size_factor) \
-    sph_set_declare_type_shared_2(name, value_type, hash, equal, null, notnull, size_factor)
-#define sph_set_declare_type_nonull(name, value_type, hash, equal, null, notnull, size_factor) sph_set_declare_type_shared_1(name, value_type, hash, equal, null, notnull, size_factor) \
-  sph_set_declare_type_without_null(name, value_type, hash, equal, null, notnull, size_factor) \
-    sph_set_declare_type_shared_2(name, value_type, hash, equal, null, notnull, size_factor)
+    sph_set_declare_type_shared_2(name, value_type, hash, equal, null, size_factor)
+#define sph_set_declare_type_nonull(name, value_type, hash, equal, null, size_factor) sph_set_declare_type_shared_1(name, value_type, hash, equal, null, size_factor) \
+  sph_set_declare_type_without_null(name, value_type, hash, equal, null, size_factor) \
+    sph_set_declare_type_shared_2(name, value_type, hash, equal, null, size_factor)

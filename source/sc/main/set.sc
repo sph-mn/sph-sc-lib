@@ -28,7 +28,7 @@
 (pre-define
   (sph-set-hash-integer value hashtable-size) (modulo value hashtable-size)
   (sph-set-equal-integer value-a value-b) (= value-a value-b)
-  (sph-set-declare-type-shared-1 name value-type set-hash set-equal null notnull size-factor)
+  (sph-set-declare-type-shared-1 name value-type set-hash set-equal null size-factor)
   (begin
     (declare (pre-concat name _t) (type (struct (size size-t) (values value-type*))))
     (define ((pre-concat name _calculate-size) min-size) (size-t size-t)
@@ -38,8 +38,11 @@
         (if (<= min-size *primes) (return *primes)))
       (sc-comment "if no prime has been found, make size at least an odd number")
       (return (bit-or 1 min-size)))
+    (define ((pre-concat name _clear) a) (void (pre-concat name _t))
+      (declare i size-t)
+      (for ((set i 0) (< i a.size) (set i (+ 1 i))) (set (array-get a.values i) null)))
     (define ((pre-concat name _free) a) (void (pre-concat name _t)) (begin (free a.values))))
-  (sph-set-declare-type-shared-2 name value-type set-hash set-equal null notnull size-factor)
+  (sph-set-declare-type-shared-2 name value-type set-hash set-equal null size-factor)
   (begin
     (define ((pre-concat name _remove) a value) (uint8-t (pre-concat name _t) value-type)
       "returns 0 if the element was removed, 1 if it was not found"
@@ -49,13 +52,13 @@
   (begin
     (define ((pre-concat name _new) min-size result) (uint8-t size-t (pre-concat name _t*))
       "returns 0 on success or 1 if the memory allocation failed"
-      (declare values value-type*)
+      (declare temp (pre-concat name _t))
       (set
-        min-size ((pre-concat name _calculate-size) min-size)
-        min-size (+ min-size 1)
-        values (calloc min-size (sizeof value-type)))
-      (if (not values) (return 1))
-      (struct-set *result values values size min-size)
+        temp.size (+ 1 ((pre-concat name _calculate-size) min-size))
+        temp.values (calloc temp.size (sizeof value-type)))
+      (if (not temp.values) (return 1))
+      ((pre-concat name _clear) temp)
+      (set *result temp)
       (return 0))
     (define ((pre-concat name _get) a value) (value-type* (pre-concat name _t) value-type)
       "returns the address of the value or 0 if it was not found.
@@ -92,7 +95,7 @@
           (begin (set (array-get a.values i) value) (return (+ i a.values))))
         (set+ i 1))
       (return 0)))
-  (sph-set-declare-type-without-null name value-type set-hash set-equal null notnull size-factor)
+  (sph-set-declare-type-without-null name value-type set-hash set-equal null size-factor)
   (begin
     (define ((pre-concat name _new) min-size result) (uint8-t size-t (pre-concat name _t*))
       "returns 0 on success or 1 if the memory allocation failed"
@@ -135,11 +138,11 @@
       (return 0)))
   (sph-set-declare-type name value-type hash equal null notnull size-factor)
   (begin
-    (sph-set-declare-type-shared-1 name value-type hash equal null notnull size-factor)
+    (sph-set-declare-type-shared-1 name value-type hash equal null size-factor)
     (sph-set-declare-type-with-null name value-type hash equal null notnull size-factor)
-    (sph-set-declare-type-shared-2 name value-type hash equal null notnull size-factor))
-  (sph-set-declare-type-nonull name value-type hash equal null notnull size-factor)
+    (sph-set-declare-type-shared-2 name value-type hash equal null size-factor))
+  (sph-set-declare-type-nonull name value-type hash equal null size-factor)
   (begin
-    (sph-set-declare-type-shared-1 name value-type hash equal null notnull size-factor)
-    (sph-set-declare-type-without-null name value-type hash equal null notnull size-factor)
-    (sph-set-declare-type-shared-2 name value-type hash equal null notnull size-factor)))
+    (sph-set-declare-type-shared-1 name value-type hash equal null size-factor)
+    (sph-set-declare-type-without-null name value-type hash equal null size-factor)
+    (sph-set-declare-type-shared-2 name value-type hash equal null size-factor)))

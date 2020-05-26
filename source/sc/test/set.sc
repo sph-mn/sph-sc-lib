@@ -1,7 +1,7 @@
 (pre-include "stdio.h" "inttypes.h" "./test.c" "../main/set.c")
 (pre-define test-element-count 10000)
 (sph-set-declare-type set64 uint64-t sph-set-hash-integer sph-set-equal-integer 0 1 2)
-(sph-set-declare-type-nonull set64nn uint64-t sph-set-hash-integer sph-set-equal-integer 0 1 2)
+(sph-set-declare-type-nonull set64nn uint64-t sph-set-hash-integer sph-set-equal-integer 0 2)
 
 (define (print-contents a) (void set64-t)
   (define i size-t 0)
@@ -11,7 +11,7 @@
 (define (test-sph-set) status-t
   status-declare
   (declare a set64-t i uint64-t value uint64-t*)
-  (set64-new test-element-count &a)
+  (test-helper-assert "allocation" (not (set64-new test-element-count &a)))
   (sc-comment "insert values")
   (for ((set i 0) (< i test-element-count) (set+ i 1))
     (test-helper-assert "insert" (set64-add a i)))

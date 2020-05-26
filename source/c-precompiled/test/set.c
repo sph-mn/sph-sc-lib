@@ -4,7 +4,7 @@
 #include "../main/set.c"
 #define test_element_count 10000
 sph_set_declare_type(set64, uint64_t, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
-sph_set_declare_type_nonull(set64nn, uint64_t, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
+sph_set_declare_type_nonull(set64nn, uint64_t, sph_set_hash_integer, sph_set_equal_integer, 0, 2);
 void print_contents(set64_t a) {
   size_t i = 0;
   printf("------\n");
@@ -18,7 +18,7 @@ status_t test_sph_set() {
   set64_t a;
   uint64_t i;
   uint64_t* value;
-  set64_new(test_element_count, (&a));
+  test_helper_assert("allocation", (!set64_new(test_element_count, (&a))));
   /* insert values */
   for (i = 0; (i < test_element_count); i += 1) {
     test_helper_assert("insert", (set64_add(a, i)));

@@ -234,9 +234,10 @@ the provided example hash functions are:
 ~~~
 
 ### exclude empty value
-by default, the null value is a valid value that can be included in the set. but as an optimisation, to make operations a tiny bit faster, this can be disabled by using sph_set_declare_type_nonull in place of
+by default, the null value is a valid value that can be included in the set. but as an optimisation, to make operations a tiny bit faster, this can be disabled by using sph_set_declare_type_nonull instead of
 sph_set_declare_type.
 the empty value can then not be part of the set; it wont be found.
+sph_set_declare_type_nonull takes one less argument - it does not need a notnull value.
 
 ### memory usage
 the memory allocated for the set is at least the requested size times set_factor, possibly rounded to a next higher prime.
