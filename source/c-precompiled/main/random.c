@@ -2,8 +2,8 @@
 #define rotl(x, k) ((x << k) | (x >> (64 - k)))
 /** guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely. this conversion prefers the high bits of x.
      from http://xoshiro.di.unimi.it/ */
-#define f64_from_u64(a) ((a >> 11) * (1.0 / (UINT64_C(1) << 53)))
-#define define_xoshiro256starstar(name, data_type, transfer) \
+#define sph_random_f64_from_u64(a) ((a >> 11) * (1.0 / (UINT64_C(1) << 53)))
+#define sph_random_define_x256ss(name, data_type, transfer) \
   /** write uniformly distributed 64 bit unsigned integers into out. \
        implements xoshiro256** from http://xoshiro.di.unimi.it/ \
        referenced by https://nullprogram.com/blog/2017/09/21/. \
@@ -27,7 +27,7 @@
       out[i] = transfer; \
     }; \
   }
-#define define_xoshiro256plus(name, data_type, transfer) \
+#define sph_random_define_x256p(name, data_type, transfer) \
   /** write uniformly distributed 64 bit floating point numbers into out. \
        implements xoshiro256+ from http://xoshiro.di.unimi.it/ */ \
   void name(sph_random_state_t* state, size_t size, data_type* out) { \
@@ -66,5 +66,5 @@ sph_random_state_t sph_random_state_new(u64 seed) {
   };
   return (result);
 }
-define_xoshiro256starstar(sph_random_u64, u64, a)
-  define_xoshiro256plus(sph_random_f64, f64, (f64_from_u64(a)))
+sph_random_define_x256ss(sph_random_u64, u64, a)
+  sph_random_define_x256p(sph_random_f64, f64, (sph_random_f64_from_u64(a)))
