@@ -1,14 +1,17 @@
-(pre-include "stdio.h" "../main/types.c"
-  "./test.c" "../main/float.c" "../main/random.h" "../main/random.c")
+(pre-include "stdio.h" "../main/types.c" "./test.c" "../main/float.c" "../main/random.c")
 
 (define (test-random) status-t
   status-declare
-  (declare s sph-random-state-t out (array f64 200))
+  (declare s sph-random-state-t out (array f64 200) out-u64 (array u64 1000))
+  (sc-comment "f64")
   (set s (sph-random-state-new 80))
-  (sph-random &s 100 out)
-  (sph-random &s 100 (+ 100 out))
-  ;(for ((define i u32 0) (< i 200) (set i (+ 1 i))) (printf "%f " (array-get out i)))
+  (sph-random-f64 &s 100 out)
+  (sph-random-f64 &s 100 (+ 100 out))
   (test-helper-assert "value" (f64-nearly-equal 0.945766 (array-get out 199) 1.0e-4))
+  (sc-comment "u64")
+  (set s (sph-random-state-new 80))
+  (sph-random-u64 &s 100 out-u64)
+  (test-helper-assert "value" (= 16312392477912876050u (array-get out-u64 99)))
   (label exit status-return))
 
 (define (main) int

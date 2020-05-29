@@ -12,7 +12,6 @@ compile_sc() {
   cd "$root" &&
   find "$c" -type f -exec ./exe/format-c -i '{}' \;
   mv "$c/main/spline-path-h.c" "$c/main/spline-path.h"
-  mv "$c/main/random-h.c" "$c/main/random.h"
 }
 
 mkdir -p "$c" &&
