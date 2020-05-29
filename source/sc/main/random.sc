@@ -7,7 +7,7 @@
     "guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely. this conversion prefers the high bits of x.
      from http://xoshiro.di.unimi.it/"
     (* (bit-shift-right a 11) (/ 1.0 (bit-shift-left (UINT64_C 1) 53))))
-  (define-sph-random-u64 name data-type transfer)
+  (define-xoshiro256starstar name data-type transfer)
   (define (name state size out) (void sph-random-state-t* size-t data-type*)
     "write uniformly distributed 64 bit unsigned integers into out.
      implements xoshiro256** from http://xoshiro.di.unimi.it/
@@ -27,7 +27,7 @@
         (array-get s 2) (bit-xor (array-get s 2) t)
         (array-get s 3) (rotl (array-get s 3) 45)
         (array-get out i) transfer)))
-  (define-sph-random-f64 name data-type transfer)
+  (define-xoshiro256plus name data-type transfer)
   (define (name state size out) (void sph-random-state-t* size-t data-type*)
     "write uniformly distributed 64 bit floating point numbers into out.
      implements xoshiro256+ from http://xoshiro.di.unimi.it/"
@@ -60,5 +60,5 @@
       (array-get result.data i) (bit-xor z (bit-shift-right z 31))))
   (return result))
 
-(define-sph-random-u64 sph-random-u64 u64 a)
-(define-sph-random-f64 sph-random-f64 f64 (f64-from-u64 a))
+(define-xoshiro256starstar sph-random-u64 u64 a)
+(define-xoshiro256plus sph-random-f64 f64 (f64-from-u64 a))
