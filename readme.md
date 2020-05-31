@@ -6,7 +6,7 @@ c code is in source/c-precompiled. sc versions are in source/sc. the libraries a
 # included libraries
 * [futures](#futures): fine-grained parallelism with objects that can be waited on for results
 * [hashtable](#hashtable): hash-tables for any key/value type
-* [i-array](#i-array): a fixed size array type with variable length content that makes iteration easier to code
+* [arrays](#arrays): structs for arrays that include size or a count of used content
 * [memreg](#memreg): track heap memory allocations in function scope
 * [mi-list](#mi-list): a basic, macro-based linked list
 * [queue](#queue): a queue for any data type
@@ -113,7 +113,7 @@ memreg_free_named(testname);
 ```
 
 ## memreg_heap
-``memreg_heap.c`` is similar to the previously mentioned memreg but uses a special i-array based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables.
+``memreg_heap.c`` is similar to the previously mentioned memreg but uses a special array4 based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables.
 
 ```c
 memreg_heap_declare(allocations);
@@ -249,51 +249,79 @@ the downside is that the insert/delete/search performance is more likely to appr
 * for sph_set_declare_type, values start at index 1 and index 0 is notnull if the null value is in the set
 * for sph_set_declare_type_nonull, values start at index 0
 
-# i-array
-a fixed size array with variable length content that makes iteration easier to code. it is used similar to a linked list and can replace linked lists in many instances. the overhead is small because it is only four pointers.
-most bindings are generic macros that will work on all i-array types. i_array_add and i_array_forward go from left to right
+# arrays
+array types that combine values that are often passed to functions as separate arguments.
+most bindings are generic macros that will work on any arrayn type.
 
 ## dependencies
 * the c standard library (stdlib.h)
 
-## usage example
+## array3
+struct {.data, .size, .used} that combines pointer, length and used length in one object.
+the \"used\" property is to support variable length data in a fixed size memory area.
+
+### usage example
 ```c
 // arguments: custom_name, element_type
-i_array_declare_type(my_type, int);
+array3_declare_type(my_type, int);
 my_type_t a;
 if(my_type_new(4, &a)) {
   // memory allocation error
 }
-i_array_add(a, 1);
-i_array_add(a, 2);
-while(i_array_in_range(a)) { i_array_get(a); }
-i_array_free(a);
+array3_add(a, 1);
+array3_add(a, 2);
+size_t i = 0;
+for(i = 0; i < a.size; i += 1) {
+  array3_get(a, i);
+}
+array3_free(a);
 ```
 
-## bindings
-### macros
-```c
-i_array_add(a, value)
-i_array_clear(a)
-i_array_declare(a, type)
-i_array_declare_type(name, element_type)
-i_array_forward(a)
-i_array_free(a)
-i_array_get(a)
-i_array_get_at(a, index)
-i_array_in_range(a)
-i_array_length(a)
-i_array_max_length(a)
-i_array_remove(a)
-i_array_rewind(a)
-i_array_set_null(a)
+### bindings
+~~~c
+array3_new_custom_##name(size_t:size, malloc, name##_t:result)
+array3_new_##name(size_t:size, name##_t:result)
+array3_resize_custom_##name(name##_t:a, size_t:new_size, realloc)
+array3_resize_##name(name##_t:result, size_t:new_size)
+array3_add(a, value)
+array3_clear(a)
+array3_declare(a, type)
+array3_declare_type(name, element_type)
+array3_free(a)
+array3_get(a, index)
+array3_is_full(a)
+array3_is_not_full(a)
+array3_max_size(a)
+array3_remove(a)
+array3_set_null(a)
+array3_size(a)
+array3_take(a, data, size, used)
 ```
 
-### routines
-```c
-i_array_allocate_custom_##name(length, allocator, result)
-i_array_allocate_##name(length, result)
-```
+## array4
+struct {.current, .data, .size, .used} that combines pointer, length, used length and iteration index in one object.
+includes all properties of array3 and the additional index can be used to make iteration easier to code, track some offset or
+use the array similar to a linked list. array4_add and array4_forward go from left to right.
+
+### usage example
+like array3 without the need to declare an iteration index counter:
+~~~c
+while(array4_in_range(a)) {
+  array4_get(a);
+  array4_forward(a);
+}
+~~~
+
+### bindings
+all bindings of array3 with array4 prefix and the following additions:
+
+~~~c
+array4_in_range(a)
+array4_get(a)
+array4_get_at(a, index)
+array4_forward(a)
+array4_rewind(a)
+~~~
 
 # mi-list
 a basic linked list with custom element types.

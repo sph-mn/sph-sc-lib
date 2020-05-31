@@ -4,6 +4,7 @@
 
 export MALLOC_CHECK_=3
 export LD_LIBRARY_PATH="$PWD/temp"
+./temp/test-arrayn
 ./temp/test-random
 ./temp/test-set
 ./temp/test-mi-list

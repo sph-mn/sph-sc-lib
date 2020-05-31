@@ -3,10 +3,12 @@
 root="$PWD"
 target_dir=temp
 c=source/c-precompiled
-warnings="-Wunused-label -Wunused-value -Wunused-variable"
-gcc_options="-std=c17 $warnings -Wfatal-errors -O3"
+optimisation=0
+#warnings="-Wunused-label -Wunused-value -Wunused-variable"
+gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimisation"
 
 compile_test_sph_sc_lib() {
+  gcc "$c/test/arrayn.c" -o temp/test-arrayn $gcc_options
   gcc "$c/test/random.c" -o temp/test-random $gcc_options
   gcc "$c/test/set.c" -o temp/test-set $gcc_options
   gcc "$c/test/hashtable.c" -o temp/test-hashtable $gcc_options
