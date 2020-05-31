@@ -1,13 +1,13 @@
 #include <stdio.h>
-#include "../main/types.c"
+#include <inttypes.h>
 #include "./test.c"
 #include "../main/float.c"
 #include "../main/random.c"
 status_t test_random() {
   status_declare;
   sph_random_state_t s;
-  f64 out[200];
-  u64 out_u64[1000];
+  double out[200];
+  uint64_t out_u64[1000];
   /* f64 */
   s = sph_random_state_new(80);
   sph_random_f64((&s), 100, out);

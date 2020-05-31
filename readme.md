@@ -556,25 +556,24 @@ int main() {
 ```
 
 # random
-[xoshiro256plus](http://xoshiro.di.unimi.it/) implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/)). fills an array with random values. also includes a macro to define custom-type random functions. the sph_ prefix was added because "random" is defined in the standard library
+[xoshiro256**](http://xoshiro.di.unimi.it/) and xoshiro256+ implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/)). fills an array with random values. also includes macros to define custom-type random functions. most u64 values will be large numbers because small numbers have a lot of leading zero bits which is unlikely; bit-shifting can be used to obtain smaller numbers.
 
+## usage
 ```c
-sph_random_state_t sph_random_state_new(u64 seed);
-void sph_random(sph_random_state_t* state, u32 size, f64* out);
-#define define_sph_random(name, size_type, data_type, transfer)
-```
-
-```c
-#include "types.c"
-#include "random-h.c"
+#include <inttypes.h>
 #include "random.c"
 
-sph_random_state_t s;
-f64 out[100];
-s = sph_random_state_new(11223344);
-sph_random((&s), 100, out);
+double out[100];
+sph_random_state_t s = sph_random_state_new(11223344);
+sph_random_f64(&s, 100, out);
 ```
 
-```c
-define_sph_random(sph_random, u32, f64, (f64_from_u64(result_plus)));
+## api
+```
+sph_random_define_x256p(name, data_type, transfer)
+sph_random_define_x256ss(name, data_type, transfer)
+sph_random_f64_from_u64(a)
+sph-random-f64 :: sph_random_state_t* size_t:count double*:out -> void
+sph_random_state_new :: uint64_t:seed -> sph_random_state_t
+sph-random-u64 :: sph_random_state_t* size_t:count uint64_t*:out -> void
 ```

@@ -1,8 +1,8 @@
-(pre-include "stdio.h" "../main/types.c" "./test.c" "../main/float.c" "../main/random.c")
+(pre-include "stdio.h" "inttypes.h" "./test.c" "../main/float.c" "../main/random.c")
 
 (define (test-random) status-t
   status-declare
-  (declare s sph-random-state-t out (array f64 200) out-u64 (array u64 1000))
+  (declare s sph-random-state-t out (array double 200) out-u64 (array uint64-t 1000))
   (sc-comment "f64")
   (set s (sph-random-state-new 80))
   (sph-random-f64 &s 100 out)

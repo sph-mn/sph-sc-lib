@@ -1,4 +1,4 @@
-/* depends on types.c. sph_ prefix is used because libc uses random */
+/* depends on <inttypes.h>. sph_ prefix is used because libc uses random */
 #define rotl(x, k) ((x << k) | (x >> (64 - k)))
 /** guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely. this conversion prefers the high bits of x.
      from http://xoshiro.di.unimi.it/ */
@@ -10,10 +10,10 @@
        most output numbers will be large because small numbers \
        require a lot of consecutive zero bits which is unlikely */ \
   void name(sph_random_state_t* state, size_t size, data_type* out) { \
-    u64 a; \
+    uint64_t a; \
     size_t i; \
-    u64 t; \
-    u64* s; \
+    uint64_t t; \
+    uint64_t* s; \
     s = state->data; \
     for (i = 0; (i < size); i += 1) { \
       a = (9 * rotl((5 * s[1]), 7)); \
@@ -31,10 +31,10 @@
   /** write uniformly distributed 64 bit floating point numbers into out. \
        implements xoshiro256+ from http://xoshiro.di.unimi.it/ */ \
   void name(sph_random_state_t* state, size_t size, data_type* out) { \
-    u64 a; \
+    uint64_t a; \
     size_t i; \
-    u64 t; \
-    u64* s; \
+    uint64_t t; \
+    uint64_t* s; \
     s = state->data; \
     for (i = 0; (i < size); i += 1) { \
       a = (s[0] + s[3]); \
@@ -49,13 +49,13 @@
     }; \
   }
 typedef struct {
-  u64 data[4];
+  uint64_t data[4];
 } sph_random_state_t;
 /** use the given u64 as a seed and set state with splitmix64 results.
    the same seed will lead to the same series of pseudo random numbers */
-sph_random_state_t sph_random_state_new(u64 seed) {
-  u8 i;
-  u64 z;
+sph_random_state_t sph_random_state_new(uint64_t seed) {
+  uint8_t i;
+  uint64_t z;
   sph_random_state_t result;
   for (i = 0; (i < 4); i = (1 + i)) {
     seed = (seed + UINT64_C(11400714819323198485));
@@ -66,5 +66,5 @@ sph_random_state_t sph_random_state_new(u64 seed) {
   };
   return (result);
 }
-sph_random_define_x256ss(sph_random_u64, u64, a)
-  sph_random_define_x256p(sph_random_f64, f64, (sph_random_f64_from_u64(a)))
+sph_random_define_x256ss(sph_random_u64, uint64_t, a)
+  sph_random_define_x256p(sph_random_f64, double, (sph_random_f64_from_u64(a)))
