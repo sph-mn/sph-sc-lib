@@ -65,6 +65,8 @@
 #define array4_remove(a) a.used -= 1
 #define array4_size(a) a.used
 #define array4_max_size(a) a.size
+#define array4_unused_size(a) (a.size - a.used)
+#define array4_right_size(a) (a.used - a.current)
 #define array4_free(a) free((a.data))
 #define array4_full(a) (a.used == a.size)
 #define array4_not_full(a) (a.used < a.size)
@@ -74,5 +76,6 @@
   a->used = used
 #define array4_in_range(a) (a.current < a.used)
 #define array4_get(a) (a.data)[a.current]
+#define array4_get_address(a) (a.data + a.current)
 #define array4_forward(a) a.current += 1
 #define array4_rewind(a) a.current = 0

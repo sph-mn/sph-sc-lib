@@ -54,11 +54,14 @@
   (array4-remove a) (set- a.used 1)
   (array4-size a) a.used
   (array4-max-size a) a.size
+  (array4-unused-size a) (- a.size a.used)
+  (array4-right-size a) (- a.used a.current)
   (array4-free a) (free a.data)
   (array4-full a) (= a.used a.size)
   (array4-not-full a) (< a.used a.size)
   (array4-take a data size used) (set a:data data a:size size a:used used)
   (array4-in-range a) (< a.current a.used)
   (array4-get a) (array-get a.data a.current)
+  (array4-get-address a) (+ a.data a.current)
   (array4-forward a) (set+ a.current 1)
   (array4-rewind a) (set a.current 0))
