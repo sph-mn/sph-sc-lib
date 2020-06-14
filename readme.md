@@ -173,7 +173,7 @@ void name##_free(name##_t a);
 
 the provided example hash functions are:
 ```
-#define hashtable_hash_integer(key, hashtable) (key % hashtable.size)
+#define hashtable_hash_integer(key, hashtable-size) (key % hashtable-size)
 #define hashtable_equal_integer(key_a, key_b) (key_a == key_b)
 ```
 

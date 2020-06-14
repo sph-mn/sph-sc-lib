@@ -18,27 +18,23 @@
 
 (pre-define
   (array3-declare-type name element-type)
+  (array3-declare-type-custom name element-type malloc realloc)
+  (array3-declare-type-custom name element-type malloc realloc)
   (begin
     (declare (pre-concat name _t) (type (struct (data element-type*) (size size-t) (used size-t))))
-    (define ((pre-concat name _new-custom) size alloc a)
-      (uint8-t size-t (function-pointer void* size-t) (pre-concat name _t*))
+    (define ((pre-concat name _new) size a) (uint8-t size-t (pre-concat name _t*))
+      "return 0 on success, 1 for memory allocation error"
       (declare data element-type*)
-      (set data (alloc (* size (sizeof element-type))))
+      (set data (malloc (* size (sizeof element-type))))
       (if (not data) (return 1))
       (set a:data data a:size size a:used 0)
       (return 0))
-    (define ((pre-concat name _new) size a) (uint8-t size-t (pre-concat name _t*))
-      "return 0 on success, 1 for memory allocation error"
-      (return ((pre-concat name _new-custom) size malloc a)))
-    (define ((pre-concat name _resize-custom) a new-size realloc)
-      (uint8-t (pre-concat name _t*) size-t (function-pointer void* void* size-t))
+    (define ((pre-concat name _resize) a new-size) (uint8-t (pre-concat name _t*) size-t)
+      "return 0 on success, 1 for realloc error"
       (define data element-type* (realloc a:data (* new-size (sizeof element-type))))
       (if (not data) (return 1))
       (set a:data data a:size new-size a:used (if* (< new-size a:used) new-size a:used))
-      (return 0))
-    (define ((pre-concat name _resize) a new-size) (uint8-t (pre-concat name _t*) size-t)
-      "return 0 on success, 1 for realloc error"
-      (return ((pre-concat name _resize-custom) a new-size realloc))))
+      (return 0)))
   (array3-declare a type) (define a type (struct-literal 0 0 0))
   (array3-add a value) (set (array-get a.data a.used) value a.used (+ a.used 1))
   (array3-set-null a) (set a.used 0 a.size 0 a.data 0)
@@ -50,4 +46,9 @@
   (array3-free a) (free a.data)
   (array3-full a) (= a.used a.size)
   (array3-not-full a) (< a.used a.size)
-  (array3-take a data size used) (set a:data data a:size size a:used used))
+  (array3-take a data size used) (set a:data data a:size size a:used used)
+  (array3-data-last a) (array-get a.data (- a.size 1))
+  (array3-declare-stack name array-size type-t value-t)
+  (begin
+    (declare (pre-concat name _data) (array value-t array-size) name type-t)
+    (set name.data (pre-concat name _data) name.size array-size)))

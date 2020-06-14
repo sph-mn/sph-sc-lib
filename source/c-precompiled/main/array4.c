@@ -15,16 +15,18 @@
      }
      array4_free(a); */
 #include <stdlib.h>
-#define array4_declare_type(name, element_type) \
+#define array4_declare_type(name, element_type) array4_declare_type_custom(name, element_type, malloc, realloc)
+#define array4_declare_type_custom(name, element_type, malloc, realloc) \
   typedef struct { \
     element_type* data; \
     size_t size; \
     size_t used; \
     size_t current; \
   } name##_t; \
-  uint8_t name##_new_custom(size_t size, void* (*alloc)(size_t), name##_t* a) { \
+  /** return 0 on success, 1 for memory allocation error */ \
+  uint8_t name##_new(size_t size, name##_t* a) { \
     element_type* data; \
-    data = alloc((size * sizeof(element_type))); \
+    data = malloc((size * sizeof(element_type))); \
     if (!data) { \
       return (1); \
     }; \
@@ -35,9 +37,8 @@
     return (0); \
   } \
 \
-  /** return 0 on success, 1 for memory allocation error */ \
-  uint8_t name##_new(size_t size, name##_t* a) { return ((name##_new_custom(size, malloc, a))); } \
-  uint8_t name##_resize_custom(name##_t* a, size_t new_size, void* (*realloc)(void*, size_t)) { \
+  /** return 0 on success, 1 for realloc error */ \
+  uint8_t name##_resize(name##_t* a, size_t new_size) { \
     element_type* data = realloc((a->data), (new_size * sizeof(element_type))); \
     if (!data) { \
       return (1); \
@@ -47,10 +48,7 @@
     a->used = ((new_size < a->used) ? new_size : a->used); \
     a->current = ((new_size < a->current) ? new_size : a->current); \
     return (0); \
-  } \
-\
-  /** return 0 on success, 1 for realloc error */ \
-  uint8_t name##_resize(name##_t* a, size_t new_size) { return ((name##_resize_custom(a, new_size, realloc))); }
+  }
 #define array4_declare(a, type) type a = { 0, 0, 0, 0 }
 #define array4_add(a, value) \
   (a.data)[a.used] = value; \
