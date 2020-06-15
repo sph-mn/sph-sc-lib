@@ -99,7 +99,7 @@
   (return (bit-shift-right (sph-random-u64 state) 32)))
 
 (define (sph-random-u32-bounded state range) (uint32-t sph-random-state-t* uint64-t)
-  (return (bit-shift-right (sph-random-u64-bounded state range) 32)))
+  (return (sph-random-u64-bounded state range)))
 
 (define (sph-random-u32-array state size out) (void sph-random-state-t* size-t uint32-t*)
   (declare i size-t)
@@ -110,4 +110,4 @@
   (void sph-random-state-t* uint64-t size-t uint32-t*)
   (declare i size-t)
   (for ((set i 0) (< i size) (set+ i 1))
-    (set (array-get out i) (bit-shift-right (sph-random-u64-bounded state range) 32))))
+    (set (array-get out i) (sph-random-u64-bounded state range))))

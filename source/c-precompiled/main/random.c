@@ -109,7 +109,7 @@ void sph_random_f64_array(sph_random_state_t* state, size_t size, double* out) {
   };
 }
 uint32_t sph_random_u32(sph_random_state_t* state) { return ((sph_random_u64(state) >> 32)); }
-uint32_t sph_random_u32_bounded(sph_random_state_t* state, uint64_t range) { return ((sph_random_u64_bounded(state, range) >> 32)); }
+uint32_t sph_random_u32_bounded(sph_random_state_t* state, uint64_t range) { return ((sph_random_u64_bounded(state, range))); }
 void sph_random_u32_array(sph_random_state_t* state, size_t size, uint32_t* out) {
   size_t i;
   for (i = 0; (i < size); i += 1) {
@@ -119,6 +119,6 @@ void sph_random_u32_array(sph_random_state_t* state, size_t size, uint32_t* out)
 void sph_random_u32_bounded_array(sph_random_state_t* state, uint64_t range, size_t size, uint32_t* out) {
   size_t i;
   for (i = 0; (i < size); i += 1) {
-    out[i] = (sph_random_u64_bounded(state, range) >> 32);
+    out[i] = sph_random_u64_bounded(state, range);
   };
 }
