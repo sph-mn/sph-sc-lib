@@ -11,6 +11,7 @@ c code is in source/c-precompiled. sc versions are in source/sc. the libraries a
 * [mi-list](#mi-list): a basic, macro-based linked list
 * [queue](#queue): a queue for any data type
 * [quicksort](#quicksort): a generic implementation for arrays of any type
+* [random](#random): pseudo random number generation
 * [set](#set): sets for any key/value type
 * [spline-path](#spline-path): interpolated 2d paths between given points
 * [status](#status): return-status and error handling using a tiny object with status/error id and source library id
@@ -584,24 +585,49 @@ int main() {
 ```
 
 # random
-[xoshiro256**](http://xoshiro.di.unimi.it/) and xoshiro256+ implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/)). fills an array with random values. also includes macros to define custom-type random functions. most u64 values will be large numbers because small numbers have a lot of leading zero bits which is unlikely; bit-shifting can be used to obtain smaller numbers.
+[xoshiro256**](http://xoshiro.di.unimi.it/) and xoshiro256+ implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/))
+and unbiased bounding
 
 ## usage
 ```c
 #include <inttypes.h>
 #include "random.c"
 
-double out[100];
 sph_random_state_t s = sph_random_state_new(11223344);
-sph_random_f64(&s, 100, out);
+
+uint64_t a = sph_random_u64(&s);
+double b = sph_random_f64(&s);
+uint64_t c = sph_random_u64_bounded(&s, 10);
+
+uint64_t a_array[100];
+double b_array[100];
+uint64_t c_array[100];
+sph_random_u64_array(&s, 100, a_array);
+sph_random_f64_array(&s, 100, b_array);
+sph_random_u64_bounded_array(&s, 100, 10, c_array);
+
 ```
 
 ## api
+### routines
 ```
-sph_random_define_x256p(name, data_type, transfer)
-sph_random_define_x256ss(name, data_type, transfer)
-sph_random_f64_from_u64(a)
-sph-random-f64 :: sph_random_state_t* size_t:count double*:out -> void
+sph_random_f64 :: sph_random_state_t*:state -> double
+sph_random_f64_array :: sph_random_state_t*:state size_t:size double*:out -> void
 sph_random_state_new :: uint64_t:seed -> sph_random_state_t
-sph-random-u64 :: sph_random_state_t* size_t:count uint64_t*:out -> void
+sph_random_u64 :: sph_random_state_t*:state -> uint64_t
+sph_random_u64_array :: sph_random_state_t*:state size_t:size uint64_t*:out -> void
+sph_random_u64_bounded :: sph_random_state_t*:state uint64_t:range -> uint64_t
+sph_random_u64_bounded_array :: sph_random_state_t*:state uint64_t:range size_t:size uint64_t*:out -> void
+```
+
+### macros
+```
+rotl(x, k)
+sph_random_f64_from_u64(a)
+```
+
+### types
+```
+sph_random_state_t: struct
+  data: array uint64_t 4
 ```

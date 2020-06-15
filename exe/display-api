@@ -1,0 +1,4 @@
+#!/bin/sh
+# depends on sc-documentor from sph-sc.
+
+sc-documentor source/sc/main/random.sc --md-level=2
