@@ -15,7 +15,7 @@
   "use the given u64 as a seed and set state with splitmix64 results.
    the same seed will lead to the same series of pseudo random numbers"
   (declare i uint8-t z uint64-t result sph-random-state-t)
-  (for ((set i 0) (< i 4) (set i (+ 1 i)))
+  (for ((set i 0) (< i 4) (set+ i 1))
     (set
       seed (+ seed (UINT64_C 11400714819323198485))
       z seed
@@ -94,3 +94,20 @@
 (define (sph-random-f64-array state size out) (void sph-random-state-t* size-t double*)
   (declare i size-t)
   (for ((set i 0) (< i size) (set+ i 1)) (set (array-get out i) (sph-random-f64 state))))
+
+(define (sph-random-u32 state) (uint32-t sph-random-state-t*)
+  (return (bit-shift-right (sph-random-u64 state) 32)))
+
+(define (sph-random-u32-bounded state range) (uint32-t sph-random-state-t* uint64-t)
+  (return (bit-shift-right (sph-random-u64-bounded state range) 32)))
+
+(define (sph-random-u32-array state size out) (void sph-random-state-t* size-t uint32-t*)
+  (declare i size-t)
+  (for ((set i 0) (< i size) (set+ i 1))
+    (set (array-get out i) (bit-shift-right (sph-random-u64 state) 32))))
+
+(define (sph-random-u32-bounded-array state range size out)
+  (void sph-random-state-t* uint64-t size-t uint32-t*)
+  (declare i size-t)
+  (for ((set i 0) (< i size) (set+ i 1))
+    (set (array-get out i) (bit-shift-right (sph-random-u64-bounded state range) 32))))

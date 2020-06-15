@@ -585,8 +585,8 @@ int main() {
 ```
 
 # random
-[xoshiro256**](http://xoshiro.di.unimi.it/) and xoshiro256+ implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/))
-and unbiased bounding
+[xoshiro256**](http://xoshiro.di.unimi.it/) and xoshiro256+ implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/)).
+unbiased bounding ([lemire](https://arxiv.org/abs/1805.10941), [o'neill](https://www.pcg-random.org/posts/bounded-rands.html)).
 
 ## usage
 ```c
