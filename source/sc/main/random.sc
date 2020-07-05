@@ -79,7 +79,8 @@
     (array-get s 3) (rotl (array-get s 3) 45))
   (return (sph-random-f64-from-u64 a range)))
 
-(define (sph-random-f64 state) (return (sph-random-f64-bounded state 1.0)))
+(define (sph-random-f64 state) (double sph-random-state-t*)
+  (return (sph-random-f64-bounded state 1.0)))
 
 (define (sph-random-u64-array state size out) (void sph-random-state-t* size-t uint64-t*)
   (declare i size-t)
