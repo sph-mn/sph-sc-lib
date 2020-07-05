@@ -2,12 +2,12 @@
 
 (pre-define
   (rotl x k) (bit-or (bit-shift-left x k) (bit-shift-right x (- 64 k)))
-  (sph-random-f64-from-u64 a)
+  (sph-random-f64-from-u64 a range)
   (begin
     "guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely.
-     this conversion prefers the high bits of x.
+     this conversion prefers the high bits of x as is recommended for xoshiro.
      from http://xoshiro.di.unimi.it/"
-    (* (bit-shift-right a 11) (/ 1.0 (bit-shift-left (UINT64_C 1) 53)))))
+    (* (bit-shift-right a 11) (/ range (bit-shift-left (UINT64_C 1) 53)))))
 
 (declare sph-random-state-t (type (struct (data (array uint64-t 4)))))
 
@@ -45,10 +45,8 @@
 
 (define (sph-random-u64-bounded state range) (uint64-t sph-random-state-t* uint64-t)
   "generate uniformly distributed unsigned 64 bit integers in range 0..range.
-   debiased integer multiplication by lemire
-   https://arxiv.org/abs/1805.10941
-   with enchancement by o'neill
-   https://www.pcg-random.org/posts/bounded-rands.html"
+   debiased integer multiplication by lemire, https://arxiv.org/abs/1805.10941
+   with enchancement by o'neill, https://www.pcg-random.org/posts/bounded-rands.html"
   (declare x uint64-t m __uint128-t l uint64-t t uint64-t)
   (set
     x (sph-random-u64 state)
@@ -65,7 +63,7 @@
           l (convert-type m uint64-t)))))
   (return (bit-shift-right m 64)))
 
-(define (sph-random-f64 state) (double sph-random-state-t*)
+(define (sph-random-f64-bounded state range) (double sph-random-state-t* double)
   "generate uniformly distributed 64 bit floating point numbers.
    implements xoshiro256+ from http://xoshiro.di.unimi.it/"
   (declare a uint64-t i size-t t uint64-t s uint64-t*)
@@ -79,7 +77,9 @@
     (array-get s 0) (bit-xor (array-get s 0) (array-get s 3))
     (array-get s 2) (bit-xor (array-get s 2) t)
     (array-get s 3) (rotl (array-get s 3) 45))
-  (return (sph-random-f64-from-u64 a)))
+  (return (sph-random-f64-from-u64 a range)))
+
+(define (sph-random-f64 state) (return (sph-random-f64-bounded state 1.0)))
 
 (define (sph-random-u64-array state size out) (void sph-random-state-t* size-t uint64-t*)
   (declare i size-t)
@@ -94,6 +94,12 @@
 (define (sph-random-f64-array state size out) (void sph-random-state-t* size-t double*)
   (declare i size-t)
   (for ((set i 0) (< i size) (set+ i 1)) (set (array-get out i) (sph-random-f64 state))))
+
+(define (sph-random-f64-bounded-array state range size out)
+  (void sph-random-state-t* double size-t double*)
+  (declare i size-t)
+  (for ((set i 0) (< i size) (set+ i 1))
+    (set (array-get out i) (sph-random-f64-bounded state range))))
 
 (define (sph-random-u32 state) (uint32-t sph-random-state-t*)
   (return (bit-shift-right (sph-random-u64 state) 32)))

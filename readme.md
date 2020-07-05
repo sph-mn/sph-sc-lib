@@ -43,7 +43,7 @@ status_t test() {
   if (1 < 2) {
     int group_id = "test";
     int error_id = 456;
-    status_set_both_goto(group_id, error_id);
+    status_set_goto(group_id, error_id);
   }
 exit:
   return status;
@@ -61,20 +61,25 @@ exit:
 
 ``status_require`` goes directly to exit if the returned ``status_t`` from ``test()`` isnt ``status_id_success``
 
-## bindings
+## macros
 ```
-status_is_failure
-status_goto
-status_group_undefined
-status_id_success
 status_declare
-status_require(expression)
-status_reset
-status_set_id_goto(status_id)
-status_set_group_goto(group_id)
-status_set_both(group_id, status_id)
-status_set_both_goto(group_id, status_id)
+status_group_undefined
+status_i_require(expression)
+status_id_success
+status_is_failure
 status_is_success
+status_require(expression)
+status_return
+status_set(group_id, status_id)
+status_set_goto(group_id, status_id)
+```
+
+## types
+```
+status_t: struct
+  id: int
+  group: uint8_t*
 ```
 
 # memreg
