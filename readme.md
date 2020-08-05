@@ -650,7 +650,7 @@ it also uses getline which needs ``#define _GNU_SOURCE`` before including stdio.
 * one key/value association per line
 * key and values separated by space
 * values can be integers, reals or strings
-* associations can be nested with two spaces indentation in lines subsequent to keys
+* associations can be nested by using two spaces of indentation in lines subsequent to keys
 
 ~~~
 key1 0 1 2 3 4
@@ -672,7 +672,7 @@ key4 string6
 #include <sph/status.c>
 #include <sph/hashtable.c>
 #include <murmur3.c>
-#include "./sah.c"
+#include <sph/sah.c>
 
 int main() {
   sah_t a;
@@ -695,6 +695,48 @@ exit:
 }
 ~~~
 
+## api
+additionally all functions declared by hashtable.c hashtable_declare_type with prefix sah_.
+
+```
+sah_floats_new :: size_t:size sah_float_t**:out -> status_t
+sah_free_all :: sah_t:a -> void
+sah_integers_new :: size_t:size sah_integer_t**:out -> status_t
+sah_read_file :: uint8_t*:path sah_t:sah -> status_t
+sah_read_indent :: FILE*:file sah_read_value_t:read_value sah_t:sah -> status_t
+sah_read_value :: char*:line size_t:size sah_value_t*:value -> status_t
+sah_write_file :: sah_t:a uint8_t*:path -> void
+sah_write_file_direct :: sah_t:a FILE*:file sah_nesting_t:nesting -> void
+```
+
+### macros
+```
+sah_equal(a, b)
+sah_float_t
+sah_integer_t
+sah_max_keysize
+sah_max_nesting
+sah_memory_error
+sah_nesting_t
+sah_s_group_sah
+sah_s_id_file_open_failed
+sah_s_id_full
+sah_s_id_memory
+sah_type_floats
+sah_type_integers
+sah_type_sah
+sah_type_strings
+```
+
+### types
+```
+sah_read_value_t: char* size_t sah_value_t* -> status_t
+sah_value_t: struct
+  type: uint8_t
+  size: sah_integer_t
+  data: void*
+```
+
 ## possible enhancements
 * read/write strings instead of files
-* convenience features for accessing values
+* convenience features for accessing values## routines
