@@ -696,8 +696,6 @@ exit:
 ~~~
 
 ## api
-additionally all functions declared by hashtable.c hashtable_declare_type with prefix sah_.
-
 ```
 sah_floats_new :: size_t:size sah_float_t**:out -> status_t
 sah_free_all :: sah_t:a -> void
@@ -708,6 +706,8 @@ sah_read_value :: char*:line size_t:size sah_value_t*:value -> status_t
 sah_write_file :: sah_t:a uint8_t*:path -> void
 sah_write_file_direct :: sah_t:a FILE*:file sah_nesting_t:nesting -> void
 ```
+
+additionally all functions declared by hashtable.c hashtable_declare_type with prefix sah_.
 
 ### macros
 ```
@@ -739,4 +739,4 @@ sah_value_t: struct
 
 ## possible enhancements
 * read/write strings instead of files
-* convenience features for accessing values## routines
+* convenience features for accessing values
