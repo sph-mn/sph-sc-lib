@@ -15,7 +15,8 @@ c code is in source/c-precompiled. sc versions are in source/sc. the libraries a
 * [set](#set): sets for any key/value type
 * [spline-path](#spline-path): interpolated 2d paths between given points
 * [status](#status): return-status and error handling using a tiny object with status/error id and source library id
-* [thread-pool](#thread-pool): a task queue with pthread threads and wait conditions to pause inactive threads
+* [thread-pool](#thread-pool): task queue with pthread threads and wait conditions for pausing inactive threads
+* [sah](#sah): file format and hash-table type for named arrays and program configuration
 * experimental
   * one: miscellaneous helpers
   * guile: a few helpers for working with guile
@@ -636,3 +637,64 @@ sph_random_f64_from_u64(a)
 sph_random_state_t: struct
   data: array uint64_t 4
 ```
+
+# sah
+string-array-hash - a file format and hashtable type for named arrays, possibly nested.
+can be used for configuration files.
+the parser is written so that it should be easy to extend it for custom value types.
+
+depends on stdio.h, inttypes.h, murmur3.c, sph/status.c and sph/hashtable.c.
+it also uses getline which needs ``#define _GNU_SOURCE`` before including stdio.h.
+
+## the file format
+* one key/value association per line
+* key and values separated by space
+* values can be integers, reals or strings
+* associations can be nested with two spaces indentation in lines subsequent to keys
+
+~~~
+key1 0 1 2 3 4
+key2 0.0 1 2.33 3 4
+key3 string1 string2
+nest1
+  nest11
+    nest111 string3 string4
+  nest12 3
+  nest13 string5
+key4 string6
+~~~
+
+## code example
+~~~
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <inttypes.h>
+#include <sph/status.c>
+#include <sph/hashtable.c>
+#include <murmur3.c>
+#include "./sah.c"
+
+int main() {
+  sah_t a;
+  sah_t b;
+  sah_value_t* value;
+  status_declare;
+  status_i_require(sah_new(100, &a));
+  status_require(sah_read_file("/tmp/example", a));
+  value = sah_get(a, "key3");
+  // display the first string from the array
+  printf("%s\n", (array-get (convert-type value:data uint8-t**) 0));
+  value = sah_get(a, "nest1");
+  b = *((sah_t*)(value->data));
+  value = sah_get(b, "nest11");
+  value = sah_get(*((sah_t*)(value->data)), "nest111");
+  printf("%s\n", (array-get (convert-type value:data uint8-t**) 0));
+  sah_free_all(a);
+exit:
+  return status.id;
+}
+~~~
+
+## possible enhancements
+* read/write strings instead of files
+* convenience features for accessing values

@@ -17,6 +17,7 @@ compile_test_sph_sc_lib() {
   gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
   gcc "$c/test/thread-pool.c" -o temp/test-thread-pool $gcc_options -lpthread -D _DEFAULT_SOURCE
   gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options
+  gcc "$c/test/sah.c" -o temp/test-sah $gcc_options
 }
 
 mkdir -p "$target_dir" &&

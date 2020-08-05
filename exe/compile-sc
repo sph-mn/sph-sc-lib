@@ -1,18 +1,20 @@
-#!/bin/sh
+#!/bin/sh -e
 
 root="$PWD"
 s="source/sc"
 c="$root/source/c-precompiled"
+cc="source/c"
 export SC_LOAD_PATH="$root/$s"
 
 compile_sc() {
   # create the c source code
-  cd "$s" &&
-  find -type f -name "*.sc" -exec sc --parents '{}' "$c" \; &&
-  cd "$root" &&
+  cd "$s"
+  find -type f -name "*.sc" -exec sc --parents '{}' "$c" \;
+  cd "$root"
   find "$c" -type f -exec ./exe/format-c -i '{}' \;
   mv "$c/main/spline-path-h.c" "$c/main/spline-path.h"
+  cp --target-directory="$c" --update --recursive "$cc"/*
 }
 
-mkdir -p "$c" &&
+mkdir -p "$c"
 compile_sc
