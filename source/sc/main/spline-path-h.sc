@@ -24,6 +24,8 @@
   spline-path-segment-count-t uint16-t
   spline-path-time-max UINT32_MAX)
 
+(pre-define (spline-path-segment-points-count s) (if* (= spline-path-i-bezier s.interpolator) 3 1))
+
 (declare
   spline-path-point-t (type (struct (x spline-path-time-t) (y spline-path-value-t)))
   spline-path-interpolator-t
@@ -71,4 +73,7 @@
   (spline-path-segment-t spline-path-time-t spline-path-value-t
     spline-path-time-t spline-path-value-t spline-path-time-t spline-path-value-t)
   (spline-path-constant) (spline-path-segment-t)
-  (spline-path-path path) (spline-path-segment-t spline-path-t*))
+  (spline-path-path path) (spline-path-segment-t spline-path-t*)
+  (spline-path-prepare-segments segments segments-count)
+  (void spline-path-segment-t* spline-path-segment-count-t)
+  (spline-path-size path) (spline-path-time-t spline-path-t))

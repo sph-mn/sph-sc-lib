@@ -159,6 +159,7 @@ exit:
 int main() {
   status_declare;
   test_helper_test_one(test_spline_path_helpers);
+  test_helper_test_one(test_spline_path);
 exit:
   test_helper_display_summary();
   return ((status.id));

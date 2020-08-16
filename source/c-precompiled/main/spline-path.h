@@ -29,6 +29,7 @@
 #ifndef spline_path_time_max
 #define spline_path_time_max UINT32_MAX
 #endif
+#define spline_path_segment_points_count(s) ((spline_path_i_bezier == s.interpolator) ? 3 : 1)
 typedef struct {
   spline_path_time_t x;
   spline_path_value_t y;
@@ -61,3 +62,5 @@ spline_path_segment_t spline_path_line(spline_path_time_t x, spline_path_value_t
 spline_path_segment_t spline_path_bezier(spline_path_time_t x1, spline_path_value_t y1, spline_path_time_t x2, spline_path_value_t y2, spline_path_time_t x3, spline_path_value_t y3);
 spline_path_segment_t spline_path_constant();
 spline_path_segment_t spline_path_path(spline_path_t* path);
+void spline_path_prepare_segments(spline_path_segment_t* segments, spline_path_segment_count_t segments_count);
+spline_path_time_t spline_path_size(spline_path_t path);

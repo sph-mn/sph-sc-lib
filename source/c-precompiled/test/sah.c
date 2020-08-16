@@ -15,7 +15,8 @@ status_t test_sah() {
   status_require((sah_read_file("/home/nonroot/testdata", a)));
   /* (sah-write-file a /tmp/sah-test) */
   value = sah_get(a, "key3c");
-  printf("%s\n", (sah_value_get_string(value, 0)));
+  /* (printf %s
+ (sah-value-get-string value 0)) */
   value = sah_get(a, "key3y");
   /* (printf %s
  (sah-value-get-string value 0)) */

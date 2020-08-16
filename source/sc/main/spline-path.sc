@@ -90,37 +90,47 @@
   (return p))
 
 (define (spline-path-end path) (spline-path-point-t spline-path-t)
+  "ends at constants"
   (declare s spline-path-segment-t)
   (set s (array-get path.segments (- path.segments-count 1)))
   (if (= spline-path-i-constant s.interpolator)
     (set s (array-get path.segments (- path.segments-count 2))))
   (return (array-get s.points (- s._points-count 1))))
 
-(define (spline-path-new segments-count segments out-path)
-  (uint8-t spline-path-segment-count-t spline-path-segment-t* spline-path-t*)
-  "segments are copied into out-path"
-  (declare
-    i spline-path-segment-count-t
-    path spline-path-t
-    s spline-path-segment-t
-    start spline-path-point-t)
+(define (spline-path-size path) (spline-path-time-t spline-path-t)
+  (declare p spline-path-point-t)
+  (set p (spline-path-end path))
+  (return p.x))
+
+(define (spline-path-prepare-segments segments segments-count)
+  (void spline-path-segment-t* spline-path-segment-count-t)
+  "set _start and _points_count for segments"
+  (declare i spline-path-segment-count-t s spline-path-segment-t start spline-path-point-t)
   (set start.x 0 start.y 0)
-  (set path.segments (malloc (* segments-count (sizeof spline-path-segment-t))))
-  (if (not path.segments) (return 1))
-  (memcpy path.segments segments (* segments-count (sizeof spline-path-segment-t)))
   (for ((set i 0) (< i segments-count) (set i (+ 1 i)))
     (set
-      (struct-get (array-get path.segments i) _start) start
-      s (array-get path.segments i)
-      s._points-count (if* (= spline-path-i-bezier s.interpolator) 3 1))
+      (struct-get (array-get segments i) _start) start
+      s (array-get segments i)
+      s._points-count (spline-path-segment-points-count s))
     (case = s.interpolator
-      ( (spline-path-i-path)
+      (spline-path-i-path
         (set
           start (spline-path-end (pointer-get (convert-type s.options spline-path-t*)))
           *s.points start))
-      ((spline-path-i-constant) (set *s.points start s.points:x spline-path-time-max))
+      (spline-path-i-constant (set *s.points start s.points:x spline-path-time-max))
       (else (set start (array-get s.points (- s._points-count 1)))))
-    (set (array-get path.segments i) s))
+    (set (array-get segments i) s)))
+
+(define (spline-path-new segments-count segments out-path)
+  (uint8-t spline-path-segment-count-t spline-path-segment-t* spline-path-t*)
+  "creates a copy of segments and sets .segments and .segments-count in out-path.
+   if segments should not be copied, calling this function is not necessary; in this case,
+   struct fields can be set manually and spline_path_prepare_segments(path.segments, path.segments_count) must be called"
+  (declare path spline-path-t)
+  (set path.segments (malloc (* segments-count (sizeof spline-path-segment-t))))
+  (if (not path.segments) (return 1))
+  (memcpy path.segments segments (* segments-count (sizeof spline-path-segment-t)))
+  (spline-path-prepare-segments path.segments segments-count)
   (set path.segments-count segments-count *out-path path)
   (return 0))
 

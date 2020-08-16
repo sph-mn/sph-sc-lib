@@ -1,6 +1,6 @@
 # sph-sc-lib
 
-various minimalistic standalone c utility libraries.
+various small standalone c utility libraries.
 c code is in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then translated to normal, readable c formatted with clang-format
 
 # included libraries
@@ -641,7 +641,7 @@ sph_random_state_t: struct
 # sah
 string-array-hash - a file format and hashtable type for named arrays, possibly nested.
 can be used for configuration files.
-the parser is written so that it should be easy to extend it for custom value types.
+the parser is written so that it should be easy to extend for custom value types.
 
 depends on stdio.h, inttypes.h, murmur3.c, sph/status.c and sph/hashtable.c.
 it also uses getline which needs ``#define _GNU_SOURCE`` before including stdio.h.
@@ -650,7 +650,7 @@ it also uses getline which needs ``#define _GNU_SOURCE`` before including stdio.
 * one key/value association per line
 * key and values separated by space
 * values can be integers, reals or strings
-* associations can be nested by using two spaces of indentation in lines subsequent to keys
+* associations can be nested by using two spaces of indentation in lines subsequent to keys without value
 
 ~~~
 key1 0 1 2 3 4

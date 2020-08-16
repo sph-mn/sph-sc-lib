@@ -85,6 +85,7 @@ spline_path_point_t spline_path_start(spline_path_t path) {
   };
   return (p);
 }
+/** ends at constants */
 spline_path_point_t spline_path_end(spline_path_t path) {
   spline_path_segment_t s;
   s = (path.segments)[(path.segments_count - 1)];
@@ -93,34 +94,45 @@ spline_path_point_t spline_path_end(spline_path_t path) {
   };
   return (((s.points)[(s._points_count - 1)]));
 }
-/** segments are copied into out-path */
-uint8_t spline_path_new(spline_path_segment_count_t segments_count, spline_path_segment_t* segments, spline_path_t* out_path) {
+spline_path_time_t spline_path_size(spline_path_t path) {
+  spline_path_point_t p;
+  p = spline_path_end(path);
+  return ((p.x));
+}
+/** set _start and _points_count for segments */
+void spline_path_prepare_segments(spline_path_segment_t* segments, spline_path_segment_count_t segments_count) {
   spline_path_segment_count_t i;
-  spline_path_t path;
   spline_path_segment_t s;
   spline_path_point_t start;
   start.x = 0;
   start.y = 0;
-  path.segments = malloc((segments_count * sizeof(spline_path_segment_t)));
-  if (!path.segments) {
-    return (1);
-  };
-  memcpy((path.segments), segments, (segments_count * sizeof(spline_path_segment_t)));
   for (i = 0; (i < segments_count); i = (1 + i)) {
-    ((path.segments)[i])._start = start;
-    s = (path.segments)[i];
-    s._points_count = ((spline_path_i_bezier == s.interpolator) ? 3 : 1);
-    if ((spline_path_i_path == s.interpolator)) {
+    (segments[i])._start = start;
+    s = segments[i];
+    s._points_count = spline_path_segment_points_count(s);
+    if (spline_path_i_path == s.interpolator) {
       start = spline_path_end((*((spline_path_t*)(s.options))));
       *(s.points) = start;
-    } else if ((spline_path_i_constant == s.interpolator)) {
+    } else if (spline_path_i_constant == s.interpolator) {
       *(s.points) = start;
       (s.points)->x = spline_path_time_max;
     } else {
       start = (s.points)[(s._points_count - 1)];
     };
-    (path.segments)[i] = s;
+    segments[i] = s;
   };
+}
+/** creates a copy of segments and sets .segments and .segments-count in out-path.
+   if segments should not be copied, calling this function is not necessary; in this case,
+   struct fields can be set manually and spline_path_prepare_segments(path.segments, path.segments_count) must be called */
+uint8_t spline_path_new(spline_path_segment_count_t segments_count, spline_path_segment_t* segments, spline_path_t* out_path) {
+  spline_path_t path;
+  path.segments = malloc((segments_count * sizeof(spline_path_segment_t)));
+  if (!path.segments) {
+    return (1);
+  };
+  memcpy((path.segments), segments, (segments_count * sizeof(spline_path_segment_t)));
+  spline_path_prepare_segments((path.segments), segments_count);
   path.segments_count = segments_count;
   *out_path = path;
   return (0);

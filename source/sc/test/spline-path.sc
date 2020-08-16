@@ -139,13 +139,11 @@
     (array-get segments2 1) (spline-path-path &path))
   (sc-comment "note that the first point leaves a gap")
   (spline-path-new-get 2 segments2 0 50 out)
-  #;(for ((set i 0) (< i 50) (set i (+ 1 i)))
-    (printf "%lu %f\n" i (array-get out i)))
   (spline-path-free path)
   (label exit status-return))
 
 (define (main) int
   status-declare
   (test-helper-test-one test-spline-path-helpers)
-  ;(test-helper-test-one test-spline-path)
+  (test-helper-test-one test-spline-path)
   (label exit (test-helper-display-summary) (return status.id)))
