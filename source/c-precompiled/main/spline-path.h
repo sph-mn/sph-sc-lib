@@ -54,9 +54,9 @@ void spline_path_get(spline_path_t path, spline_path_time_t start, spline_path_t
 void spline_path_i_path(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* options, spline_path_value_t* out);
 spline_path_point_t spline_path_start(spline_path_t path);
 spline_path_point_t spline_path_end(spline_path_t path);
-uint8_t spline_path_new(spline_path_segment_count_t segments_count, spline_path_segment_t* segments, spline_path_t* out_path);
-void spline_path_free(spline_path_t a);
-uint8_t spline_path_new_get(spline_path_segment_count_t segments_count, spline_path_segment_t* segments, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out);
+void spline_path_set(spline_path_t* path, spline_path_segment_t* segments, spline_path_segment_count_t segments_count);
+uint8_t spline_path_set_copy(spline_path_t* path, spline_path_segment_t* segments, spline_path_segment_count_t segments_count);
+uint8_t spline_path_segments_get(spline_path_segment_t* segments, spline_path_segment_count_t segments_count, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out);
 spline_path_segment_t spline_path_move(spline_path_time_t x, spline_path_value_t y);
 spline_path_segment_t spline_path_line(spline_path_time_t x, spline_path_value_t y);
 spline_path_segment_t spline_path_bezier(spline_path_time_t x1, spline_path_value_t y1, spline_path_time_t x2, spline_path_value_t y2, spline_path_time_t x3, spline_path_value_t y3);

@@ -121,28 +121,28 @@
       (else (set start (array-get s.points (- s._points-count 1)))))
     (set (array-get segments i) s)))
 
-(define (spline-path-new segments-count segments out-path)
-  (uint8-t spline-path-segment-count-t spline-path-segment-t* spline-path-t*)
-  "creates a copy of segments and sets .segments and .segments-count in out-path.
-   if segments should not be copied, calling this function is not necessary; in this case,
-   struct fields can be set manually and spline_path_prepare_segments(path.segments, path.segments_count) must be called"
-  (declare path spline-path-t)
-  (set path.segments (malloc (* segments-count (sizeof spline-path-segment-t))))
-  (if (not path.segments) (return 1))
-  (memcpy path.segments segments (* segments-count (sizeof spline-path-segment-t)))
-  (spline-path-prepare-segments path.segments segments-count)
-  (set path.segments-count segments-count *out-path path)
+(define (spline-path-set path segments segments-count)
+  (void spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
+  "set segments for a path and initialise it"
+  (spline-path-prepare-segments segments segments-count)
+  (set path:segments segments path:segments-count segments-count))
+
+(define (spline-path-set-copy path segments segments-count)
+  (uint8-t spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
+  "like spline-path-set but copies segments to new memory in .segments that has to be freed
+   when not needed anymore"
+  (define s spline-path-segment-t* (malloc (* segments-count (sizeof spline-path-segment-t))))
+  (if (not s) (return 1))
+  (memcpy s segments (* segments-count (sizeof spline-path-segment-t)))
+  (spline-path-set path s segments-count)
   (return 0))
 
-(define (spline-path-free a) (void spline-path-t) (free a.segments))
-
-(define (spline-path-new-get segments-count segments start end out)
-  (uint8-t spline-path-segment-count-t spline-path-segment-t* spline-path-time-t spline-path-time-t spline-path-value-t*)
+(define (spline-path-segments-get segments segments-count start end out)
+  (uint8-t spline-path-segment-t* spline-path-segment-count-t spline-path-time-t spline-path-time-t spline-path-value-t*)
   "create a path array immediately from segments without creating a path object"
   (declare path spline-path-t)
-  (if (spline-path-new segments-count segments &path) (return 1))
+  (spline-path-set &path segments segments-count)
   (spline-path-get path start end out)
-  (spline-path-free path)
   (return 0))
 
 (define (spline-path-move x y) (spline-path-segment-t spline-path-time-t spline-path-value-t)

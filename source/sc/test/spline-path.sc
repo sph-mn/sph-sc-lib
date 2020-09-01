@@ -13,7 +13,7 @@
     p spline-path-point-t
     s spline-path-segment-t
     segments (array spline-path-segment-t 4)
-    segments-len spline-path-segment-count-t
+    segments-count spline-path-segment-count-t
     log-path-new-0 uint8-t
     log-path-new-1 uint8-t
     log-path-new-get-0 uint8-t
@@ -40,8 +40,8 @@
     (array-get segments 2) s
     s.interpolator spline-path-i-constant
     (array-get segments 3) s
-    segments-len 4)
-  (status-i-require (spline-path-new-get segments-len segments 0 100 out-new-get))
+    segments-count 4)
+  (status-i-require (spline-path-segments-get segments segments-count 0 100 out-new-get))
   (sc-comment "path 0 - will be written to output starting at offset 5")
   (set
     s.interpolator spline-path-i-move
@@ -67,8 +67,8 @@
     (array-get segments 2) s
     s.interpolator spline-path-i-constant
     (array-get segments 3) s
-    segments-len 4)
-  (status-i-require (spline-path-new segments-len segments &path))
+    segments-count 4)
+  (status-i-require (spline-path-set-copy &path segments segments-count))
   (spline-path-get path 5 25 out)
   (spline-path-get path 25 55 (+ 20 out))
   (if log-path-new-0
@@ -81,9 +81,9 @@
   (test-helper-assert "path 0.34" (f64-nearly-equal 24.25 (array-get out 34) error-margin))
   (test-helper-assert "path 0.35" (f64-nearly-equal 25 (array-get out 35) error-margin))
   (test-helper-assert "path 0.49" (f64-nearly-equal 25 (array-get out 49) error-margin))
-  (spline-path-free path)
+  (free path.segments)
   (sc-comment "path 0 new-get")
-  (status-i-require (spline-path-new-get segments-len segments 5 55 out-new-get))
+  (status-i-require (spline-path-segments-get segments segments-count 5 55 out-new-get))
   (if log-path-new-get-0
     (for ((set i 0) (< i 50) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out-new-get i))))
   (test-helper-assert "path 0 new-get equal"
@@ -98,8 +98,8 @@
     p.y 5
     (array-get s.points 0) p
     (array-get segments 0) s
-    segments-len 1)
-  (status-i-require (spline-path-new segments-len segments &path))
+    segments-count 1)
+  (status-i-require (spline-path-set-copy &path segments segments-count))
   (spline-path-get path 0 12 out)
   (if log-path-new-1
     (for ((set i 0) (< i 12) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out i))))
@@ -107,9 +107,9 @@
     (f64-nearly-equal 5 (array-get out 10) error-margin))
   (test-helper-assert "path 1.11 - should be zero after segments"
     (f64-nearly-equal 0 (array-get out 11) error-margin))
-  (spline-path-free path)
+  (free path.segments)
   (sc-comment "path 1 new-get")
-  (status-i-require (spline-path-new-get segments-len segments 0 12 out-new-get))
+  (status-i-require (spline-path-segments-get segments segments-count 0 12 out-new-get))
   (if log-path-new-get-1
     (for ((set i 0) (< i 12) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out-new-get i))))
   (test-helper-assert "path 1 new-get equal"
@@ -130,7 +130,7 @@
     (array-get segments 1) (spline-path-line 10 10)
     (array-get segments 2) (spline-path-bezier 20 15 30 5 40 15)
     (array-get segments 3) (spline-path-constant))
-  (spline-path-new 4 segments &path)
+  (spline-path-set-copy &path segments 4)
   (spline-path-get path 0 50 out)
   (test-helper-assert "helper path 0" (f64-nearly-equal 0 (array-get out 0) error-margin))
   (test-helper-assert "helper path 49" (f64-nearly-equal 15 (array-get out 49) error-margin))
@@ -138,8 +138,8 @@
     (array-get segments2 0) (spline-path-line 5 10)
     (array-get segments2 1) (spline-path-path &path))
   (sc-comment "note that the first point leaves a gap")
-  (spline-path-new-get 2 segments2 0 50 out)
-  (spline-path-free path)
+  (spline-path-segments-get segments2 2 0 50 out)
+  (free path.segments)
   (label exit status-return))
 
 (define (main) int

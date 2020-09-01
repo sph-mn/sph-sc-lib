@@ -122,30 +122,28 @@ void spline_path_prepare_segments(spline_path_segment_t* segments, spline_path_s
     segments[i] = s;
   };
 }
-/** creates a copy of segments and sets .segments and .segments-count in out-path.
-   if segments should not be copied, calling this function is not necessary; in this case,
-   struct fields can be set manually and spline_path_prepare_segments(path.segments, path.segments_count) must be called */
-uint8_t spline_path_new(spline_path_segment_count_t segments_count, spline_path_segment_t* segments, spline_path_t* out_path) {
-  spline_path_t path;
-  path.segments = malloc((segments_count * sizeof(spline_path_segment_t)));
-  if (!path.segments) {
+/** set segments for a path and initialise it */
+void spline_path_set(spline_path_t* path, spline_path_segment_t* segments, spline_path_segment_count_t segments_count) {
+  spline_path_prepare_segments(segments, segments_count);
+  path->segments = segments;
+  path->segments_count = segments_count;
+}
+/** like spline-path-set but copies segments to new memory in .segments that has to be freed
+   when not needed anymore */
+uint8_t spline_path_set_copy(spline_path_t* path, spline_path_segment_t* segments, spline_path_segment_count_t segments_count) {
+  spline_path_segment_t* s = malloc((segments_count * sizeof(spline_path_segment_t)));
+  if (!s) {
     return (1);
   };
-  memcpy((path.segments), segments, (segments_count * sizeof(spline_path_segment_t)));
-  spline_path_prepare_segments((path.segments), segments_count);
-  path.segments_count = segments_count;
-  *out_path = path;
+  memcpy(s, segments, (segments_count * sizeof(spline_path_segment_t)));
+  spline_path_set(path, s, segments_count);
   return (0);
 }
-void spline_path_free(spline_path_t a) { free((a.segments)); }
 /** create a path array immediately from segments without creating a path object */
-uint8_t spline_path_new_get(spline_path_segment_count_t segments_count, spline_path_segment_t* segments, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out) {
+uint8_t spline_path_segments_get(spline_path_segment_t* segments, spline_path_segment_count_t segments_count, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out) {
   spline_path_t path;
-  if (spline_path_new(segments_count, segments, (&path))) {
-    return (1);
-  };
+  spline_path_set((&path), segments, segments_count);
   spline_path_get(path, start, end, out);
-  spline_path_free(path);
   return (0);
 }
 /** returns a move segment for the specified point */

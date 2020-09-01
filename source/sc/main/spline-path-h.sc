@@ -61,11 +61,12 @@
     spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   (spline-path-start path) (spline-path-point-t spline-path-t)
   (spline-path-end path) (spline-path-point-t spline-path-t)
-  (spline-path-new segments-count segments out-path)
-  (uint8-t spline-path-segment-count-t spline-path-segment-t* spline-path-t*)
-  (spline-path-free a) (void spline-path-t)
-  (spline-path-new-get segments-count segments start end out)
-  (uint8-t spline-path-segment-count-t spline-path-segment-t*
+  (spline-path-set path segments segments-count)
+  (void spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
+  (spline-path-set-copy path segments segments-count)
+  (uint8-t spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
+  (spline-path-segments-get segments segments-count start end out)
+  (uint8-t spline-path-segment-t* spline-path-segment-count-t
     spline-path-time-t spline-path-time-t spline-path-value-t*)
   (spline-path-move x y) (spline-path-segment-t spline-path-time-t spline-path-value-t)
   (spline-path-line x y) (spline-path-segment-t spline-path-time-t spline-path-value-t)
