@@ -98,7 +98,7 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
     return (0); \
   } \
 \
-  /** returns the address of the value or 0 if no space is left */ \
+  /** add if not already exists. returns the address of the existing or new value or 0 if no space is left */ \
   value_type* name##_add(name##_t a, value_type value) { \
     size_t i; \
     size_t hash_i; \
@@ -110,7 +110,9 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
     i = hash_i; \
     while ((i < a.size)) { \
       if (set_equal(null, ((a.values)[i]))) { \
-        (a.values)[i] = value; \
+        if (!set_equal(value, ((a.values)[i]))) { \
+          (a.values)[i] = value; \
+        }; \
         return ((i + a.values)); \
       }; \
       i += 1; \
@@ -119,7 +121,9 @@ uint32_t* sph_set_primes_end = (sph_set_primes + 25);
     i = 1; \
     while ((i < hash_i)) { \
       if (set_equal(null, ((a.values)[i]))) { \
-        (a.values)[i] = value; \
+        if (!set_equal(value, ((a.values)[i]))) { \
+          (a.values)[i] = value; \
+        }; \
         return ((i + a.values)); \
       }; \
       i += 1; \

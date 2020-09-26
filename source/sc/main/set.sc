@@ -79,20 +79,24 @@
         (set+ i 1))
       (return 0))
     (define ((pre-concat name _add) a value) (value-type* (pre-concat name _t) value-type)
-      "returns the address of the value or 0 if no space is left"
+      "add if not already exists. returns the address of the existing or new value or 0 if no space is left"
       (declare i size-t hash-i size-t)
       (if (set-equal null value) (begin (set *a.values notnull) (return a.values)))
       (set hash-i (+ 1 (set-hash value (- a.size 1))))
       (set i hash-i)
       (while (< i a.size)
         (if (set-equal null (array-get a.values i))
-          (begin (set (array-get a.values i) value) (return (+ i a.values))))
+          (begin
+            (if (not (set-equal value (array-get a.values i))) (set (array-get a.values i) value))
+            (return (+ i a.values))))
         (set+ i 1))
       (sc-comment "wraps over")
       (set i 1)
       (while (< i hash-i)
         (if (set-equal null (array-get a.values i))
-          (begin (set (array-get a.values i) value) (return (+ i a.values))))
+          (begin
+            (if (not (set-equal value (array-get a.values i))) (set (array-get a.values i) value))
+            (return (+ i a.values))))
         (set+ i 1))
       (return 0)))
   (sph-set-declare-type-without-null name value-type set-hash set-equal null size-factor)
