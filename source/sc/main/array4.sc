@@ -1,6 +1,7 @@
 (sc-comment
   "\"array4\" - struct {.current, .data, .size, .used} that combines pointer, length, used length and iteration index in one object.
-   this type can be used similar to linked lists.
+   includes a current offset, which can be used as an index variable for iteration. particularly useful in macros that should not declare variables.
+   this type can be used similar to linked lists, as a drop-in replacement possibly.
    most bindings are generic macros that will work on any array4 type. array4-add and array4-forward go from left to right.
    examples:
      array4_declare_type(my_type, int);
