@@ -16,7 +16,7 @@ c code is in source/c-precompiled. sc versions are in source/sc. the libraries a
 * [spline-path](#spline-path): interpolated 2d paths between given points
 * [status](#status): return-status and error handling using a tiny object with status/error id and source library id
 * [thread-pool](#thread-pool): task queue with pthread threads and wait conditions for pausing inactive threads
-* [ikv](#ikv): file format and hash-table type for named arrays and program configuration
+* [ikv](#ikv): file format for nested named arrays, for example for text configuration
 * experimental
   * one: miscellaneous helpers
   * guile: a few helpers for working with guile
@@ -755,4 +755,4 @@ ikv_value_t: struct
 ~~~
 
 ## possible enhancements
-* additional support for read/write from/to strings instead of files
+* read/write from/to strings
