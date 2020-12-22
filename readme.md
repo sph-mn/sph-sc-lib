@@ -16,7 +16,7 @@ c code is in source/c-precompiled. sc versions are in source/sc. the libraries a
 * [spline-path](#spline-path): interpolated 2d paths between given points
 * [status](#status): return-status and error handling using a tiny object with status/error id and source library id
 * [thread-pool](#thread-pool): task queue with pthread threads and wait conditions for pausing inactive threads
-* [sah](#sah): file format and hash-table type for named arrays and program configuration
+* [ikv](#ikv): file format and hash-table type for named arrays and program configuration
 * experimental
   * one: miscellaneous helpers
   * guile: a few helpers for working with guile
@@ -638,30 +638,30 @@ sph_random_state_t: struct
   data: array uint64_t 4
 ```
 
-# sah
-string-array-hash - a file format and hashtable type for named arrays, possibly nested.
-can be used for configuration files.
-the parser is written so that it should be easy to extend for custom value types.
+# ikv
+indent-key-value - file format and hashtable type for possibly nested named arrays.
+use case: text configuration file format.
+the parser is written so that it should be relatively easy to add custom value types.
 
 depends on stdio.h, inttypes.h, murmur3.c, sph/status.c and sph/hashtable.c.
-it also uses getline which needs ``#define _GNU_SOURCE`` before including stdio.h.
+it uses getline which with gcc needs ``#define _GNU_SOURCE`` before including stdio.h.
 
 ## the file format
 * one key/value association per line
 * key and values separated by space
 * values can be integers, reals or strings
-* associations can be nested by using two spaces of indentation in lines subsequent to keys without value
+* associations can be nested by using two spaces of indentation in lines subsequent to keys that have no value
 
 ~~~
 key1 0 1 2 3 4
-key2 0.0 1 2.33 3 4
-key3 string1 string2
+key2 0.1 5 6.33 7 8
+key3 string1 string2 string3
 nest1
   nest11
-    nest111 string3 string4
-  nest12 3
-  nest13 string5
-key4 string6
+    nest111 string4 string5
+  nest12 9
+  nest13 string6
+key4 string7
 ~~~
 
 ## code example
@@ -672,71 +672,87 @@ key4 string6
 #include <sph/status.c>
 #include <sph/hashtable.c>
 #include <murmur3.c>
-#include <sph/sah.c>
+#include <sph/ikv.c>
 
 int main() {
-  sah_t a;
-  sah_t b;
-  sah_value_t* value;
+  ikv_t a;
+  ikv_t b;
+  ikv_value_t* value;
   status_declare;
-  status_i_require(sah_new(100, &a));
-  status_require(sah_read_file("/tmp/example", a));
-  value = sah_get(a, "key3");
-  // display the first string from the array
-  printf("%s\n", (array-get (convert-type value:data uint8-t**) 0));
-  value = sah_get(a, "nest1");
-  b = *((sah_t*)(value->data));
-  value = sah_get(b, "nest11");
-  value = sah_get(*((sah_t*)(value->data)), "nest111");
-  printf("%s\n", (array-get (convert-type value:data uint8-t**) 0));
-  sah_free_all(a);
+  status_i_require(ikv_new(100, &a));
+  /* read/write */
+  status_require(ikv_read_file("other/ikv-test-data", a));
+  ikv_write_file(a, "temp/ikv-test");
+  ikv_free_all(a);
+  status_i_require(ikv_new(100, &a));
+  status_require(ikv_read_file("temp/ikv-test", a));
+  /* access top level */
+  value = ikv_get(a, "key4");
+  printf("key4 string: %s\n", ikv_value_get_string(value, 0));
+  value = ikv_get(a, "key3");
+  printf("key3 string: %s\n", ikv_value_get_string(value, 2));
+  /* access nested */
+  value = ikv_get(a, "nest1");
+  b = ikv_value_get_ikv(value);
+  value = ikv_get(b, "nest11");
+  value = ikv_get((ikv_value_get_ikv(value)), "nest111");
+  printf("nest111 string: %s\n", ikv_value_get_string(value, 0));
+  value = ikv_get(b, "nest12");
+  printf("nest12 integer %lu\n", ikv_value_get_integer(value, 0));
+  ikv_free_all(a);
 exit:
   return status.id;
 }
 ~~~
 
 ## api
-```
-sah_floats_new :: size_t:size sah_float_t**:out -> status_t
-sah_free_all :: sah_t:a -> void
-sah_integers_new :: size_t:size sah_integer_t**:out -> status_t
-sah_read_file :: uint8_t*:path sah_t:sah -> status_t
-sah_read_indent :: FILE*:file sah_read_value_t:read_value sah_t:sah -> status_t
-sah_read_value :: char*:line size_t:size sah_value_t*:value -> status_t
-sah_write_file :: sah_t:a uint8_t*:path -> void
-sah_write_file_direct :: sah_t:a FILE*:file sah_nesting_t:nesting -> void
-```
+### functions
+~~~
+ikv_floats_new :: size_t:size ikv_float_t**:out -> status_t
+ikv_free_all :: ikv_t:a -> void
+ikv_hash_64 :: ikv_key_t*:key size_t:size -> uint64_t
+ikv_integers_new :: size_t:size ikv_integer_t**:out -> status_t
+ikv_read_file :: ikv_string_t*:path ikv_t:ikv -> status_t
+ikv_read_indent :: FILE*:file ikv_read_value_t:read_value ikv_t:ikv -> status_t
+ikv_read_value :: char*:line size_t:size ikv_value_t*:value -> status_t
+ikv_write_file :: ikv_t:a ikv_string_t*:path -> void
+ikv_write_file_direct :: ikv_t:a FILE*:file ikv_nesting_t:nesting -> void
+~~~
 
-additionally all functions declared by hashtable.c hashtable_declare_type with prefix sah_.
+## macros
+~~~
+ikv_equal(a, b)
+ikv_float_t
+ikv_integer_t
+ikv_key_t
+ikv_max_keysize
+ikv_max_nesting
+ikv_memory_error
+ikv_nesting_t
+ikv_s_group_ikv
+ikv_s_id_file_open_failed
+ikv_s_id_full
+ikv_s_id_memory
+ikv_string_t
+ikv_type_floats
+ikv_type_ikv
+ikv_type_integers
+ikv_type_strings
+ikv_type_t
+ikv_value_get_float(ikv_value_t*:a, index)
+ikv_value_get_ikv(a)
+ikv_value_get_integer(a, index)
+ikv_value_get_string(a, index)
+~~~
 
-### macros
-```
-sah_equal(a, b)
-sah_float_t
-sah_integer_t
-sah_max_keysize
-sah_max_nesting
-sah_memory_error
-sah_nesting_t
-sah_s_group_sah
-sah_s_id_file_open_failed
-sah_s_id_full
-sah_s_id_memory
-sah_type_floats
-sah_type_integers
-sah_type_sah
-sah_type_strings
-```
-
-### types
-```
-sah_read_value_t: char* size_t sah_value_t* -> status_t
-sah_value_t: struct
-  type: uint8_t
-  size: sah_integer_t
+## types
+~~~
+ikv_read_value_t: char* size_t ikv_value_t* -> status_t
+ikv_value_t: struct
+  type: ikv_type_t
+  size: ikv_integer_t
   data: void*
-```
+~~~
 
 ## possible enhancements
-* read/write strings instead of files
-* convenience features for accessing values
+* additional support for read/write from/to strings instead of files

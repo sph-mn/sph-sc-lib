@@ -8,6 +8,7 @@ optimisation=0
 gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimisation"
 
 compile_test_sph_sc_lib() {
+  gcc "$c/test/ikv.c" -o temp/test-ikv $gcc_options
   gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options
   gcc "$c/test/arrayn.c" -o temp/test-arrayn $gcc_options
   gcc "$c/test/random.c" -o temp/test-random $gcc_options
@@ -17,7 +18,6 @@ compile_test_sph_sc_lib() {
   gcc "$c/test/quicksort.c" -o temp/test-quicksort $gcc_options
   gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
   gcc "$c/test/thread-pool.c" -o temp/test-thread-pool $gcc_options -lpthread -D _DEFAULT_SOURCE
-  gcc "$c/test/sah.c" -o temp/test-sah $gcc_options
 }
 
 mkdir -p "$target_dir" &&

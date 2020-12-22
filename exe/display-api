@@ -1,4 +1,4 @@
 #!/bin/sh
 # depends on sc-documentor from sph-sc.
 
-sc-documentor source/sc/main/sah.sc --md-level=2
+sc-documentor source/sc/main/ikv.sc --md-level=2
