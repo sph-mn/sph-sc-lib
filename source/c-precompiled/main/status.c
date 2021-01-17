@@ -2,7 +2,7 @@
 for exception handling with a local variable and a goto label
 status id 0 is success, everything else can be considered a special case or failure
 status ids are signed integers for compatibility with error return codes from other existing libraries
-group ids are strings used to categorise sets of errors codes from different libraries for example */
+group ids are strings, used to categorise sets of errors codes from different libraries for example */
 typedef struct {
   int id;
   uint8_t* group;
@@ -28,4 +28,9 @@ typedef struct {
   status.id = expression; \
   if (status_is_failure) { \
     goto exit; \
+  }
+#define status_require_return(expression) \
+  status = expression; \
+  if (status_is_failure) { \
+    status_return; \
   }
