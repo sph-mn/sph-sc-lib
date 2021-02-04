@@ -1,3 +1,4 @@
+
 /* a macro that defines set data types and functions for arbitrary value types.
    * compared to hashtable.c, this uses less than half the space and operations are faster (about 20% in first tests)
    * linear probing for collision resolve

@@ -1,3 +1,4 @@
+
 /* "array4" - struct {.current, .data, .size, .used} that combines pointer, length, used length and iteration index in one object.
    includes a current offset, which can be used as an index variable for iteration. particularly useful in macros that should not declare variables.
    this type can be used similar to linked lists, as a drop-in replacement possibly.
@@ -16,6 +17,7 @@
      }
      array4_free(a); */
 #include <stdlib.h>
+
 #define array4_declare_type(name, element_type) array4_declare_type_custom(name, element_type, malloc, realloc)
 #define array4_declare_type_custom(name, element_type, malloc, realloc) \
   typedef struct { \
@@ -50,7 +52,7 @@
     a->current = ((new_size < a->current) ? new_size : a->current); \
     return (0); \
   }
-#define array4_declare(a, type) type a = { 0, 0, 0, 0 }
+#define array4_declare(a, type) type a = { 0 }
 #define array4_add(a, value) \
   (a.data)[a.used] = value; \
   a.used = (a.used + 1)
@@ -69,12 +71,13 @@
 #define array4_free(a) free((a.data))
 #define array4_full(a) (a.used == a.size)
 #define array4_not_full(a) (a.used < a.size)
-#define array4_take(a, data, size, used) \
-  a->data = data; \
-  a->size = size; \
-  a->used = used
+#define array4_take(a, _data, _size, _used) \
+  a.data = _data; \
+  a.size = _size; \
+  a.used = _used
 #define array4_in_range(a) (a.current < a.used)
 #define array4_get(a) (a.data)[a.current]
 #define array4_get_address(a) (a.data + a.current)
 #define array4_forward(a) a.current += 1
 #define array4_rewind(a) a.current = 0
+#define array4_get_last(a) (a.data)[(a.used - 1)]

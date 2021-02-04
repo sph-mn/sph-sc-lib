@@ -1,6 +1,8 @@
+
 /* string-array-hash - a file format and hashtable type for named arrays, possibly nested.
 depends on stdio.h, inttypes.h, murmur3.c, sph/status.c and sph/hashtable.c.
 it uses getline which needs #define _GNU_SOURCE before including stdio.h */
+
 #ifndef ikv_integer_t
 #define ikv_integer_t uintmax_t
 #endif
@@ -25,6 +27,7 @@ it uses getline which needs #define _GNU_SOURCE before including stdio.h */
 #ifndef ikv_max_nesting
 #define ikv_max_nesting 8
 #endif
+
 #define ikv_type_ikv 1
 #define ikv_type_integers 2
 #define ikv_type_floats 3
@@ -138,6 +141,7 @@ status_t ikv_integers_new(size_t size, ikv_integer_t** out) {
 exit:
   status_return;
 }
+
 /** value of i is the index of the space after key */
 status_t ikv_read_value(char* line, size_t size, ikv_value_t* value) {
   void* a;
@@ -235,6 +239,7 @@ status_t ikv_read_value(char* line, size_t size, ikv_value_t* value) {
 exit:
   status_return;
 }
+
 /** reads keys and indentation, creating nested hashtables for keys as required and
    calls read-value to get the value from the rest of a line.
    generic indent key-value reader - custom read-value functions can read custom value formats */
@@ -322,6 +327,7 @@ exit:
   };
   status_return;
 }
+
 /** read key/value associations from file and add to hashtable.
    values can be integer/float/string arrays.
    file contains one key-value association per line.

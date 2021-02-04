@@ -1,3 +1,4 @@
+
 /* "array3" - struct {.data, .size, .used} that combines memory pointer, length and used length in one object.
    the "used" property is to support variable length data in a fixed size memory area.
    depends on stdlib.h for malloc. custom allocators can be used.
@@ -14,6 +15,7 @@
        array3_get(a, i);
      }
      array3_free(a); */
+
 #define array3_declare_type(name, element_type) array3_declare_type_custom(name, element_type, malloc, realloc)
 #define array3_declare_type_custom(name, element_type, malloc, realloc) \
   typedef struct { \

@@ -1,7 +1,9 @@
+
 /* fine-grain parallelism based on thread-pool.c.
 provides task objects with functions executed in threads that can be waited for to get a result value.
 manages the memory of thread-pool task objects.
 thread-pool.c must be included beforehand */
+
 /* for nanosleep */
 #include <time.h>
 uint8_t sph_futures_pool_is_initialised = 0;
@@ -28,6 +30,7 @@ int future_init(thread_pool_size_t thread_count) {
     return (status);
   };
 }
+
 /** internal future worker.
   a->f returns because modifying data likely needs extra type conversions inside a->f.
   thread-pool does not have a finished field by default so that tasks can themselves free
@@ -38,6 +41,7 @@ void future_eval(thread_pool_task_t* task) {
   task->data = (a->f)((task->data));
   a->finished = 1;
 }
+
 /** prepare a future in out and possibly start evaluation in parallel.
   the given function receives data as its sole argument */
 void future_new(future_f_t f, void* data, future_t* out) {
@@ -47,6 +51,7 @@ void future_new(future_f_t f, void* data, future_t* out) {
   out->task.data = data;
   thread_pool_enqueue((&sph_futures_pool), (&(out->task)));
 }
+
 /** can be called to stop and free the main thread-pool.
   waits till all active futures are finished */
 void future_deinit() {

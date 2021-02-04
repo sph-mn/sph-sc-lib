@@ -1,3 +1,4 @@
+
 /* a fifo queue with the operations enqueue and dequeue that can enqueue custom struct types and a mix of types.
    # example usage
    typedef struct {
@@ -12,7 +13,9 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stddef.h>
+
 #define queue_size_t uint32_t
+
 /** returns a pointer to the enqueued struct based on the offset of the queue_node_t field in the struct.
      because of this queue nodes dont have to be allocated separate from user data.
      downside is that the same user data object cant be contained multiple times */
@@ -32,6 +35,7 @@ void queue_init(queue_t* a) {
   a->last = 0;
   a->size = 0;
 }
+
 /** enqueue a node. the node must not already be in the queue */
 void queue_enq(queue_t* a, queue_node_t* node) {
   if (a->first) {
@@ -43,6 +47,7 @@ void queue_enq(queue_t* a, queue_node_t* node) {
   node->next = 0;
   a->size = (1 + a->size);
 }
+
 /** queue must not be empty. a.size can be checked to see if the queue is empty */
 queue_node_t* queue_deq(queue_t* a) {
   queue_node_t* n;

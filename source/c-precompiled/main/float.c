@@ -1,3 +1,4 @@
+
 #include <float.h>
 #include <math.h>
 #define define_float_sum(prefix, type) \
@@ -30,8 +31,10 @@
     }; \
     return (1); \
   }
+
 /** approximate float comparison. margin is a factor and is low for low accepted differences */
 uint8_t f64_nearly_equal(double a, double b, double margin) { return ((fabs((a - b)) < margin)); }
+
 /** approximate float comparison. margin is a factor and is low for low accepted differences */
 uint8_t f32_nearly_equal(float a, float b, float margin) { return ((fabs((a - b)) < margin)); }
 define_float_array_nearly_equal(f32, float)

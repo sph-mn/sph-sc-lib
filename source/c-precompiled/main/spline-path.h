@@ -1,3 +1,4 @@
+
 /* * spline-path creates discrete 2d paths interpolated between some given points
    * maps from one independent discrete value to one dependent continuous value
    * only the dependent value is returned
@@ -17,6 +18,7 @@
 #include <inttypes.h>
 #include <strings.h>
 #include <stdlib.h>
+
 #ifndef spline_path_time_t
 #define spline_path_time_t uint32_t
 #endif

@@ -1,5 +1,7 @@
+
 #include "../main/status.c"
 #include <stdio.h>
+
 #define test_helper_test_one(func) \
   printf("%s\n", #func); \
   status_require((func()))

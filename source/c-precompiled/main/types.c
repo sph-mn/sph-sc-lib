@@ -1,5 +1,7 @@
+
 /* shorter type names derived from inttypes.h */
 #include <inttypes.h>
+
 #define boolean uint8_t
 #define i8 int8_t
 #define i16 int16_t

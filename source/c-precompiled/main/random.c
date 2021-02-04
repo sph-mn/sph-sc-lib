@@ -1,5 +1,8 @@
+
 /* depends on <inttypes.h>. sph_ prefix is used because libc uses random */
+
 #define rotl(x, k) ((x << k) | (x >> (64 - k)))
+
 /** guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely.
      this conversion prefers the high bits of x as is recommended for xoshiro.
      from http://xoshiro.di.unimi.it/ */
@@ -22,6 +25,7 @@ sph_random_state_t sph_random_state_new(uint64_t seed) {
   };
   return (result);
 }
+
 /** generate uniformly distributed 64 bit unsigned integers.
    implements xoshiro256** from http://xoshiro.di.unimi.it/
    referenced by https://nullprogram.com/blog/2017/09/21/.
@@ -43,6 +47,7 @@ uint64_t sph_random_u64(sph_random_state_t* state) {
   s[3] = rotl((s[3]), 45);
   return (a);
 }
+
 /** generate uniformly distributed unsigned 64 bit integers in range 0..range.
    debiased integer multiplication by lemire, https://arxiv.org/abs/1805.10941
    with enchancement by o'neill, https://www.pcg-random.org/posts/bounded-rands.html */
@@ -70,6 +75,7 @@ uint64_t sph_random_u64_bounded(sph_random_state_t* state, uint64_t range) {
   };
   return ((m >> 64));
 }
+
 /** generate uniformly distributed 64 bit floating point numbers.
    implements xoshiro256+ from http://xoshiro.di.unimi.it/ */
 double sph_random_f64_bounded(sph_random_state_t* state, double range) {

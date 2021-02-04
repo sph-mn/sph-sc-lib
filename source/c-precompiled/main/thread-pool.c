@@ -1,8 +1,10 @@
+
 /* thread-pool that uses pthread condition variables to pause unused threads.
    based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing.
    queue.c must be included beforehand */
 #include <inttypes.h>
 #include <pthread.h>
+
 #ifndef thread_pool_size_t
 #define thread_pool_size_t uint8_t
 #endif
@@ -27,11 +29,13 @@ void thread_pool_destroy(thread_pool_t* a) {
   pthread_cond_destroy((&(a->queue_not_empty)));
   pthread_mutex_destroy((&(a->queue_mutex)));
 }
+
 /** if enqueued call pthread-exit to end the thread it was dequeued in */
 void thread_finish(thread_pool_task_t* task) {
   free(task);
   pthread_exit(0);
 }
+
 /** add a task to be processed by the next free thread.
   mutexes are used so that the queue is only ever accessed by a single thread */
 void thread_pool_enqueue(thread_pool_t* a, thread_pool_task_t* task) {
@@ -40,6 +44,7 @@ void thread_pool_enqueue(thread_pool_t* a, thread_pool_task_t* task) {
   pthread_cond_signal((&(a->queue_not_empty)));
   pthread_mutex_unlock((&(a->queue_mutex)));
 }
+
 /** let threads complete all currently enqueued tasks, close the threads and free resources unless no_wait is true.
   if no_wait is true then the call is non-blocking and threads might still be running until they finish the queue after this call.
   thread_pool_finish can be called again without no_wait. with only no_wait thread_pool_destroy will not be called
@@ -77,6 +82,7 @@ int thread_pool_finish(thread_pool_t* a, uint8_t no_wait, uint8_t discard_queue)
   };
   return (0);
 }
+
 /** internal worker routine */
 void* thread_pool_worker(thread_pool_t* a) {
   thread_pool_task_t* task;
@@ -94,6 +100,7 @@ wait:
   (task->f)(task);
   goto get_task;
 }
+
 /** returns zero when successful and a non-zero pthread error code otherwise */
 int thread_pool_new(thread_pool_size_t size, thread_pool_t* a) {
   thread_pool_size_t i;

@@ -1,3 +1,4 @@
+
 /* a linked list with custom data type. each element is a heap allocated struct.
    examples:
      mi_list_declare_type(list_64, uint64_t);
@@ -21,6 +22,7 @@
    access custom fields from the list pointer, for example list->custom_field */
 #include <stdlib.h>
 #include <inttypes.h>
+
 #define mi_list_declare_struct_type(name, element_type) \
   typedef struct name##_struct { \
     struct name##_struct* link; \

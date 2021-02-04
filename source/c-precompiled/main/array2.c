@@ -1,3 +1,4 @@
+
 #define array2_declare_type(name, element_type) array2_declare_type_custom(name, element_type, malloc, realloc)
 #define array2_declare_type_custom(name, element_type, malloc, realloc) \
   typedef struct { \
