@@ -50,3 +50,35 @@
     (set- (pre-concat memreg-index _ register-id) 1)
     (free
       (array-get (pre-concat memreg-register _ register-id) (pre-concat memreg-index _ register-id)))))
+
+(sc-comment
+  "memreg2 is like memreg but additionally supports specifying a handler function {void* -> void} with each address that will be used to free the data")
+
+(pre-define
+  (memreg2-init-named register-id register-size)
+  (begin
+    (declare
+      (pre-concat memreg2-register _ register-id) (array memreg2-t (register-size))
+      (pre-concat memreg2-index _ register-id) (unsigned int))
+    (set (pre-concat memreg2-index _ register-id) 0))
+  (memreg2-add-named register-id _address _handler)
+  (begin
+    (struct-set
+      (array-get (pre-concat memreg2-register _ register-id)
+        (pre-concat memreg2-index _ register-id))
+      address _address
+      handler (convert-type _handler (function-pointer void void*)))
+    (set+ (pre-concat memreg2-index _ register-id) 1))
+  (memreg2-free-named register-id)
+  (while (pre-concat memreg2-index _ register-id)
+    (set- (pre-concat memreg2-index _ register-id) 1)
+    ( (struct-get
+        (array-get (pre-concat memreg2-register _ register-id)
+          (pre-concat memreg2-index _ register-id))
+        handler)
+      (struct-get
+        (array-get (pre-concat memreg2-register _ register-id)
+          (pre-concat memreg2-index _ register-id))
+        address))))
+
+(declare memreg2-t (type (struct (address void*) (handler (function-pointer void void*)))))

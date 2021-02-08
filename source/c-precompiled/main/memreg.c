@@ -43,3 +43,23 @@ usage:
     memreg_index##_##register_id -= 1; \
     free((memreg_register##_##register_id[memreg_index##_##register_id])); \
   }
+
+/* memreg2 is like memreg but additionally supports specifying a handler function {void* -> void} with each address that will be used to free the data */
+
+#define memreg2_init_named(register_id, register_size) \
+  memreg2_t memreg2_register##_##register_id[register_size]; \
+  unsigned int memreg2_index##_##register_id; \
+  memreg2_index##_##register_id = 0
+#define memreg2_add_named(register_id, _address, _handler) \
+  (memreg2_register##_##register_id[memreg2_index##_##register_id]).address = _address; \
+  (memreg2_register##_##register_id[memreg2_index##_##register_id]).handler = ((void (*)(void*))(_handler)); \
+  memreg2_index##_##register_id += 1
+#define memreg2_free_named(register_id) \
+  while (memreg2_index##_##register_id) { \
+    memreg2_index##_##register_id -= 1; \
+    ((memreg2_register##_##register_id[memreg2_index##_##register_id]).handler)(((memreg2_register##_##register_id[memreg2_index##_##register_id]).address)); \
+  }
+typedef struct {
+  void* address;
+  void (*handler)(void*);
+} memreg2_t;
