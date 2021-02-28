@@ -55,7 +55,7 @@
 #define array4_declare(a, type) type a = { 0 }
 #define array4_add(a, value) \
   (a.data)[a.used] = value; \
-  a.used = (a.used + 1)
+  a.used += 1
 #define array4_set_null(a) \
   a.used = 0; \
   a.size = 0; \

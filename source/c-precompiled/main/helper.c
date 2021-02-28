@@ -28,7 +28,7 @@ uint8_t* sph_helper_status_name(status_t a) {
   };
 }
 
-/** allocation helpers use status-t and have a consistent interface */
+/** allocation helpers use status-t and have the same interface */
 status_t sph_helper_primitive_malloc(size_t size, void** result) {
   status_declare;
   void* a;
@@ -64,12 +64,12 @@ status_t sph_helper_primitive_calloc(size_t size, void** result) {
   };
   status_return;
 }
-status_t sph_helper_primitive_realloc(size_t size, void** block) {
+status_t sph_helper_primitive_realloc(size_t size, void** memory) {
   status_declare;
   void* a;
-  a = realloc((*block), size);
+  a = realloc((*memory), size);
   if (a) {
-    *block = a;
+    *memory = a;
   } else {
     status.group = sph_helper_status_group;
     status.id = sph_helper_status_id_memory;

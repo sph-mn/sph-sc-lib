@@ -2,12 +2,12 @@
 
 (pre-define
   (rotl x k) (bit-or (bit-shift-left x k) (bit-shift-right x (- 64 k)))
-  (sph-random-f64-from-u64 a range)
+  (sph-random-f64-from-u64 a)
   (begin
     "guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely.
-     this conversion prefers the high bits of x as is recommended for xoshiro.
-     from http://xoshiro.di.unimi.it/"
-    (* (bit-shift-right a 11) (/ range (bit-shift-left (UINT64_C 1) 53)))))
+     from http://xoshiro.di.unimi.it/
+     0x1.0p-53 is a binary floating point constant for 2**-53"
+    (* (bit-shift-right a 11) (sc-insert "0x1.0p-53"))))
 
 (declare sph-random-state-t (type (struct (data (array uint64-t 4)))))
 
@@ -46,7 +46,7 @@
 (define (sph-random-u64-bounded state range) (uint64-t sph-random-state-t* uint64-t)
   "generate uniformly distributed unsigned 64 bit integers in range 0..range.
    debiased integer multiplication by lemire, https://arxiv.org/abs/1805.10941
-   with enchancement by o'neill, https://www.pcg-random.org/posts/bounded-rands.html"
+   with enhancement by o'neill, https://www.pcg-random.org/posts/bounded-rands.html"
   (declare x uint64-t m __uint128-t l uint64-t t uint64-t)
   (set
     x (sph-random-u64 state)
@@ -77,7 +77,7 @@
     (array-get s 0) (bit-xor (array-get s 0) (array-get s 3))
     (array-get s 2) (bit-xor (array-get s 2) t)
     (array-get s 3) (rotl (array-get s 3) 45))
-  (return (sph-random-f64-from-u64 a range)))
+  (return (* range (sph-random-f64-from-u64 a))))
 
 (define (sph-random-f64 state) (double sph-random-state-t*)
   (return (sph-random-f64-bounded state 1.0)))
@@ -118,3 +118,11 @@
   (declare i size-t)
   (for ((set i 0) (< i size) (set+ i 1))
     (set (array-get out i) (sph-random-u64-bounded state range))))
+
+(define (sph-random-f64-1to1 state) (double sph-random-state-t*)
+  "return a random floating point number in the range -1 to 1"
+  (return (- (sph-random-f64-bounded state 2.0) 1)))
+
+(define (sph-random-f64-array-1to1 state size out) (void sph-random-state-t* size-t double*)
+  (declare i size-t)
+  (for ((set i 0) (< i size) (set+ i 1)) (set (array-get out i) (sph-random-f64-1to1 state))))

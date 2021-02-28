@@ -44,7 +44,7 @@
         a:current (if* (< new-size a:current) new-size a:current))
       (return 0)))
   (array4-declare a type) (define a type (struct-literal 0))
-  (array4-add a value) (set (array-get a.data a.used) value a.used (+ a.used 1))
+  (array4-add a value) (begin (set (array-get a.data a.used) value) (set+ a.used 1))
   (array4-set-null a) (set a.used 0 a.size 0 a.data 0 a.current 0)
   (array4-get-at a index) (array-get a.data index)
   (array4-clear a) (set a.used 0)

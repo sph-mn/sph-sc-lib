@@ -50,7 +50,7 @@
 #define array3_declare(a, type) type a = { 0, 0, 0 }
 #define array3_add(a, value) \
   (a.data)[a.used] = value; \
-  a.used = (a.used + 1)
+  a.used += 1
 #define array3_set_null(a) \
   a.used = 0; \
   a.size = 0; \
@@ -59,6 +59,7 @@
 #define array3_clear(a) a.used = 0
 #define array3_remove(a) a.used -= 1
 #define array3_size(a) a.used
+#define array3_unused_size(a) (a.size - a.used)
 #define array3_max_size(a) a.size
 #define array3_free(a) free((a.data))
 #define array3_full(a) (a.used == a.size)

@@ -4,9 +4,9 @@
 #define rotl(x, k) ((x << k) | (x >> (64 - k)))
 
 /** guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely.
-     this conversion prefers the high bits of x as is recommended for xoshiro.
-     from http://xoshiro.di.unimi.it/ */
-#define sph_random_f64_from_u64(a, range) ((a >> 11) * (range / (UINT64_C(1) << 53)))
+     from http://xoshiro.di.unimi.it/
+     0x1.0p-53 is a binary floating point constant for 2**-53 */
+#define sph_random_f64_from_u64(a) ((a >> 11) * 0x1.0p-53)
 typedef struct {
   uint64_t data[4];
 } sph_random_state_t;
@@ -50,7 +50,7 @@ uint64_t sph_random_u64(sph_random_state_t* state) {
 
 /** generate uniformly distributed unsigned 64 bit integers in range 0..range.
    debiased integer multiplication by lemire, https://arxiv.org/abs/1805.10941
-   with enchancement by o'neill, https://www.pcg-random.org/posts/bounded-rands.html */
+   with enhancement by o'neill, https://www.pcg-random.org/posts/bounded-rands.html */
 uint64_t sph_random_u64_bounded(sph_random_state_t* state, uint64_t range) {
   uint64_t x;
   __uint128_t m;
@@ -60,7 +60,7 @@ uint64_t sph_random_u64_bounded(sph_random_state_t* state, uint64_t range) {
   m = (((__uint128_t)(x)) * ((__uint128_t)(range)));
   l = ((uint64_t)(m));
   if (l < range) {
-    t = (range);
+    t = (-range);
     if (t >= range) {
       t -= range;
       if (t >= range) {
@@ -92,7 +92,7 @@ double sph_random_f64_bounded(sph_random_state_t* state, double range) {
   s[0] = (s[0] ^ s[3]);
   s[2] = (s[2] ^ t);
   s[3] = rotl((s[3]), 45);
-  return ((sph_random_f64_from_u64(a, range)));
+  return ((range * sph_random_f64_from_u64(a)));
 }
 double sph_random_f64(sph_random_state_t* state) { return ((sph_random_f64_bounded(state, (1.0)))); }
 void sph_random_u64_array(sph_random_state_t* state, size_t size, uint64_t* out) {
@@ -131,5 +131,14 @@ void sph_random_u32_bounded_array(sph_random_state_t* state, uint64_t range, siz
   size_t i;
   for (i = 0; (i < size); i += 1) {
     out[i] = sph_random_u64_bounded(state, range);
+  };
+}
+
+/** return a random floating point number in the range -1 to 1 */
+double sph_random_f64_1to1(sph_random_state_t* state) { return ((sph_random_f64_bounded(state, (2.0)) - 1)); }
+void sph_random_f64_array_1to1(sph_random_state_t* state, size_t size, double* out) {
+  size_t i;
+  for (i = 0; (i < size); i += 1) {
+    out[i] = sph_random_f64_1to1(state);
   };
 }

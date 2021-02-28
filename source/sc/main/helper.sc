@@ -24,7 +24,7 @@
   (case = a.id (sph-helper-status-id-memory (set b "memory")) (else (set b "unknown"))))
 
 (define (sph-helper-primitive-malloc size result) (status-t size-t void**)
-  "allocation helpers use status-t and have a consistent interface"
+  "allocation helpers use status-t and have the same interface"
   status-declare
   (declare a void*)
   (set a (malloc size))
@@ -48,11 +48,11 @@
     (set status.group sph-helper-status-group status.id sph-helper-status-id-memory))
   status-return)
 
-(define (sph-helper-primitive-realloc size block) (status-t size-t void**)
+(define (sph-helper-primitive-realloc size memory) (status-t size-t void**)
   status-declare
   (declare a void*)
-  (set a (realloc *block size))
-  (if a (set *block a)
+  (set a (realloc *memory size))
+  (if a (set *memory a)
     (set status.group sph-helper-status-group status.id sph-helper-status-id-memory))
   status-return)
 

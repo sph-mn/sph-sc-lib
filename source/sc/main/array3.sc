@@ -36,12 +36,13 @@
       (set a:data data a:size new-size a:used (if* (< new-size a:used) new-size a:used))
       (return 0)))
   (array3-declare a type) (define a type (struct-literal 0 0 0))
-  (array3-add a value) (set (array-get a.data a.used) value a.used (+ a.used 1))
+  (array3-add a value) (begin (set (array-get a.data a.used) value) (set+ a.used 1))
   (array3-set-null a) (set a.used 0 a.size 0 a.data 0)
   (array3-get a index) (array-get a.data index)
   (array3-clear a) (set a.used 0)
   (array3-remove a) (set- a.used 1)
   (array3-size a) a.used
+  (array3-unused-size a) (- a.size a.used)
   (array3-max-size a) a.size
   (array3-free a) (free a.data)
   (array3-full a) (= a.used a.size)
