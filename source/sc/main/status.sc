@@ -13,6 +13,7 @@
   status-is-success (= status-id-success status.id)
   status-is-failure (not status-is-success)
   status-return (return status)
+  status-i-return (return status.id)
   (status-set group-id status-id)
   (set status.group (convert-type group-id uint8-t*) status.id status-id)
   (status-set-goto group-id status-id) (begin (status-set group-id status-id) (goto exit))

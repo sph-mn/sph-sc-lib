@@ -14,6 +14,7 @@ typedef struct {
 #define status_is_success (status_id_success == status.id)
 #define status_is_failure !status_is_success
 #define status_return return (status)
+#define status_i_return return ((status.id))
 #define status_set(group_id, status_id) \
   status.group = ((uint8_t*)(group_id)); \
   status.id = status_id

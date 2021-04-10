@@ -63,18 +63,18 @@ exit:
 ``status_require`` goes directly to exit if the returned ``status_t`` from ``test()`` isnt ``status_id_success``
 
 ## macros
-```
-status_declare
+~~~
+status_declare: declares a variable with name `status` of type `status_t`
 status_group_undefined
-status_i_require(expression)
-status_id_success
-status_is_failure
-status_is_success
-status_require(expression)
-status_return
-status_set(group_id, status_id)
-status_set_goto(group_id, status_id)
-```
+status_i_require(expression): `status.id = expression`, otherwise like status_require
+status_id_success: 0
+status_is_failure: true if status.id is zero
+status_is_success: true if status.id is non-zero
+status_require(expression): evaluates `status = expression` and jumps to exit on error
+status_return: same as `return status`
+status_set(group_id, status_id): `status.group = group_id; status.id = status_id;`
+status_set_goto(group_id, status_id): like status_set but goes to exit
+~~~
 
 ## types
 ```

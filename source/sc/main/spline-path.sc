@@ -9,7 +9,7 @@
   (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 0"
   (declare i spline-path-time-t)
-  (for ((set i start) (< i end) (set i (+ 1 i))) (set (array-get out (- i start)) p-start.y)))
+  (for ((set i start) (< i end) (set+ i 1)) (set (array-get out (- i start)) p-start.y)))
 
 (define (spline-path-i-line start end p-start p-rest options out)
   (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
@@ -20,14 +20,14 @@
     s-size spline-path-value-t
     t spline-path-value-t)
   (set p-end (array-get p-rest 0) s-size (- p-end.x p-start.x))
-  (for ((set i start) (< i end) (set i (+ 1 i)))
+  (for ((set i start) (< i end) (set+ i 1))
     (set
       t (/ (- i p-start.x) s-size)
       (array-get out (- i start)) (+ (* p-end.y t) (* p-start.y (- 1 t))))))
 
 (define (spline-path-i-bezier start end p-start p-rest options out)
   (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
-  "p-rest length 3"
+  "p-rest length 3. this rudimentary implementation ignores control point x values"
   (declare
     i spline-path-time-t
     mt spline-path-value-t
@@ -35,7 +35,7 @@
     s-size spline-path-value-t
     t spline-path-value-t)
   (set p-end (array-get p-rest 2) s-size (- p-end.x p-start.x))
-  (for ((set i start) (< i end) (set i (+ 1 i)))
+  (for ((set i start) (< i end) (set+ i 1))
     (set
       t (/ (- i p-start.x) s-size)
       mt (- 1 t)
@@ -55,7 +55,7 @@
     s-start spline-path-time-t
     s-end spline-path-time-t
     out-start spline-path-time-t)
-  (for ((set i 0) (< i path.segments-count) (set i (+ 1 i)))
+  (for ((set i 0) (< i path.segments-count) (set+ i 1))
     (set
       s (array-get path.segments i)
       s-start s._start.x
@@ -107,7 +107,7 @@
   "set _start and _points_count for segments"
   (declare i spline-path-segment-count-t s spline-path-segment-t start spline-path-point-t)
   (set start.x 0 start.y 0)
-  (for ((set i 0) (< i segments-count) (set i (+ 1 i)))
+  (for ((set i 0) (< i segments-count) (set+ i 1))
     (set
       (struct-get (array-get segments i) _start) start
       s (array-get segments i)

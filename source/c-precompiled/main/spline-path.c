@@ -7,7 +7,7 @@ void spline_path_i_move(spline_path_time_t start, spline_path_time_t end, spline
 /** p-rest length 0 */
 void spline_path_i_constant(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* options, spline_path_value_t* out) {
   spline_path_time_t i;
-  for (i = start; (i < end); i = (1 + i)) {
+  for (i = start; (i < end); i += 1) {
     out[(i - start)] = p_start.y;
   };
 }
@@ -20,13 +20,13 @@ void spline_path_i_line(spline_path_time_t start, spline_path_time_t end, spline
   spline_path_value_t t;
   p_end = p_rest[0];
   s_size = (p_end.x - p_start.x);
-  for (i = start; (i < end); i = (1 + i)) {
+  for (i = start; (i < end); i += 1) {
     t = ((i - p_start.x) / s_size);
     out[(i - start)] = ((p_end.y * t) + (p_start.y * (1 - t)));
   };
 }
 
-/** p-rest length 3 */
+/** p-rest length 3. this rudimentary implementation ignores control point x values */
 void spline_path_i_bezier(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* options, spline_path_value_t* out) {
   spline_path_time_t i;
   spline_path_value_t mt;
@@ -35,7 +35,7 @@ void spline_path_i_bezier(spline_path_time_t start, spline_path_time_t end, spli
   spline_path_value_t t;
   p_end = p_rest[2];
   s_size = (p_end.x - p_start.x);
-  for (i = start; (i < end); i = (1 + i)) {
+  for (i = start; (i < end); i += 1) {
     t = ((i - p_start.x) / s_size);
     mt = (1 - t);
     out[(i - start)] = ((p_start.y * mt * mt * mt) + ((p_rest[0]).y * 3 * mt * mt * t) + ((p_rest[1]).y * 3 * mt * t * t) + (p_end.y * t * t * t));
@@ -52,7 +52,7 @@ void spline_path_get(spline_path_t path, spline_path_time_t start, spline_path_t
   spline_path_time_t s_start;
   spline_path_time_t s_end;
   spline_path_time_t out_start;
-  for (i = 0; (i < path.segments_count); i = (1 + i)) {
+  for (i = 0; (i < path.segments_count); i += 1) {
     s = (path.segments)[i];
     s_start = s._start.x;
     s_end = ((s.points)[(s._points_count - 1)]).x;
@@ -115,7 +115,7 @@ void spline_path_prepare_segments(spline_path_segment_t* segments, spline_path_s
   spline_path_point_t start;
   start.x = 0;
   start.y = 0;
-  for (i = 0; (i < segments_count); i = (1 + i)) {
+  for (i = 0; (i < segments_count); i += 1) {
     (segments[i])._start = start;
     s = segments[i];
     s._points_count = spline_path_segment_points_count(s);
