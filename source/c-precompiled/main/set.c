@@ -1,15 +1,15 @@
 
 /* a macro that defines set data types and functions for arbitrary value types.
-   * compared to hashtable.c, this uses less than half the space and operations are faster (about 20% in first tests)
-   * linear probing for collision resolve
-   * sph-set-declare-type allows the null value (used for unset elements) to be part of the set
-     * except the null value, values are in .values starting from index 1
-     * notnull is used at index 0 to check if the empty-value is included
-   * sph-set-declare-type-nonull does not allow the null value to be part of the set and should be a bit faster
-     * values are in .values starting from index 0
-   * null and notnull arguments are user provided so that they have same data type as other set elements
-   * primes from https://planetmath.org/goodhashtableprimes
-   * automatic resizing is not implemented */
+ * compared to hashtable.c, this uses less than half the space and operations are faster (about 20% in first tests)
+ * linear probing for collision resolve
+ * sph-set-declare-type allows the null value (used for unset elements) to be part of the set
+ * except the null value, values are in .values starting from index 1
+ * notnull is used at index 0 to check if the empty-value is included
+ * sph-set-declare-type-nonull does not allow the null value to be part of the set and should be a bit faster
+ * values are in .values starting from index 0
+ * null and notnull arguments are user provided so that they have same data type as other set elements
+ * primes from https://planetmath.org/goodhashtableprimes
+ * automatic resizing is not implemented */
 #include <stdlib.h>
 #include <inttypes.h>
 uint32_t sph_set_primes[] = { 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741 };

@@ -4,8 +4,9 @@
 
 export MALLOC_CHECK_=3
 export LD_LIBRARY_PATH="$PWD/temp"
-./temp/test-ikv
 ./temp/test-spline-path
+exit 0
+./temp/test-ikv
 ./temp/test-arrayn
 ./temp/test-random
 ./temp/test-set
