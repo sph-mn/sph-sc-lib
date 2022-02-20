@@ -44,35 +44,38 @@
       (+ (* p-start.y mt mt mt) (* (struct-get (array-get p-rest 0) y) 3 mt mt t)
         (* (struct-get (array-get p-rest 1) y) 3 mt t t) (* p-end.y t t t)))))
 
-(define (complex-difference p1 p2) (spline-path-point-t spline-path-point-t spline-path-point-t)
-  (declare result spline-path-point-t)
+(define (complex-difference p1 p2)
+  (spline-path-point-calc-t spline-path-point-calc-t spline-path-point-calc-t)
+  (declare result spline-path-point-calc-t)
   (set result.x (- p1.x p2.x) result.y (- p1.y p2.y))
   (return result))
 
 (define (complex-multiplication p1 p2)
-  (spline-path-point-t spline-path-point-t spline-path-point-t)
-  (declare result spline-path-point-t)
+  (spline-path-point-t spline-path-point-calc-t spline-path-point-calc-t)
+  (declare result spline-path-point-calc-t)
   (set result.x (- (* p1.x p2.x) (* p1.y p2.y)) result.y (- (* p1.x p2.y) (* p1.y p2.x)))
   (return result))
 
-(define (complex-inversion p) (spline-path-point-t spline-path-point-t)
-  (declare scale spline-path-value-t result spline-path-point-t)
+(define (complex-inversion p) (spline-path-point-calc-t spline-path-point-calc-t)
+  (declare scale spline-path-value-t result spline-path-point-calc-t)
   (set scale (/ 1 (+ (* p.x p.x) (* p.y p.y))) result.x (* scale p.x) result.y (* (- scale) p.y))
   (return result))
 
-(define (complex-division p1 p2) (spline-path-point-t spline-path-point-t spline-path-point-t)
+(define (complex-division p1 p2)
+  (spline-path-point-calc-t spline-path-point-calc-t spline-path-point-calc-t)
   (return (complex-multiplication p1 (complex-inversion p2))))
 
 (define (complex-linear-interpolation p1 p2 t)
-  (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
-  (declare result spline-path-point-t)
+  (spline-path-point-calc-t spline-path-point-calc-t spline-path-point-calc-t spline-path-value-t)
+  (declare result spline-path-point-calc-t)
   (set result.x (+ (* p1.x (- 1 t)) (* p2.x t)) result.y (+ (* p1.y (- 1 t)) (* p2.y t)))
+  (printf "%lu %f %f\n" result.x (* p2.x t) t)
   (return result))
 
 (pre-include "stdio.h")
 
 (define (spline-path-i-circular-arc-control-point p1 p2 c)
-  (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
+  (spline-path-point-calc-t spline-path-point-calc-t spline-path-point-calc-t spline-path-value-t)
   "return a point on a perpendicular line across the midpoint"
   (declare
     dx spline-path-value-t
@@ -85,9 +88,9 @@
     scale spline-path-value-t
     result spline-path-point-t)
   (set
-    dx (- (convert-type p2.x spline-path-value-t) (convert-type p1.x spline-path-value-t))
+    dx (- p2.x p1.x)
     dy (- p2.y p1.y)
-    mx (/ (+ (convert-type p1.x spline-path-value-t) (convert-type p2.x spline-path-value-t)) 2)
+    mx (/ (+ p1.x p2.x) 2)
     my (/ (+ p1.y p2.y) 2)
     d (sqrt (+ (* dx dx) (* dy dy)))
     ux (/ (- dy) d)
@@ -100,35 +103,39 @@
 (declare spline-path-i-circular-arc-data-t
   (type
     (struct
-      (m-a spline-path-point-t)
-      (b-m spline-path-point-t)
-      (ab-m spline-path-point-t)
-      (bm-a spline-path-point-t)
-      (s-size spline-path-time-t))))
+      (m-a spline-path-point-calc-t)
+      (b-m spline-path-point-calc-t)
+      (ab-m spline-path-point-calc-t)
+      (bm-a spline-path-point-calc-t)
+      (s-size spline-path-value-t))))
 
 (define (spline-path-i-circular-arc start end p-start p-rest data out)
   (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 2. circular arc interpolation formula from jacob rus,
    https://observablehq.com/@jrus/circle-arc-interpolation"
-  (declare t spline-path-value-t d spline-path-i-circular-arc-data-t p spline-path-point-t)
+  (declare t spline-path-value-t d spline-path-i-circular-arc-data-t p spline-path-point-calc-t)
   (set d (pointer-get (convert-type data spline-path-i-circular-arc-data-t*)))
   (if (not d.s-size)
     (begin
       (declare
         dp spline-path-i-circular-arc-data-t*
         curvature spline-path-value-t
-        p-end spline-path-point-t
-        m spline-path-point-t)
+        m spline-path-point-calc-t
+        p-start-calc spline-path-point-calc-t
+        p-end spline-path-point-calc-t)
       (set
         curvature p-rest:y
-        p-end (array-get p-rest 1)
+        p-start-calc.x p-start.x
+        p-start-calc.y p-start.y
+        p-end-calc.x (: (array-get p-rest 1) x)
+        p-end-calc.y (: (array-get p-rest 1) y)
         dp data
-        m (spline-path-i-circular-arc-control-point p-start p-end curvature)
-        dp:b-m (complex-difference p-end m)
+        m (spline-path-i-circular-arc-control-point p-start-calc p-end-calc curvature)
+        dp:b-m (complex-difference p-end-calc m)
         dp:m-a (complex-difference m p-start)
         dp:ab-m (complex-multiplication p-start dp:b-m)
-        dp:bm-a (complex-multiplication p-end dp:m-a)
-        dp:s-size (- p-end.x p-start.x)
+        dp:bm-a (complex-multiplication p-end-calc dp:m-a)
+        dp:s-size (- p-end-calc.x p-start-calc.x)
         d *dp)))
   (for ((define i spline-path-time-t start) (< i end) (set+ i 1))
     (set
@@ -136,9 +143,7 @@
       p
       (complex-division (complex-linear-interpolation d.ab-m d.bm-a t)
         (complex-linear-interpolation d.b-m d.m-a t))
-      (array-get out (- i start)) p.y)
-    (printf "%lu %lu %f\n" i p.x p.y)
-    ))
+      (array-get out (- i start)) p.y)))
 
 (define (spline-path-get path start end out)
   (void spline-path-t* spline-path-time-t spline-path-time-t spline-path-value-t*)
@@ -169,7 +174,6 @@
       out-start (if* (> s-start start) (- s-start start) 0)
       s-start (if* (> s-start start) s-start start)
       s-end (if* (< s-end end) s-end end))
-    (printf "%lu %lu\n" s-start s-end)
     (s.interpolator s-start s-end s._start s.points s.data (+ out-start out))
     (set+ i 1))
   (sc-comment

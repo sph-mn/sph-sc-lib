@@ -36,6 +36,10 @@ typedef struct {
   spline_path_time_t x;
   spline_path_value_t y;
 } spline_path_point_t;
+typedef struct {
+  spline_path_value_t x;
+  spline_path_value_t y;
+} spline_path_point_calc_t;
 typedef void (*spline_path_interpolator_t)(spline_path_time_t, spline_path_time_t, spline_path_point_t, spline_path_point_t*, void*, spline_path_value_t*);
 typedef struct {
   spline_path_point_t _start;

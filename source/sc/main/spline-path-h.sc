@@ -19,17 +19,16 @@
 (pre-include "inttypes.h" "strings.h" "stdlib.h")
 
 (pre-define-if-not-defined
-  spline-path-time-t uint32-t
   spline-path-value-t double
   spline-path-segment-count-t uint16-t
-  spline-path-time-max UINT32_MAX)
+  spline-path-time-max DBL_MAX)
 
 (pre-define (spline-path-segment-points-count s)
   (if* (= spline-path-i-bezier s.interpolator) 3
     (if* (= spline-path-i-circular-arc s.interpolator) 2 1)))
 
 (declare
-  spline-path-point-t (type (struct (x spline-path-time-t) (y spline-path-value-t)))
+  spline-path-point-t (type (struct (x spline-path-value-t) (y spline-path-value-t)))
   spline-path-interpolator-t
   (type
     (function-pointer void spline-path-time-t
