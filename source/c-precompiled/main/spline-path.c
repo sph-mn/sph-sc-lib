@@ -1,35 +1,35 @@
 
 /* depends on spline-path-h.c */
 #include <math.h>
+#include <stdio.h>
 
 /** p-rest length 1 */
-void spline_path_i_move(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) { memset(out, 0, (sizeof(spline_path_value_t) * (end - start))); }
+void spline_path_i_move(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) { memset(out, 0, (sizeof(spline_path_value_t) * (end - start))); }
 
 /** p-rest length 0 */
-void spline_path_i_constant(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
-  spline_path_time_t i;
-  for (i = start; (i < end); i += 1) {
+void spline_path_i_constant(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
+  for (size_t i = start; (i < end); i += 1) {
     out[(i - start)] = p_start.y;
   };
 }
 
 /** p-rest length 1 */
-void spline_path_i_line(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
-  spline_path_time_t i;
+void spline_path_i_line(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
+  size_t i;
   spline_path_point_t p_end;
-  spline_path_value_t s_size;
   spline_path_value_t t;
+  size_t p_start_x;
+  p_start_x = p_start.x;
   p_end = p_rest[0];
-  s_size = (p_end.x - p_start.x);
   for (i = start; (i < end); i += 1) {
-    t = ((i - p_start.x) / s_size);
+    t = ((i - p_start_x) / (p_end.x - p_start.x));
     out[(i - start)] = ((p_end.y * t) + (p_start.y * (1 - t)));
   };
 }
 
 /** p-rest length 3. this implementation ignores control point x values */
-void spline_path_i_bezier(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
-  spline_path_time_t i;
+void spline_path_i_bezier(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
+  size_t i;
   spline_path_value_t mt;
   spline_path_point_t p_end;
   spline_path_value_t s_size;
@@ -42,38 +42,37 @@ void spline_path_i_bezier(spline_path_time_t start, spline_path_time_t end, spli
     out[(i - start)] = ((p_start.y * mt * mt * mt) + ((p_rest[0]).y * 3 * mt * mt * t) + ((p_rest[1]).y * 3 * mt * t * t) + (p_end.y * t * t * t));
   };
 }
-spline_path_point_calc_t complex_difference(spline_path_point_calc_t p1, spline_path_point_calc_t p2) {
-  spline_path_point_calc_t result;
+spline_path_point_t complex_difference(spline_path_point_t p1, spline_path_point_t p2) {
+  spline_path_point_t result;
   result.x = (p1.x - p2.x);
   result.y = (p1.y - p2.y);
   return (result);
 }
-spline_path_point_t complex_multiplication(spline_path_point_calc_t p1, spline_path_point_calc_t p2) {
-  spline_path_point_calc_t result;
+spline_path_point_t complex_multiplication(spline_path_point_t p1, spline_path_point_t p2) {
+  spline_path_point_t result;
   result.x = ((p1.x * p2.x) - (p1.y * p2.y));
-  result.y = ((p1.x * p2.y) - (p1.y * p2.x));
+  result.y = ((p1.x * p2.y) + (p1.y * p2.x));
   return (result);
 }
-spline_path_point_calc_t complex_inversion(spline_path_point_calc_t p) {
+spline_path_point_t complex_inversion(spline_path_point_t p) {
   spline_path_value_t scale;
-  spline_path_point_calc_t result;
+  spline_path_point_t result;
   scale = (1 / ((p.x * p.x) + (p.y * p.y)));
   result.x = (scale * p.x);
   result.y = ((-scale) * p.y);
   return (result);
 }
-spline_path_point_calc_t complex_division(spline_path_point_calc_t p1, spline_path_point_calc_t p2) { return ((complex_multiplication(p1, (complex_inversion(p2))))); }
-spline_path_point_calc_t complex_linear_interpolation(spline_path_point_calc_t p1, spline_path_point_calc_t p2, spline_path_value_t t) {
-  spline_path_point_calc_t result;
+spline_path_point_t complex_division(spline_path_point_t p1, spline_path_point_t p2) { return ((complex_multiplication(p1, (complex_inversion(p2))))); }
+spline_path_point_t complex_linear_interpolation(spline_path_point_t p1, spline_path_point_t p2, spline_path_value_t t) {
+  spline_path_point_t result;
   result.x = ((p1.x * (1 - t)) + (p2.x * t));
   result.y = ((p1.y * (1 - t)) + (p2.y * t));
-  printf("%lu %f %f\n", (result.x), (p2.x * t), t);
   return (result);
 }
-#include <stdio.h>
 
-/** return a point on a perpendicular line across the midpoint */
-spline_path_point_calc_t spline_path_i_circular_arc_control_point(spline_path_point_calc_t p1, spline_path_point_calc_t p2, spline_path_value_t c) {
+/** return a point on a perpendicular line across the midpoint.
+   calculates the midpoint, the negative reciprocal slope and a unit vector */
+spline_path_point_t spline_path_i_circular_arc_control_point(spline_path_point_t p1, spline_path_point_t p2, spline_path_value_t c) {
   spline_path_value_t dx;
   spline_path_value_t dy;
   spline_path_value_t mx;
@@ -91,45 +90,39 @@ spline_path_point_calc_t spline_path_i_circular_arc_control_point(spline_path_po
   ux = ((-dy) / d);
   uy = (dx / d);
   scale = (c * (p2.y - my));
-  result.x = ceil((mx + (ux * scale)));
+  result.x = (mx + (ux * scale));
   result.y = (my + (uy * scale));
   return (result);
 }
 typedef struct {
-  spline_path_point_calc_t m_a;
-  spline_path_point_calc_t b_m;
-  spline_path_point_calc_t ab_m;
-  spline_path_point_calc_t bm_a;
+  spline_path_point_t m_a;
+  spline_path_point_t b_m;
+  spline_path_point_t ab_m;
+  spline_path_point_t bm_a;
   spline_path_value_t s_size;
 } spline_path_i_circular_arc_data_t;
 /** p-rest length 2. circular arc interpolation formula from jacob rus,
    https://observablehq.com/@jrus/circle-arc-interpolation */
-void spline_path_i_circular_arc(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
+void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
   spline_path_value_t t;
   spline_path_i_circular_arc_data_t d;
-  spline_path_point_calc_t p;
+  spline_path_point_t p;
   d = *((spline_path_i_circular_arc_data_t*)(data));
   if (!d.s_size) {
     spline_path_i_circular_arc_data_t* dp;
-    spline_path_value_t curvature;
-    spline_path_point_calc_t m;
-    spline_path_point_calc_t p_start_calc;
-    spline_path_point_calc_t p_end;
-    curvature = p_rest->y;
-    p_start_calc.x = p_start.x;
-    p_start_calc.y = p_start.y;
-    p_end_calc.x = (p_rest[1])->x;
-    p_end_calc.y = (p_rest[1])->y;
+    spline_path_point_t m;
+    spline_path_point_t p_end;
+    p_end = p_rest[1];
     dp = data;
-    m = spline_path_i_circular_arc_control_point(p_start_calc, p_end_calc, curvature);
-    dp->b_m = complex_difference(p_end_calc, m);
+    m = spline_path_i_circular_arc_control_point(p_start, p_end, (p_rest->y));
+    dp->b_m = complex_difference(p_end, m);
     dp->m_a = complex_difference(m, p_start);
     dp->ab_m = complex_multiplication(p_start, (dp->b_m));
-    dp->bm_a = complex_multiplication(p_end_calc, (dp->m_a));
-    dp->s_size = (p_end_calc.x - p_start_calc.x);
+    dp->bm_a = complex_multiplication(p_end, (dp->m_a));
+    dp->s_size = (p_end.x - p_start.x);
     d = *dp;
   };
-  for (spline_path_time_t i = start; (i < end); i += 1) {
+  for (size_t i = start; (i < end); i += 1) {
     t = ((i - p_start.x) / d.s_size);
     p = complex_division((complex_linear_interpolation((d.ab_m), (d.bm_a), t)), (complex_linear_interpolation((d.b_m), (d.m_a), t)));
     out[(i - start)] = p.y;
@@ -139,13 +132,13 @@ void spline_path_i_circular_arc(spline_path_time_t start, spline_path_time_t end
 /** get values on path between start (inclusive) and end (exclusive).
    since x values are integers, a path from (0 0) to (10 20) for example would have reached 20 only at the 11th point.
    out memory is managed by the caller. the size required for out is end minus start */
-void spline_path_get(spline_path_t* path, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out) {
+void spline_path_get(spline_path_t* path, size_t start, size_t end, spline_path_value_t* out) {
   /* find all segments that overlap with requested range */
   spline_path_segment_count_t i;
   spline_path_segment_t s;
-  spline_path_time_t s_start;
-  spline_path_time_t s_end;
-  spline_path_time_t out_start;
+  size_t s_start;
+  size_t s_end;
+  size_t out_start;
   spline_path_segment_count_t segments_count;
   uint8_t second_search;
   segments_count = path->segments_count;
@@ -188,7 +181,7 @@ void spline_path_get(spline_path_t* path, spline_path_time_t start, spline_path_
 }
 
 /** p-rest length 0. data is one spline-path-t */
-void spline_path_i_path(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) { spline_path_get(data, (start - p_start.x), (end - p_start.x), out); }
+void spline_path_i_path(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) { spline_path_get(data, (start - p_start.x), (end - p_start.x), out); }
 spline_path_point_t spline_path_start(spline_path_t path) {
   spline_path_point_t p;
   spline_path_segment_t s;
@@ -211,7 +204,7 @@ spline_path_point_t spline_path_end(spline_path_t path) {
   };
   return (((s.points)[(s._points_count - 1)]));
 }
-spline_path_time_t spline_path_size(spline_path_t path) {
+size_t spline_path_size(spline_path_t path) {
   spline_path_point_t p;
   p = spline_path_end(path);
   return ((p.x));
@@ -233,7 +226,7 @@ void spline_path_prepare_segments(spline_path_segment_t* segments, spline_path_s
       *(s.points) = start;
     } else if (spline_path_i_constant == s.interpolator) {
       *(s.points) = start;
-      (s.points)->x = spline_path_time_max;
+      (s.points)->x = spline_path_size_max;
     } else {
       start = (s.points)[(s._points_count - 1)];
     };
@@ -262,7 +255,7 @@ uint8_t spline_path_set_copy(spline_path_t* path, spline_path_segment_t* segment
 }
 
 /** create a path array immediately from segments without creating a path object */
-uint8_t spline_path_segments_get(spline_path_segment_t* segments, spline_path_segment_count_t segments_count, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out) {
+uint8_t spline_path_segments_get(spline_path_segment_t* segments, spline_path_segment_count_t segments_count, size_t start, size_t end, spline_path_value_t* out) {
   spline_path_t path;
   spline_path_set((&path), segments, segments_count);
   spline_path_get((&path), start, end, out);
@@ -270,7 +263,7 @@ uint8_t spline_path_segments_get(spline_path_segment_t* segments, spline_path_se
 }
 
 /** returns a move segment to move to the specified point */
-spline_path_segment_t spline_path_move(spline_path_time_t x, spline_path_value_t y) {
+spline_path_segment_t spline_path_move(size_t x, spline_path_value_t y) {
   spline_path_segment_t s;
   s.interpolator = spline_path_i_move;
   (s.points)->x = x;
@@ -278,7 +271,7 @@ spline_path_segment_t spline_path_move(spline_path_time_t x, spline_path_value_t
   s.free = 0;
   return (s);
 }
-spline_path_segment_t spline_path_line(spline_path_time_t x, spline_path_value_t y) {
+spline_path_segment_t spline_path_line(size_t x, spline_path_value_t y) {
   spline_path_segment_t s;
   s.interpolator = spline_path_i_line;
   (s.points)->x = x;
@@ -288,7 +281,7 @@ spline_path_segment_t spline_path_line(spline_path_time_t x, spline_path_value_t
 }
 
 /** curvature is a real between -1..1, with the maximum being the edge of the segment */
-spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, spline_path_time_t x2, spline_path_value_t y2) {
+spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, size_t x2, spline_path_value_t y2) {
   spline_path_segment_t s;
   spline_path_i_circular_arc_data_t* d;
   d = malloc((sizeof(spline_path_i_circular_arc_data_t)));
@@ -308,7 +301,7 @@ spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, sp
 }
 
 /** the first two points are the control points */
-spline_path_segment_t spline_path_bezier(spline_path_time_t x1, spline_path_value_t y1, spline_path_time_t x2, spline_path_value_t y2, spline_path_time_t x3, spline_path_value_t y3) {
+spline_path_segment_t spline_path_bezier(size_t x1, spline_path_value_t y1, size_t x2, spline_path_value_t y2, size_t x3, spline_path_value_t y3) {
   spline_path_segment_t s;
   s.free = 0;
   s.interpolator = spline_path_i_bezier;

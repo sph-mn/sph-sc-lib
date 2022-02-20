@@ -8,8 +8,8 @@
   (declare
     out (array spline-path-value-t 100)
     out-new-get (array spline-path-value-t 100)
-    i spline-path-time-t
-    length spline-path-time-t
+    i size-t
+    length size-t
     path spline-path-t
     segments (array spline-path-segment-t 4)
     segments-count spline-path-segment-count-t
@@ -83,24 +83,28 @@
   (declare
     out (array spline-path-value-t 50)
     path spline-path-t
-    i spline-path-time-t
+    end-x size-t
+    i size-t
     segments (array spline-path-segment-t 4)
-    segments2 (array spline-path-segment-t 2))
-  (for ((set i 0) (< i 50) (set+ i 1)) (set (array-get out i) 999))
+    segments2 (array spline-path-segment-t 2)
+    log-path-0 uint8-t)
+  (set end-x 50 log-path-0 #f)
+  (for ((set i 0) (< i end-x) (set+ i 1)) (set (array-get out i) 999))
   (set
     (array-get segments 0) (spline-path-move 1 5)
     (array-get segments 1) (spline-path-line 10 10)
     (array-get segments 2) (spline-path-bezier 20 15 30 5 40 15)
     (array-get segments 3) (spline-path-constant))
   (spline-path-set-copy &path segments 4)
-  (spline-path-get &path 0 50 out)
+  (spline-path-get &path 0 end-x out)
+  (if log-path-0 (for ((set i 0) (< i end-x) (set+ i 1)) (printf "%lu %f\n" i (array-get out i))))
   (test-helper-assert "helper path 0" (f64-nearly-equal 0 (array-get out 0) error-margin))
   (test-helper-assert "helper path 49" (f64-nearly-equal 15 (array-get out 49) error-margin))
   (set
     (array-get segments2 0) (spline-path-line 5 10)
     (array-get segments2 1) (spline-path-path path))
   (sc-comment "note that the first point leaves a gap")
-  (spline-path-segments-get segments2 2 0 50 out)
+  (spline-path-segments-get segments2 2 0 end-x out)
   (free path.segments)
   (label exit status-return))
 
@@ -113,29 +117,32 @@
     out (array spline-path-value-t 50)
     log-path-0 uint8-t
     path spline-path-t
-    i spline-path-time-t
-    length spline-path-time-t
+    i size-t
+    end-x size-t
+    end-y spline-path-value-t
     segments spline-path-segment-t)
-  (set log-path-0 #f)
+  (set log-path-0 #f end-x 50 end-y 10)
   (sc-comment "control-point")
-  (set p1.x 0 p1.y 0 p2.x 10 p2.y 10 pc (spline-path-i-circular-arc-control-point p1 p2 1.0))
-  (test-helper-assert "control point"
-    (and (= pc.x 2) (f64-nearly-equal 8.535534 pc.y error-margin)))
+  (set p1.x 0 p1.y 0 p2.x end-x p2.y end-y pc (spline-path-i-circular-arc-control-point p1 p2 1.0))
+  (sc-comment
+    (test-helper-assert "control point"
+      (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))))
   (sc-comment "interpolation")
-  (set length 50)
-  (for ((set i 0) (< i length) (set+ i 1)) (set (array-get out i) 999))
-  (set segments (spline-path-circular-arc 1 10 10))
+  (for ((set i 0) (< i end-x) (set+ i 1)) (set (array-get out i) 999))
+  (set segments (spline-path-circular-arc 1 end-x end-y))
   (spline-path-set &path &segments 1)
-  (spline-path-get &path 0 length out)
+  (spline-path-get &path 0 end-x out)
   (spline-path-free path)
   (if log-path-0
-    (for ((set i 0) (< i length) (set+ i 1)) (printf "%lu %f\n" i (array-get out i))))
+    (begin
+      (printf "%f %f\n" pc.x pc.y)
+      (for ((set i 0) (< i end-x) (set+ i 1)) (printf "%lu %f\n" i (array-get out i)))))
+  (goto exit)
   (label exit status-return))
 
 (define (main) int
   status-declare
-  (test-helper-test-one test-spline-path-circular-arc)
-  (goto exit)
   (test-helper-test-one test-spline-path-helpers)
+  (test-helper-test-one test-spline-path-circular-arc)
   (test-helper-test-one test-spline-path)
   (label exit (test-helper-display-summary) (return status.id)))

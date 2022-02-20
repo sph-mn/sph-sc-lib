@@ -16,31 +16,27 @@
  * segments draw to the endpoint inclusive, start point exclusive
  * spline-path-interpolator-points-count */
 #include <inttypes.h>
+#include <float.h>
 #include <strings.h>
 #include <stdlib.h>
 
-#ifndef spline_path_time_t
-#define spline_path_time_t uint32_t
-#endif
+/* spline-path-size-max must be a value that fits in spline-path-value-t and size-t */
+
 #ifndef spline_path_value_t
 #define spline_path_value_t double
 #endif
 #ifndef spline_path_segment_count_t
 #define spline_path_segment_count_t uint16_t
 #endif
-#ifndef spline_path_time_max
-#define spline_path_time_max UINT32_MAX
+#ifndef spline_path_size_max
+#define spline_path_size_max (SIZE_MAX / 2)
 #endif
 #define spline_path_segment_points_count(s) ((spline_path_i_bezier == s.interpolator) ? 3 : ((spline_path_i_circular_arc == s.interpolator) ? 2 : 1))
 typedef struct {
-  spline_path_time_t x;
-  spline_path_value_t y;
-} spline_path_point_t;
-typedef struct {
   spline_path_value_t x;
   spline_path_value_t y;
-} spline_path_point_calc_t;
-typedef void (*spline_path_interpolator_t)(spline_path_time_t, spline_path_time_t, spline_path_point_t, spline_path_point_t*, void*, spline_path_value_t*);
+} spline_path_point_t;
+typedef void (*spline_path_interpolator_t)(size_t, size_t, spline_path_point_t, spline_path_point_t*, void*, spline_path_value_t*);
 typedef struct {
   spline_path_point_t _start;
   uint8_t _points_count;
@@ -54,25 +50,25 @@ typedef struct {
   spline_path_segment_t* segments;
   spline_path_segment_count_t current_segment;
 } spline_path_t;
-void spline_path_i_move(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
-void spline_path_i_constant(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
-void spline_path_i_line(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
-void spline_path_i_bezier(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
-void spline_path_get(spline_path_t* path, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out);
-void spline_path_i_path(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
+void spline_path_i_move(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
+void spline_path_i_constant(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
+void spline_path_i_line(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
+void spline_path_i_bezier(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
+void spline_path_get(spline_path_t* path, size_t start, size_t end, spline_path_value_t* out);
+void spline_path_i_path(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
 spline_path_point_t spline_path_start(spline_path_t path);
 spline_path_point_t spline_path_end(spline_path_t path);
 void spline_path_set(spline_path_t* path, spline_path_segment_t* segments, spline_path_segment_count_t segments_count);
 uint8_t spline_path_set_copy(spline_path_t* path, spline_path_segment_t* segments, spline_path_segment_count_t segments_count);
-uint8_t spline_path_segments_get(spline_path_segment_t* segments, spline_path_segment_count_t segments_count, spline_path_time_t start, spline_path_time_t end, spline_path_value_t* out);
-spline_path_segment_t spline_path_move(spline_path_time_t x, spline_path_value_t y);
-spline_path_segment_t spline_path_line(spline_path_time_t x, spline_path_value_t y);
-spline_path_segment_t spline_path_bezier(spline_path_time_t x1, spline_path_value_t y1, spline_path_time_t x2, spline_path_value_t y2, spline_path_time_t x3, spline_path_value_t y3);
+uint8_t spline_path_segments_get(spline_path_segment_t* segments, spline_path_segment_count_t segments_count, size_t start, size_t end, spline_path_value_t* out);
+spline_path_segment_t spline_path_move(size_t x, spline_path_value_t y);
+spline_path_segment_t spline_path_line(size_t x, spline_path_value_t y);
+spline_path_segment_t spline_path_bezier(size_t x1, spline_path_value_t y1, size_t x2, spline_path_value_t y2, size_t x3, spline_path_value_t y3);
 spline_path_segment_t spline_path_constant();
 spline_path_segment_t spline_path_path(spline_path_t path);
 void spline_path_prepare_segments(spline_path_segment_t* segments, spline_path_segment_count_t segments_count);
-spline_path_time_t spline_path_size(spline_path_t path);
+size_t spline_path_size(spline_path_t path);
 void spline_path_free(spline_path_t path);
-void spline_path_i_circular_arc(spline_path_time_t start, spline_path_time_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
-spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, spline_path_time_t x2, spline_path_value_t y2);
+void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out);
+spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, size_t x2, spline_path_value_t y2);
 spline_path_point_t spline_path_i_circular_arc_control_point(spline_path_point_t p1, spline_path_point_t p2, spline_path_value_t c);

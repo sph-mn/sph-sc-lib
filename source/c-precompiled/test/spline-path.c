@@ -10,8 +10,8 @@ status_t test_spline_path() {
   status_declare;
   spline_path_value_t out[100];
   spline_path_value_t out_new_get[100];
-  spline_path_time_t i;
-  spline_path_time_t length;
+  size_t i;
+  size_t length;
   spline_path_t path;
   spline_path_segment_t segments[4];
   spline_path_segment_count_t segments_count;
@@ -100,10 +100,14 @@ status_t test_spline_path_helpers() {
   status_declare;
   spline_path_value_t out[50];
   spline_path_t path;
-  spline_path_time_t i;
+  size_t end_x;
+  size_t i;
   spline_path_segment_t segments[4];
   spline_path_segment_t segments2[2];
-  for (i = 0; (i < 50); i += 1) {
+  uint8_t log_path_0;
+  end_x = 50;
+  log_path_0 = 0;
+  for (i = 0; (i < end_x); i += 1) {
     out[i] = 999;
   };
   segments[0] = spline_path_move(1, 5);
@@ -111,13 +115,18 @@ status_t test_spline_path_helpers() {
   segments[2] = spline_path_bezier(20, 15, 30, 5, 40, 15);
   segments[3] = spline_path_constant();
   spline_path_set_copy((&path), segments, 4);
-  spline_path_get((&path), 0, 50, out);
+  spline_path_get((&path), 0, end_x, out);
+  if (log_path_0) {
+    for (i = 0; (i < end_x); i += 1) {
+      printf("%lu %f\n", i, (out[i]));
+    };
+  };
   test_helper_assert("helper path 0", (f64_nearly_equal(0, (out[0]), error_margin)));
   test_helper_assert("helper path 49", (f64_nearly_equal(15, (out[49]), error_margin)));
   segments2[0] = spline_path_line(5, 10);
   segments2[1] = spline_path_path(path);
   /* note that the first point leaves a gap */
-  spline_path_segments_get(segments2, 2, 0, 50, out);
+  spline_path_segments_get(segments2, 2, 0, end_x, out);
   free((path.segments));
 exit:
   status_return;
@@ -130,39 +139,43 @@ status_t test_spline_path_circular_arc() {
   spline_path_value_t out[50];
   uint8_t log_path_0;
   spline_path_t path;
-  spline_path_time_t i;
-  spline_path_time_t length;
+  size_t i;
+  size_t end_x;
+  spline_path_value_t end_y;
   spline_path_segment_t segments;
   log_path_0 = 0;
+  end_x = 50;
+  end_y = 10;
   /* control-point */
   p1.x = 0;
   p1.y = 0;
-  p2.x = 10;
-  p2.y = 10;
+  p2.x = end_x;
+  p2.y = end_y;
   pc = spline_path_i_circular_arc_control_point(p1, p2, (1.0));
-  test_helper_assert("control point", ((pc.x == 2) && f64_nearly_equal((8.535534), (pc.y), error_margin)));
+  /* (test-helper-assert control point (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))) */
+
   /* interpolation */
-  length = 50;
-  for (i = 0; (i < length); i += 1) {
+  for (i = 0; (i < end_x); i += 1) {
     out[i] = 999;
   };
-  segments = spline_path_circular_arc(1, 10, 10);
+  segments = spline_path_circular_arc(1, end_x, end_y);
   spline_path_set((&path), (&segments), 1);
-  spline_path_get((&path), 0, length, out);
+  spline_path_get((&path), 0, end_x, out);
   spline_path_free(path);
   if (log_path_0) {
-    for (i = 0; (i < length); i += 1) {
+    printf("%f %f\n", (pc.x), (pc.y));
+    for (i = 0; (i < end_x); i += 1) {
       printf("%lu %f\n", i, (out[i]));
     };
   };
+  goto exit;
 exit:
   status_return;
 }
 int main() {
   status_declare;
-  test_helper_test_one(test_spline_path_circular_arc);
-  goto exit;
   test_helper_test_one(test_spline_path_helpers);
+  test_helper_test_one(test_spline_path_circular_arc);
   test_helper_test_one(test_spline_path);
 exit:
   test_helper_display_summary();

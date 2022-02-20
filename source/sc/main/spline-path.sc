@@ -1,36 +1,32 @@
 (sc-comment "depends on spline-path-h.c")
 (pre-include "math.h")
+(pre-include "stdio.h")
 
 (define (spline-path-i-move start end p-start p-rest data out)
-  (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 1"
   (memset out 0 (* (sizeof spline-path-value-t) (- end start))))
 
 (define (spline-path-i-constant start end p-start p-rest data out)
-  (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 0"
-  (declare i spline-path-time-t)
-  (for ((set i start) (< i end) (set+ i 1)) (set (array-get out (- i start)) p-start.y)))
+  (for ((define i size-t start) (< i end) (set+ i 1)) (set (array-get out (- i start)) p-start.y)))
 
 (define (spline-path-i-line start end p-start p-rest data out)
-  (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 1"
-  (declare
-    i spline-path-time-t
-    p-end spline-path-point-t
-    s-size spline-path-value-t
-    t spline-path-value-t)
-  (set p-end (array-get p-rest 0) s-size (- p-end.x p-start.x))
+  (declare i size-t p-end spline-path-point-t t spline-path-value-t p-start-x size-t)
+  (set p-start-x p-start.x p-end (array-get p-rest 0))
   (for ((set i start) (< i end) (set+ i 1))
     (set
-      t (/ (- i p-start.x) s-size)
+      t (/ (- i p-start-x) (- p-end.x p-start.x))
       (array-get out (- i start)) (+ (* p-end.y t) (* p-start.y (- 1 t))))))
 
 (define (spline-path-i-bezier start end p-start p-rest data out)
-  (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 3. this implementation ignores control point x values"
   (declare
-    i spline-path-time-t
+    i size-t
     mt spline-path-value-t
     p-end spline-path-point-t
     s-size spline-path-value-t
@@ -44,39 +40,35 @@
       (+ (* p-start.y mt mt mt) (* (struct-get (array-get p-rest 0) y) 3 mt mt t)
         (* (struct-get (array-get p-rest 1) y) 3 mt t t) (* p-end.y t t t)))))
 
-(define (complex-difference p1 p2)
-  (spline-path-point-calc-t spline-path-point-calc-t spline-path-point-calc-t)
-  (declare result spline-path-point-calc-t)
+(define (complex-difference p1 p2) (spline-path-point-t spline-path-point-t spline-path-point-t)
+  (declare result spline-path-point-t)
   (set result.x (- p1.x p2.x) result.y (- p1.y p2.y))
   (return result))
 
 (define (complex-multiplication p1 p2)
-  (spline-path-point-t spline-path-point-calc-t spline-path-point-calc-t)
-  (declare result spline-path-point-calc-t)
-  (set result.x (- (* p1.x p2.x) (* p1.y p2.y)) result.y (- (* p1.x p2.y) (* p1.y p2.x)))
+  (spline-path-point-t spline-path-point-t spline-path-point-t)
+  (declare result spline-path-point-t)
+  (set result.x (- (* p1.x p2.x) (* p1.y p2.y)) result.y (+ (* p1.x p2.y) (* p1.y p2.x)))
   (return result))
 
-(define (complex-inversion p) (spline-path-point-calc-t spline-path-point-calc-t)
-  (declare scale spline-path-value-t result spline-path-point-calc-t)
+(define (complex-inversion p) (spline-path-point-t spline-path-point-t)
+  (declare scale spline-path-value-t result spline-path-point-t)
   (set scale (/ 1 (+ (* p.x p.x) (* p.y p.y))) result.x (* scale p.x) result.y (* (- scale) p.y))
   (return result))
 
-(define (complex-division p1 p2)
-  (spline-path-point-calc-t spline-path-point-calc-t spline-path-point-calc-t)
+(define (complex-division p1 p2) (spline-path-point-t spline-path-point-t spline-path-point-t)
   (return (complex-multiplication p1 (complex-inversion p2))))
 
 (define (complex-linear-interpolation p1 p2 t)
-  (spline-path-point-calc-t spline-path-point-calc-t spline-path-point-calc-t spline-path-value-t)
-  (declare result spline-path-point-calc-t)
+  (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
+  (declare result spline-path-point-t)
   (set result.x (+ (* p1.x (- 1 t)) (* p2.x t)) result.y (+ (* p1.y (- 1 t)) (* p2.y t)))
-  (printf "%lu %f %f\n" result.x (* p2.x t) t)
   (return result))
 
-(pre-include "stdio.h")
-
 (define (spline-path-i-circular-arc-control-point p1 p2 c)
-  (spline-path-point-calc-t spline-path-point-calc-t spline-path-point-calc-t spline-path-value-t)
-  "return a point on a perpendicular line across the midpoint"
+  (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
+  "return a point on a perpendicular line across the midpoint.
+   calculates the midpoint, the negative reciprocal slope and a unit vector"
   (declare
     dx spline-path-value-t
     dy spline-path-value-t
@@ -96,48 +88,42 @@
     ux (/ (- dy) d)
     uy (/ dx d)
     scale (* c (- p2.y my))
-    result.x (ceil (+ mx (* ux scale)))
+    result.x (+ mx (* ux scale))
     result.y (+ my (* uy scale)))
   (return result))
 
 (declare spline-path-i-circular-arc-data-t
   (type
     (struct
-      (m-a spline-path-point-calc-t)
-      (b-m spline-path-point-calc-t)
-      (ab-m spline-path-point-calc-t)
-      (bm-a spline-path-point-calc-t)
+      (m-a spline-path-point-t)
+      (b-m spline-path-point-t)
+      (ab-m spline-path-point-t)
+      (bm-a spline-path-point-t)
       (s-size spline-path-value-t))))
 
 (define (spline-path-i-circular-arc start end p-start p-rest data out)
-  (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 2. circular arc interpolation formula from jacob rus,
    https://observablehq.com/@jrus/circle-arc-interpolation"
-  (declare t spline-path-value-t d spline-path-i-circular-arc-data-t p spline-path-point-calc-t)
+  (declare t spline-path-value-t d spline-path-i-circular-arc-data-t p spline-path-point-t)
   (set d (pointer-get (convert-type data spline-path-i-circular-arc-data-t*)))
   (if (not d.s-size)
     (begin
       (declare
         dp spline-path-i-circular-arc-data-t*
-        curvature spline-path-value-t
-        m spline-path-point-calc-t
-        p-start-calc spline-path-point-calc-t
-        p-end spline-path-point-calc-t)
+        m spline-path-point-t
+        p-end spline-path-point-t)
       (set
-        curvature p-rest:y
-        p-start-calc.x p-start.x
-        p-start-calc.y p-start.y
-        p-end-calc.x (: (array-get p-rest 1) x)
-        p-end-calc.y (: (array-get p-rest 1) y)
+        p-end (array-get p-rest 1)
         dp data
-        m (spline-path-i-circular-arc-control-point p-start-calc p-end-calc curvature)
-        dp:b-m (complex-difference p-end-calc m)
+        m (spline-path-i-circular-arc-control-point p-start p-end p-rest:y)
+        dp:b-m (complex-difference p-end m)
         dp:m-a (complex-difference m p-start)
         dp:ab-m (complex-multiplication p-start dp:b-m)
-        dp:bm-a (complex-multiplication p-end-calc dp:m-a)
-        dp:s-size (- p-end-calc.x p-start-calc.x)
+        dp:bm-a (complex-multiplication p-end dp:m-a)
+        dp:s-size (- p-end.x p-start.x)
         d *dp)))
-  (for ((define i spline-path-time-t start) (< i end) (set+ i 1))
+  (for ((define i size-t start) (< i end) (set+ i 1))
     (set
       t (/ (- i p-start.x) d.s-size)
       p
@@ -146,7 +132,7 @@
       (array-get out (- i start)) p.y)))
 
 (define (spline-path-get path start end out)
-  (void spline-path-t* spline-path-time-t spline-path-time-t spline-path-value-t*)
+  (void spline-path-t* size-t size-t spline-path-value-t*)
   "get values on path between start (inclusive) and end (exclusive).
    since x values are integers, a path from (0 0) to (10 20) for example would have reached 20 only at the 11th point.
    out memory is managed by the caller. the size required for out is end minus start"
@@ -154,9 +140,9 @@
   (declare
     i spline-path-segment-count-t
     s spline-path-segment-t
-    s-start spline-path-time-t
-    s-end spline-path-time-t
-    out-start spline-path-time-t
+    s-start size-t
+    s-end size-t
+    out-start size-t
     segments-count spline-path-segment-count-t
     second-search uint8-t)
   (set segments-count path:segments-count i path:current-segment second-search #f)
@@ -187,7 +173,7 @@
       (if (> end s-end) (memset (+ s-end out) 0 (* (- end s-end) (sizeof spline-path-value-t)))))))
 
 (define (spline-path-i-path start end p-start p-rest data out)
-  (void spline-path-time-t spline-path-time-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 0. data is one spline-path-t"
   (spline-path-get data (- start p-start.x) (- end p-start.x) out))
 
@@ -205,7 +191,7 @@
     (set s (array-get path.segments (- path.segments-count 2))))
   (return (array-get s.points (- s._points-count 1))))
 
-(define (spline-path-size path) (spline-path-time-t spline-path-t)
+(define (spline-path-size path) (size-t spline-path-t)
   (declare p spline-path-point-t)
   (set p (spline-path-end path))
   (return p.x))
@@ -225,7 +211,7 @@
         (set
           start (spline-path-end (pointer-get (convert-type s.data spline-path-t*)))
           *s.points start))
-      (spline-path-i-constant (set *s.points start s.points:x spline-path-time-max))
+      (spline-path-i-constant (set *s.points start s.points:x spline-path-size-max))
       (else (set start (array-get s.points (- s._points-count 1)))))
     (set (array-get segments i) s)))
 
@@ -246,26 +232,26 @@
   (return 0))
 
 (define (spline-path-segments-get segments segments-count start end out)
-  (uint8-t spline-path-segment-t* spline-path-segment-count-t spline-path-time-t spline-path-time-t spline-path-value-t*)
+  (uint8-t spline-path-segment-t* spline-path-segment-count-t size-t size-t spline-path-value-t*)
   "create a path array immediately from segments without creating a path object"
   (declare path spline-path-t)
   (spline-path-set &path segments segments-count)
   (spline-path-get &path start end out)
   (return 0))
 
-(define (spline-path-move x y) (spline-path-segment-t spline-path-time-t spline-path-value-t)
+(define (spline-path-move x y) (spline-path-segment-t size-t spline-path-value-t)
   "returns a move segment to move to the specified point"
   (declare s spline-path-segment-t)
   (set s.interpolator spline-path-i-move s.points:x x s.points:y y s.free 0)
   (return s))
 
-(define (spline-path-line x y) (spline-path-segment-t spline-path-time-t spline-path-value-t)
+(define (spline-path-line x y) (spline-path-segment-t size-t spline-path-value-t)
   (declare s spline-path-segment-t)
   (set s.interpolator spline-path-i-line s.points:x x s.points:y y s.free 0)
   (return s))
 
 (define (spline-path-circular-arc curvature x2 y2)
-  (spline-path-segment-t spline-path-value-t spline-path-time-t spline-path-value-t)
+  (spline-path-segment-t spline-path-value-t size-t spline-path-value-t)
   "curvature is a real between -1..1, with the maximum being the edge of the segment"
   (declare s spline-path-segment-t d spline-path-i-circular-arc-data-t*)
   (set d (malloc (sizeof spline-path-i-circular-arc-data-t)))
@@ -282,7 +268,7 @@
   (return s))
 
 (define (spline-path-bezier x1 y1 x2 y2 x3 y3)
-  (spline-path-segment-t spline-path-time-t spline-path-value-t spline-path-time-t spline-path-value-t spline-path-time-t spline-path-value-t)
+  (spline-path-segment-t size-t spline-path-value-t size-t spline-path-value-t size-t spline-path-value-t)
   "the first two points are the control points"
   (declare s spline-path-segment-t)
   (set
