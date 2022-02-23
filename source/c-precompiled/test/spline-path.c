@@ -19,9 +19,9 @@ status_t test_spline_path() {
   uint8_t log_path_new_1;
   uint8_t log_path_new_get_0;
   uint8_t log_path_new_get_1;
-  log_path_new_0 = 0;
+  log_path_new_0 = 1;
   log_path_new_1 = 0;
-  log_path_new_get_0 = 0;
+  log_path_new_get_0 = 1;
   log_path_new_get_1 = 0;
   length = 50;
   for (i = 0; (i < length); i += 1) {
@@ -146,15 +146,12 @@ status_t test_spline_path_circular_arc() {
   log_path_0 = 0;
   end_x = 50;
   end_y = 10;
-  /* control-point */
   p1.x = 0;
   p1.y = 0;
   p2.x = end_x;
   p2.y = end_y;
   pc = spline_path_i_circular_arc_control_point(p1, p2, (1.0));
   /* (test-helper-assert control point (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))) */
-
-  /* interpolation */
   for (i = 0; (i < end_x); i += 1) {
     out[i] = 999;
   };

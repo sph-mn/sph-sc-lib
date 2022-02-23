@@ -1,6 +1,6 @@
 (sc-comment
   "* spline-path creates discrete 2d paths interpolated between some given points
-   * maps from one independent discrete value to one dependent continuous value
+   * maps from one independent value to one dependent continuous value
    * only the dependent value is returned
    * kept minimal (only 2d, only selected interpolators, limited segment count) to be extremely fast
    * multidimensional interpolation can be archieved with multiple configs and calls
@@ -12,7 +12,6 @@
    * all segment types require a fixed number of given points. line: 1, bezier: 3, move: 1, constant: 0, path: 0
    * negative x values not supported
    * internally all segments start at (0 0) and no gaps are between segments
-   * assumes that bit 0 is spline-path-value-t zero
    * segments draw to the endpoint inclusive, start point exclusive
    * spline-path-interpolator-points-count")
 

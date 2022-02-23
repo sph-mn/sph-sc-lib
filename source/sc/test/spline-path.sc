@@ -17,7 +17,7 @@
     log-path-new-1 uint8-t
     log-path-new-get-0 uint8-t
     log-path-new-get-1 uint8-t)
-  (set log-path-new-0 #f log-path-new-1 #f log-path-new-get-0 #f log-path-new-get-1 #f length 50)
+  (set log-path-new-0 #t log-path-new-1 #f log-path-new-get-0 #t log-path-new-get-1 #f length 50)
   (for ((set i 0) (< i length) (set+ i 1))
     (set (array-get out i) 999 (array-get out-new-get i) 999))
   (sc-comment "path 2 - a special case that lead to errors before")
@@ -122,12 +122,10 @@
     end-y spline-path-value-t
     segments spline-path-segment-t)
   (set log-path-0 #f end-x 50 end-y 10)
-  (sc-comment "control-point")
   (set p1.x 0 p1.y 0 p2.x end-x p2.y end-y pc (spline-path-i-circular-arc-control-point p1 p2 1.0))
   (sc-comment
     (test-helper-assert "control point"
       (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))))
-  (sc-comment "interpolation")
   (for ((set i 0) (< i end-x) (set+ i 1)) (set (array-get out i) 999))
   (set segments (spline-path-circular-arc 1 end-x end-y))
   (spline-path-set &path &segments 1)

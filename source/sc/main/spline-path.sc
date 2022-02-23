@@ -2,6 +2,30 @@
 (pre-include "math.h")
 (pre-include "stdio.h")
 
+(pre-define
+  (spline-path-min a b) (if* (< a b) a b)
+  (spline-path-abs a) (if* (> 0 a) (* -1 a) a)
+  (spline-path-cheap-round-positive a) (convert-type (+ 0.5 a) size-t))
+
+(define (spline-path-set-out-x-interpolated out i start end p)
+  ((static inline void) spline-path-value-t* size-t size-t size-t spline-path-point-t)
+  "x values from some interpolation methods dont match i and are
+   interpolated or extrapolated to match integer i - rounding alone would skip some i"
+  (declare x size-t t spline-path-value-t)
+  (set x (spline-path-cheap-round-positive p.x) x (spline-path-min (- end start 1) (- x start)))
+  (if (or (= x i) (= 0 i)) (set (array-get out i) p.y)
+    (if (= 0.0 (array-get out i))
+      (begin
+        (set (array-get out x) p.y)
+        (if (> x i)
+          (set
+            t (/ 0.5 (convert-type (- x i) spline-path-value-t))
+            (array-get out i) (+ (array-get out (- i 1)) (* t (- p.y (array-get out (- i 1))))))
+          (if (> i 1)
+            (set (array-get out i)
+              (+ p.y (* (- i x) (- (array-get out (- i 1)) (array-get out (- i 2))))))
+            (set (array-get out i) p.y)))))))
+
 (define (spline-path-i-move start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 1"
@@ -22,6 +46,9 @@
       t (/ (- i p-start-x) (- p-end.x p-start.x))
       (array-get out (- i start)) (+ (* p-end.y t) (* p-start.y (- 1 t))))))
 
+(pre-define (spline-path-i-bezier-interpolate mt t a b c d)
+  (+ (* a mt mt mt) (* b 3 mt mt t) (* c 3 mt t t) (* d t t t)))
+
 (define (spline-path-i-bezier start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   "p-rest length 3. this implementation ignores control point x values"
@@ -29,16 +56,20 @@
     i size-t
     mt spline-path-value-t
     p-end spline-path-point-t
-    s-size spline-path-value-t
-    t spline-path-value-t)
-  (set p-end (array-get p-rest 2) s-size (- p-end.x p-start.x))
+    t spline-path-value-t
+    p spline-path-point-t)
+  (set p-end (array-get p-rest 2))
   (for ((set i start) (< i end) (set+ i 1))
     (set
-      t (/ (- i p-start.x) s-size)
+      t (/ (- i p-start.x) (- p-end.x p-start.x))
       mt (- 1 t)
-      (array-get out (- i start))
-      (+ (* p-start.y mt mt mt) (* (struct-get (array-get p-rest 0) y) 3 mt mt t)
-        (* (struct-get (array-get p-rest 1) y) 3 mt t t) (* p-end.y t t t)))))
+      p.x
+      (spline-path-i-bezier-interpolate mt t
+        p-start.x (struct-get (array-get p-rest 0) x) (struct-get (array-get p-rest 1) x) p-end.x)
+      p.y
+      (spline-path-i-bezier-interpolate mt t
+        p-start.y (struct-get (array-get p-rest 0) y) (struct-get (array-get p-rest 1) y) p-end.y))
+    (spline-path-set-out-x-interpolated out (- i start) start end p)))
 
 (define (complex-difference p1 p2) (spline-path-point-t spline-path-point-t spline-path-point-t)
   (declare result spline-path-point-t)
@@ -87,7 +118,7 @@
     d (sqrt (+ (* dx dx) (* dy dy)))
     ux (/ (- dy) d)
     uy (/ dx d)
-    scale (* c (- p2.y my))
+    scale (* c (/ (spline-path-min (spline-path-abs dx) (spline-path-abs dy)) 4.0))
     result.x (+ mx (* ux scale))
     result.y (+ my (* uy scale)))
   (return result))
@@ -123,13 +154,13 @@
         dp:bm-a (complex-multiplication p-end dp:m-a)
         dp:s-size (- p-end.x p-start.x)
         d *dp)))
-  (for ((define i size-t start) (< i end) (set+ i 1))
+  (for ((define i size-t 0) (< i (- end start)) (set+ i 1))
     (set
-      t (/ (- i p-start.x) d.s-size)
+      t (/ (- (+ i start) p-start.x) d.s-size)
       p
       (complex-division (complex-linear-interpolation d.ab-m d.bm-a t)
-        (complex-linear-interpolation d.b-m d.m-a t))
-      (array-get out (- i start)) p.y)))
+        (complex-linear-interpolation d.b-m d.m-a t)))
+    (spline-path-set-out-x-interpolated out i start end p)))
 
 (define (spline-path-get path start end out)
   (void spline-path-t* size-t size-t spline-path-value-t*)
