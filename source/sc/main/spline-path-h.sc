@@ -13,7 +13,8 @@
    * all segment types require a fixed number of given points. line: 1, bezier: 3, move: 1, constant: 0, path: 0
    * segments start at the previous point or (0 0)
    * bezier and circular-arc interpolation assume that output array values are set to zero before use
-   * segments draw from the start point inclusive to end point exclusive")
+   * segments draw from the start point inclusive to end point exclusive
+   * both dimensions are float types for precision with internal calculations")
 
 (pre-include "inttypes.h" "float.h" "strings.h" "stdlib.h")
 (sc-comment "spline-path-size-max must be a value that fits in spline-path-value-t and size-t")

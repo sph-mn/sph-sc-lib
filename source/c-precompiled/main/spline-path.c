@@ -1,7 +1,6 @@
 
 /* depends on spline-path-h.c */
 #include <math.h>
-#include <stdio.h>
 
 #define spline_path_min(a, b) ((a < b) ? a : b)
 #define spline_path_max(a, b) ((a > b) ? a : b)
@@ -12,8 +11,9 @@
 #define lerp(a, b, t) (a + (t * (b - a)))
 #define convert_point_x(x, x_min, x_max) ((size_t)(spline_path_cheap_round_positive((spline_path_limit(x, x_min, x_max)))))
 
-/** add a missing last point and a missing intermediate points by interpolating between neighboring points.
-   for interpolation methods that return float values for x that dont map directly to the currently interpolated index.
+/** add missing intermediate points by interpolating between neighboring points.
+   for interpolation methods that return float values for x that dont map directly to the currently interpolated index
+   and may therefore leave gaps.
    assumes unset output values are 0 */
 void spline_path_set_missing_points(spline_path_value_t* out, size_t start, size_t end) {
   size_t i2;
@@ -91,7 +91,7 @@ void spline_path_i_line(size_t start, size_t end, spline_path_point_t p_start, s
   };
 }
 
-/** p-rest length 3. this implementation ignores control point x values */
+/** p-rest length 3 */
 void spline_path_i_bezier(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
   size_t b_size;
   size_t i;
@@ -166,7 +166,7 @@ void spline_path_get(spline_path_t* path, size_t start, size_t end, spline_path_
   /* outside points are zero */
   if (end > s_end) {
     out_start = ((start > s_end) ? 0 : (s_end - start));
-    /* (memset (+ out out-start) 0 (* (- end out-start) (sizeof spline-path-value-t))) */
+    memset((out + out_start), 0, ((end - out_start) * sizeof(spline_path_value_t)));
   };
 }
 

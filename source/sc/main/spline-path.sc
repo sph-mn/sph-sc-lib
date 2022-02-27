@@ -1,6 +1,5 @@
 (sc-comment "depends on spline-path-h.c")
 (pre-include "math.h")
-(pre-include "stdio.h")
 
 (pre-define
   (spline-path-min a b) (if* (< a b) a b)
@@ -15,8 +14,9 @@
   (convert-type (spline-path-cheap-round-positive (spline-path-limit x x-min x-max)) size-t))
 
 (define (spline-path-set-missing-points out start end) (void spline-path-value-t* size-t size-t)
-  "add a missing last point and a missing intermediate points by interpolating between neighboring points.
-   for interpolation methods that return float values for x that dont map directly to the currently interpolated index.
+  "add missing intermediate points by interpolating between neighboring points.
+   for interpolation methods that return float values for x that dont map directly to the currently interpolated index
+   and may therefore leave gaps.
    assumes unset output values are 0"
   (declare i2 size-t b-size size-t)
   (set b-size (- end start))
@@ -87,7 +87,7 @@
 
 (define (spline-path-i-bezier start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
-  "p-rest length 3. this implementation ignores control point x values"
+  "p-rest length 3"
   (declare
     b-size size-t
     i size-t
@@ -156,7 +156,7 @@
   (if (> end s-end)
     (begin
       (set out-start (if* (> start s-end) 0 (- s-end start)))
-      (sc-comment (memset (+ out out-start) 0 (* (- end out-start) (sizeof spline-path-value-t)))))))
+      (memset (+ out out-start) 0 (* (- end out-start) (sizeof spline-path-value-t))))))
 
 (define (spline-path-i-path start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
