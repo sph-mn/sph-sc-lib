@@ -1,13 +1,16 @@
 (pre-include "inttypes.h" "string.h"
   "../main/spline-path.h" "../main/spline-path.c" "../main/float.c" "./test.c")
 
-(define error-margin double 0.1)
+(pre-define error-margin 0.1)
+
+(define (reset-output out length) (void spline-path-value-t* size-t)
+  (for ((define i size-t 0) (< i length) (set+ i 1)) (set (array-get out i) 0)))
 
 (define (test-spline-path) status-t
   status-declare
   (declare
-    out (array spline-path-value-t 100)
-    out-new-get (array spline-path-value-t 100)
+    out (array spline-path-value-t 50)
+    out-new-get (array spline-path-value-t 50)
     i size-t
     length size-t
     path spline-path-t
@@ -17,25 +20,18 @@
     log-path-new-1 uint8-t
     log-path-new-get-0 uint8-t
     log-path-new-get-1 uint8-t)
-  (set log-path-new-0 #t log-path-new-1 #f log-path-new-get-0 #t log-path-new-get-1 #f length 50)
-  (for ((set i 0) (< i length) (set+ i 1))
-    (set (array-get out i) 999 (array-get out-new-get i) 999))
-  (sc-comment "path 2 - a special case that lead to errors before")
-  (set
-    (array-get segments 0) (spline-path-move 0 6)
-    (array-get segments 1) (spline-path-line 24 18)
-    (array-get segments 2) (spline-path-line 96 24)
-    (array-get segments 3) (spline-path-constant)
-    segments-count 4)
-  (status-i-require (spline-path-segments-get segments segments-count 0 100 out-new-get))
+  (set log-path-new-0 #f log-path-new-1 #f log-path-new-get-0 #f log-path-new-get-1 #f length 50)
   (sc-comment "path 0 - will be written to output starting at offset 5")
+  (reset-output out length)
+  (reset-output out-new-get length)
   (set
     (array-get segments 0) (spline-path-move 10 5)
     (array-get segments 1) (spline-path-line 20 10)
     (array-get segments 2) (spline-path-bezier 25 15 30 20 40 25)
-    (array-get segments 4) (spline-path-constant)
+    (array-get segments 3) (spline-path-constant)
     segments-count 4)
   (status-i-require (spline-path-set-copy &path segments segments-count))
+  (sc-comment "get value starting from x 5")
   (spline-path-get &path 5 25 out)
   (spline-path-get &path 25 (+ 5 length) (+ 20 out))
   (if log-path-new-0
@@ -56,16 +52,17 @@
   (test-helper-assert "path 0 new-get equal"
     (not (memcmp out out-new-get (* (sizeof spline-path-value-t) length))))
   (sc-comment "path 1 - path that ends at 10")
-  (for ((set i 0) (< i length) (set+ i 1))
-    (sc-comment "reset output arrays")
-    (set (array-get out i) 999 (array-get out-new-get i) 999))
+  (reset-output out length)
+  (reset-output out-new-get length)
   (set (array-get segments 0) (spline-path-line 10 5) segments-count 1)
   (status-i-require (spline-path-set-copy &path segments segments-count))
   (spline-path-get &path 0 12 out)
   (if log-path-new-1
     (for ((set i 0) (< i 12) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out i))))
-  (test-helper-assert "path 1.10 - should reach maximum at 10"
-    (f64-nearly-equal 5 (array-get out 10) error-margin))
+  (test-helper-assert "path 1.9 - should reach maximum at 9"
+    (f64-nearly-equal 4.5 (array-get out 9) error-margin))
+  (test-helper-assert "path 1.10 - should not set the next start point"
+    (f64-nearly-equal 0 (array-get out 10) error-margin))
   (test-helper-assert "path 1.11 - should be zero after segments"
     (f64-nearly-equal 0 (array-get out 11) error-margin))
   (free path.segments)
@@ -89,7 +86,7 @@
     segments2 (array spline-path-segment-t 2)
     log-path-0 uint8-t)
   (set end-x 50 log-path-0 #f)
-  (for ((set i 0) (< i end-x) (set+ i 1)) (set (array-get out i) 999))
+  (reset-output out end-x)
   (set
     (array-get segments 0) (spline-path-move 1 5)
     (array-get segments 1) (spline-path-line 10 10)
@@ -122,11 +119,11 @@
     end-y spline-path-value-t
     segments spline-path-segment-t)
   (set log-path-0 #f end-x 50 end-y 10)
-  (set p1.x 0 p1.y 0 p2.x end-x p2.y end-y pc (spline-path-i-circular-arc-control-point p1 p2 1.0))
+  (set p1.x 0 p1.y 0 p2.x end-x p2.y end-y pc (spline-path-perpendicular-point p1 p2 1.0))
   (sc-comment
-    (test-helper-assert "control point"
+    (test-helper-assert "perpendicular point"
       (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))))
-  (for ((set i 0) (< i end-x) (set+ i 1)) (set (array-get out i) 999))
+  (reset-output out end-x)
   (set segments (spline-path-circular-arc 1 end-x end-y))
   (spline-path-set &path &segments 1)
   (spline-path-get &path 0 end-x out)
@@ -140,7 +137,7 @@
 
 (define (main) int
   status-declare
+  (test-helper-test-one test-spline-path)
   (test-helper-test-one test-spline-path-helpers)
   (test-helper-test-one test-spline-path-circular-arc)
-  (test-helper-test-one test-spline-path)
   (label exit (test-helper-display-summary) (return status.id)))

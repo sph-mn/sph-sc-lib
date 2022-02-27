@@ -5,11 +5,16 @@
 #include "../main/spline-path.c"
 #include "../main/float.c"
 #include "./test.c"
-double error_margin = 0.1;
+#define error_margin 0.1
+void reset_output(spline_path_value_t* out, size_t length) {
+  for (size_t i = 0; (i < length); i += 1) {
+    out[i] = 0;
+  };
+}
 status_t test_spline_path() {
   status_declare;
-  spline_path_value_t out[100];
-  spline_path_value_t out_new_get[100];
+  spline_path_value_t out[50];
+  spline_path_value_t out_new_get[50];
   size_t i;
   size_t length;
   spline_path_t path;
@@ -19,29 +24,21 @@ status_t test_spline_path() {
   uint8_t log_path_new_1;
   uint8_t log_path_new_get_0;
   uint8_t log_path_new_get_1;
-  log_path_new_0 = 1;
+  log_path_new_0 = 0;
   log_path_new_1 = 0;
-  log_path_new_get_0 = 1;
+  log_path_new_get_0 = 0;
   log_path_new_get_1 = 0;
   length = 50;
-  for (i = 0; (i < length); i += 1) {
-    out[i] = 999;
-    out_new_get[i] = 999;
-  };
-  /* path 2 - a special case that lead to errors before */
-  segments[0] = spline_path_move(0, 6);
-  segments[1] = spline_path_line(24, 18);
-  segments[2] = spline_path_line(96, 24);
-  segments[3] = spline_path_constant();
-  segments_count = 4;
-  status_i_require((spline_path_segments_get(segments, segments_count, 0, 100, out_new_get)));
   /* path 0 - will be written to output starting at offset 5 */
+  reset_output(out, length);
+  reset_output(out_new_get, length);
   segments[0] = spline_path_move(10, 5);
   segments[1] = spline_path_line(20, 10);
   segments[2] = spline_path_bezier(25, 15, 30, 20, 40, 25);
-  segments[4] = spline_path_constant();
+  segments[3] = spline_path_constant();
   segments_count = 4;
   status_i_require((spline_path_set_copy((&path), segments, segments_count)));
+  /* get value starting from x 5 */
   spline_path_get((&path), 5, 25, out);
   spline_path_get((&path), 25, (5 + length), (20 + out));
   if (log_path_new_0) {
@@ -67,11 +64,8 @@ status_t test_spline_path() {
   };
   test_helper_assert("path 0 new-get equal", (!memcmp(out, out_new_get, (sizeof(spline_path_value_t) * length))));
   /* path 1 - path that ends at 10 */
-  for (i = 0; (i < length); i += 1) {
-    /* reset output arrays */
-    out[i] = 999;
-    out_new_get[i] = 999;
-  };
+  reset_output(out, length);
+  reset_output(out_new_get, length);
   segments[0] = spline_path_line(10, 5);
   segments_count = 1;
   status_i_require((spline_path_set_copy((&path), segments, segments_count)));
@@ -81,7 +75,8 @@ status_t test_spline_path() {
       printf("%lu %f\n", i, (out[i]));
     };
   };
-  test_helper_assert(("path 1.10 - should reach maximum at 10"), (f64_nearly_equal(5, (out[10]), error_margin)));
+  test_helper_assert(("path 1.9 - should reach maximum at 9"), (f64_nearly_equal((4.5), (out[9]), error_margin)));
+  test_helper_assert(("path 1.10 - should not set the next start point"), (f64_nearly_equal(0, (out[10]), error_margin)));
   test_helper_assert(("path 1.11 - should be zero after segments"), (f64_nearly_equal(0, (out[11]), error_margin)));
   free((path.segments));
   /* path 1 new-get */
@@ -107,9 +102,7 @@ status_t test_spline_path_helpers() {
   uint8_t log_path_0;
   end_x = 50;
   log_path_0 = 0;
-  for (i = 0; (i < end_x); i += 1) {
-    out[i] = 999;
-  };
+  reset_output(out, end_x);
   segments[0] = spline_path_move(1, 5);
   segments[1] = spline_path_line(10, 10);
   segments[2] = spline_path_bezier(20, 15, 30, 5, 40, 15);
@@ -150,11 +143,9 @@ status_t test_spline_path_circular_arc() {
   p1.y = 0;
   p2.x = end_x;
   p2.y = end_y;
-  pc = spline_path_i_circular_arc_control_point(p1, p2, (1.0));
-  /* (test-helper-assert control point (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))) */
-  for (i = 0; (i < end_x); i += 1) {
-    out[i] = 999;
-  };
+  pc = spline_path_perpendicular_point(p1, p2, (1.0));
+  /* (test-helper-assert perpendicular point (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))) */
+  reset_output(out, end_x);
   segments = spline_path_circular_arc(1, end_x, end_y);
   spline_path_set((&path), (&segments), 1);
   spline_path_get((&path), 0, end_x, out);
@@ -171,9 +162,9 @@ exit:
 }
 int main() {
   status_declare;
+  test_helper_test_one(test_spline_path);
   test_helper_test_one(test_spline_path_helpers);
   test_helper_test_one(test_spline_path_circular_arc);
-  test_helper_test_one(test_spline_path);
 exit:
   test_helper_display_summary();
   return ((status.id));

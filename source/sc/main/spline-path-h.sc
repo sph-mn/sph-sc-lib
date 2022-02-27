@@ -3,21 +3,20 @@
    * maps from one independent value to one dependent continuous value
    * only the dependent value is returned
    * kept minimal (only 2d, only selected interpolators, limited segment count) to be extremely fast
-   * multidimensional interpolation can be archieved with multiple configs and calls
+   * negative independent values are not supported
+   * segments-count must be greater than zero
+   * multidimensional interpolation could only be archieved with multiple configs and calls
    * a copy of segments is made internally and only the copy is used
    * uses points as structs because pre-defined size arrays can not be used in structs
-   * segments-count must be greater than zero
    * segments must be a valid spline-path segment configuration
-   * interpolators are called with path-relative start/end inside segment and with out positioned at the segment output
+   * interpolators are called with path-relative start/end inside segment and with out positioned at offset for this start/end block
    * all segment types require a fixed number of given points. line: 1, bezier: 3, move: 1, constant: 0, path: 0
-   * negative x values not supported
-   * internally all segments start at (0 0) and no gaps are between segments
-   * segments draw to the endpoint inclusive, start point exclusive
-   * spline-path-interpolator-points-count")
+   * segments start at the previous point or (0 0)
+   * bezier and circular-arc interpolation assume that output array values are set to zero before use
+   * segments draw from the start point inclusive to end point exclusive")
 
 (pre-include "inttypes.h" "float.h" "strings.h" "stdlib.h")
-
-(sc-comment "spline-path-size-max must be a value that fits in spline-path-value-t and size-t" )
+(sc-comment "spline-path-size-max must be a value that fits in spline-path-value-t and size-t")
 
 (pre-define-if-not-defined
   spline-path-value-t double
@@ -25,10 +24,7 @@
   spline-path-size-max (/ SIZE_MAX 2))
 
 (pre-define (spline-path-segment-points-count s)
-  (case* = s.interpolator
-    (spline-path-i-bezier 3)
-    (spline-path-i-circular-arc 2)
-    (else 1)))
+  (case* = s.interpolator (spline-path-i-bezier 3) (spline-path-i-circular-arc 2) (else 1)))
 
 (declare
   spline-path-point-t (type (struct (x spline-path-value-t) (y spline-path-value-t)))
@@ -70,11 +66,11 @@
   (uint8-t spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
   (spline-path-segments-get segments segments-count start end out)
   (uint8-t spline-path-segment-t* spline-path-segment-count-t size-t size-t spline-path-value-t*)
-  (spline-path-move x y) (spline-path-segment-t size-t spline-path-value-t)
-  (spline-path-line x y) (spline-path-segment-t size-t spline-path-value-t)
+  (spline-path-move x y) (spline-path-segment-t spline-path-value-t spline-path-value-t)
+  (spline-path-line x y) (spline-path-segment-t spline-path-value-t spline-path-value-t)
   (spline-path-bezier x1 y1 x2 y2 x3 y3)
-  (spline-path-segment-t size-t spline-path-value-t
-    size-t spline-path-value-t size-t spline-path-value-t)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t
+    spline-path-value-t spline-path-value-t spline-path-value-t spline-path-value-t)
   (spline-path-constant) (spline-path-segment-t)
   (spline-path-path path) (spline-path-segment-t spline-path-t)
   (spline-path-prepare-segments segments segments-count)
@@ -84,6 +80,6 @@
   (spline-path-i-circular-arc start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
   (spline-path-circular-arc curvature x2 y2)
-  (spline-path-segment-t spline-path-value-t size-t spline-path-value-t)
-  (spline-path-i-circular-arc-control-point p1 p2 c)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
+  (spline-path-perpendicular-point p1 p2 distance-factor)
   (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t))
