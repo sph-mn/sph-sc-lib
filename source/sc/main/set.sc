@@ -6,10 +6,10 @@
      * except the null value, values are in .values starting from index 1
      * notnull is used at index 0 to check if the empty-value is included
    * sph-set-declare-type-nonull does not allow the null value to be part of the set and should be a bit faster
-     * values are in .values starting from index 0
+     * values are in .values, starting from index 0
    * null and notnull arguments are user provided so that they have same data type as other set elements
    * primes from https://planetmath.org/goodhashtableprimes
-   * automatic resizing is not implemented")
+   * automatic resizing is not implemented but easy to do")
 
 (pre-include "stdlib.h" "inttypes.h")
 
