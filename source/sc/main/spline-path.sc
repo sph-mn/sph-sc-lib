@@ -1,5 +1,6 @@
 (sc-comment "depends on spline-path-h.c")
 (pre-include "math.h")
+(pre-include "stdio.h")
 
 (pre-define
   (spline-path-min a b) (if* (< a b) a b)
