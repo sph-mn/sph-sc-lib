@@ -25,14 +25,17 @@
   spline-path-size-max (/ SIZE_MAX 2))
 
 (pre-define (spline-path-segment-points-count s)
-  (case* = s.interpolator (spline-path-i-bezier 3) (spline-path-i-circular-arc 2) (else 1)))
+  (case* = s.interpolator
+    ((spline-path-i-bezier spline-path-i-bezier-arc) 3)
+    (spline-path-i-circular-arc 2)
+    (else 1)))
 
 (declare
   spline-path-point-t (type (struct (x spline-path-value-t) (y spline-path-value-t)))
   spline-path-interpolator-t
   (type
     (function-pointer void size-t
-      size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*))
+      size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*))
   spline-path-segment-t
   (type
     (struct
@@ -49,16 +52,16 @@
       (segments spline-path-segment-t*)
       (current-segment spline-path-segment-count-t)))
   (spline-path-i-move start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   (spline-path-i-constant start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   (spline-path-i-line start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   (spline-path-i-bezier start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   (spline-path-get path start end out) (void spline-path-t* size-t size-t spline-path-value-t*)
   (spline-path-i-path start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   (spline-path-start path) (spline-path-point-t spline-path-t)
   (spline-path-end path) (spline-path-point-t spline-path-t)
   (spline-path-set path segments segments-count)
@@ -79,8 +82,12 @@
   (spline-path-size path) (size-t spline-path-t)
   (spline-path-free path) (void spline-path-t)
   (spline-path-i-circular-arc start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
-  (spline-path-circular-arc curvature x2 y2)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
+  (spline-path-circular-arc curvature x y)
   (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
   (spline-path-perpendicular-point p1 p2 distance-factor)
-  (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t))
+  (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
+  (spline-path-i-bezier-arc start end p-start p-rest data out)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
+  (spline-path-bezier-arc curvature x y)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t))

@@ -3,13 +3,12 @@
 root="$PWD"
 target_dir=temp
 c=source/c-precompiled
-optimisation=0
+optimisation=3
 warnings="-Wunused-label -Wunused-value -Wunused-variable"
 gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimisation -fno-math-errno"
 
 compile_test_sph_sc_lib() {
   gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options -lm
-  exit 0
   gcc "$c/test/ikv.c" -o temp/test-ikv $gcc_options
   gcc "$c/test/arrayn.c" -o temp/test-arrayn $gcc_options
   gcc "$c/test/random.c" -o temp/test-random $gcc_options

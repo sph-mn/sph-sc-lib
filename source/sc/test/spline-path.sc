@@ -105,6 +105,35 @@
   (free path.segments)
   (label exit status-return))
 
+(define (test-spline-path-bezier-arc) status-t
+  status-declare
+  (declare
+    p1 spline-path-point-t
+    p2 spline-path-point-t
+    pc spline-path-point-t
+    out (array spline-path-value-t 50)
+    log-path-0 uint8-t
+    path spline-path-t
+    i size-t
+    end-x size-t
+    end-y spline-path-value-t
+    segments spline-path-segment-t)
+  (set log-path-0 #f end-x 50 end-y 10)
+  (set p1.x 0 p1.y 0 p2.x end-x p2.y end-y pc (spline-path-perpendicular-point p1 p2 1.0))
+  (sc-comment
+    (test-helper-assert "perpendicular point"
+      (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))))
+  (reset-output out end-x)
+  (set segments (spline-path-circular-arc 0 end-x end-y))
+  (spline-path-set &path &segments 1)
+  (spline-path-get &path 0 end-x out)
+  (spline-path-free path)
+  (if log-path-0
+    (begin
+      (printf "%f %f\n" pc.x pc.y)
+      (for ((set i 0) (< i end-x) (set+ i 1)) (printf "%lu %f\n" i (array-get out i)))))
+  status-return)
+
 (define (test-spline-path-circular-arc) status-t
   status-declare
   (declare
@@ -137,7 +166,8 @@
 
 (define (main) int
   status-declare
+  (test-helper-test-one test-spline-path-bezier-arc)
+  (test-helper-test-one test-spline-path-circular-arc)
   (test-helper-test-one test-spline-path)
   (test-helper-test-one test-spline-path-helpers)
-  (test-helper-test-one test-spline-path-circular-arc)
   (label exit (test-helper-display-summary) (return status.id)))

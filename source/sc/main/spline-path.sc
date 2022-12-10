@@ -14,25 +14,10 @@
   (convert-point-x x x-min x-max)
   (convert-type (spline-path-cheap-round-positive (spline-path-limit x x-min x-max)) size-t))
 
-(define (spline-path-set-missing-points out start end) (void spline-path-value-t* size-t size-t)
-  "add missing intermediate points by interpolating between neighboring points.
-   for interpolation methods that return float values for x that dont map directly to the currently interpolated index
-   and may therefore leave gaps.
-   assumes unset output values are 0"
-  (declare i2 size-t b-size size-t)
-  (set b-size (- end start))
-  (for ((define i size-t 1) (< i b-size) (set+ i 1))
-    (if (= 0.0 (array-get out i))
-      (begin
-        (set i2 (+ i 1))
-        (while (< i2 b-size) (if (= 0.0 (array-get out i2)) (set+ i2 1) break))
-        (if (< i2 b-size)
-          (set (array-get out i) (lerp (array-get out (- i 1)) (array-get out i2) (/ 0.5 (- i2 i)))))))))
-
 (define (spline-path-perpendicular-point p1 p2 distance-factor)
   (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
   "return a point on a perpendicular line across the midpoint of a line between p1 and p2.
-   can be used for control points.
+   can be used to find control points.
    distance-factor at -1 and 1 are the bounds of a rectangle where p1 and p2 are diagonally opposed edges,
    so that the distance will not be below or above the x and y values of the given points.
    calculates the midpoint, the negative reciprocal slope and a unit vector"
@@ -59,18 +44,33 @@
     result.y (+ my (* uy scale)))
   (return result))
 
+(define (spline-path-set-missing-points out start end) (void spline-path-value-t* size-t size-t)
+  "add missing intermediate points by interpolating between neighboring points.
+   for interpolation methods that return float values for x that dont map directly to the currently interpolated index
+   and may therefore leave gaps.
+   assumes unset output values are 0"
+  (declare i2 size-t b-size size-t)
+  (set b-size (- end start))
+  (for ((define i size-t 1) (< i b-size) (set+ i 1))
+    (if (= 0.0 (array-get out i))
+      (begin
+        (set i2 (+ i 1))
+        (while (< i2 b-size) (if (= 0.0 (array-get out i2)) (set+ i2 1) break))
+        (if (< i2 b-size)
+          (set (array-get out i) (lerp (array-get out (- i 1)) (array-get out i2) (/ 0.5 (- i2 i)))))))))
+
 (define (spline-path-i-move start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   "p-rest length 1"
   (memset out 0 (* (sizeof spline-path-value-t) (- end start))))
 
 (define (spline-path-i-constant start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   "p-rest length 0"
   (for ((define i size-t 0) (< i (- end start)) (set+ i 1)) (set (array-get out i) p-start.y)))
 
 (define (spline-path-i-line start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   "p-rest length 1"
   (declare
     p-end spline-path-point-t
@@ -87,7 +87,7 @@
     (set t (/ (+ i s-offset) s-size) (array-get out i) (lerp p-start.y p-end.y t))))
 
 (define (spline-path-i-bezier start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   "p-rest length 3"
   (declare
     b-size size-t
@@ -122,6 +122,30 @@
     (set+ i 1))
   (spline-path-set-missing-points out start end))
 
+(define (spline-path-i-bezier-arc start end p-start p-rest data out)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
+  (if (not *data)
+    (begin
+      (declare
+        distance spline-path-value-t
+        p-end spline-path-point-t
+        p-temp spline-path-point-t
+        x-distance spline-path-value-t
+        y-distance spline-path-value-t)
+      (set
+        distance (* p-rest:y (/ 4.0 3.0) (- (sqrt 2.0) 1.0))
+        p-end (array-get p-rest 2)
+        x-distance (if* (> p-end.x p-start.x) (- p-end.x p-start.x) (- p-start.x p-end.x))
+        y-distance (if* (> p-end.y p-start.y) (- p-end.y p-start.y) (- p-start.y p-end.y))
+        p-temp.x (+ p-end.x x-distance)
+        p-temp.y (+ p-end.y y-distance)
+        (array-get p-rest 1) (spline-path-perpendicular-point p-start p-temp distance)
+        p-temp.x (- p-start.x x-distance)
+        p-temp.y (- p-start.y y-distance)
+        (array-get p-rest 0) (spline-path-perpendicular-point p-temp p-end distance)
+        *data (convert-type 1 void*))))
+  (spline-path-i-bezier start end p-start p-rest data out))
+
 (define (spline-path-get path start end out)
   (void spline-path-t* size-t size-t spline-path-value-t*)
   "get values on path between start (inclusive) and end (exclusive).
@@ -151,7 +175,7 @@
       out-start (if* (> s-start start) (- s-start start) 0)
       s-start (if* (> s-start start) s-start start)
       s-end (if* (< s-end end) s-end end))
-    (s.interpolator s-start s-end s._start s.points s.data (+ out-start out))
+    (s.interpolator s-start s-end s._start s.points &s.data (+ out-start out))
     (set+ i 1))
   (sc-comment "outside points are zero")
   (if (> end s-end)
@@ -160,9 +184,9 @@
       (memset (+ out out-start) 0 (* (- end out-start) (sizeof spline-path-value-t))))))
 
 (define (spline-path-i-path start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   "p-rest length 0. data is one spline-path-t"
-  (spline-path-get data (- start p-start.x) (- end p-start.x) out))
+  (spline-path-get *data (- start p-start.x) (- end p-start.x) out))
 
 (define (spline-path-start path) (spline-path-point-t spline-path-t)
   (declare p spline-path-point-t s spline-path-segment-t)
@@ -250,6 +274,19 @@
     (: (+ 1 s.points) y) y2
     (: (+ 2 s.points) x) x3
     (: (+ 2 s.points) y) y3)
+  (return s))
+
+(define (spline-path-bezier-arc curvature x y)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
+  "curvature is a real between -1..1, with the maximum being the edge of the segment"
+  (declare s spline-path-segment-t)
+  (set
+    s.free 0
+    s.data 0
+    s.interpolator spline-path-i-bezier-arc
+    s.points:y curvature
+    (: (+ 2 s.points) x) x
+    (: (+ 2 s.points) y) y)
   (return s))
 
 (define (spline-path-constant) spline-path-segment-t

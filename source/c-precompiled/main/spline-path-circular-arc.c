@@ -35,7 +35,7 @@ spline_path_point_t complex_linear_interpolation(spline_path_point_t p1, spline_
 
 /** p-rest length 2. circular arc interpolation formula from jacob rus,
    https://observablehq.com/@jrus/circle-arc-interpolation */
-void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void* data, spline_path_value_t* out) {
+void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void** data, spline_path_value_t* out) {
   size_t b_size;
   spline_path_i_circular_arc_data_t d;
   size_t i;
@@ -45,7 +45,7 @@ void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_
   size_t s_offset;
   spline_path_value_t s_size;
   spline_path_value_t t;
-  d = *((spline_path_i_circular_arc_data_t*)(data));
+  d = *((spline_path_i_circular_arc_data_t*)(*data));
   p_end = p_rest[1];
   b_size = (end - start);
   s_size = (p_end.x - p_start.x);
@@ -53,7 +53,7 @@ void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_
   if (!d.s_size) {
     spline_path_i_circular_arc_data_t* dp;
     spline_path_point_t m;
-    dp = data;
+    dp = *data;
     m = spline_path_perpendicular_point(p_start, p_end, (p_rest->y));
     dp->b_m = complex_difference(p_end, m);
     dp->m_a = complex_difference(m, p_start);
@@ -77,8 +77,9 @@ void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_
   spline_path_set_missing_points(out, start, end);
 }
 
-/** curvature is a real between -1..1, with the maximum being the edge of the segment */
-spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, spline_path_value_t x2, spline_path_value_t y2) {
+/** curvature is a real between -1..1, with the maximum being the edge of the segment.
+   the current implementation turned out to be extremely slow */
+spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, spline_path_value_t x, spline_path_value_t y) {
   spline_path_segment_t s;
   spline_path_i_circular_arc_data_t* d;
   d = malloc((sizeof(spline_path_i_circular_arc_data_t)));
@@ -88,8 +89,8 @@ spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, sp
     s.data = d;
     s.interpolator = spline_path_i_circular_arc;
     (s.points)->y = curvature;
-    (1 + s.points)->x = x2;
-    (1 + s.points)->y = y2;
+    (1 + s.points)->x = x;
+    (1 + s.points)->y = y;
   } else {
     s.free = 0;
     s.interpolator = spline_path_i_constant;

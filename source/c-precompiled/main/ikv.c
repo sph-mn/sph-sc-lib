@@ -246,8 +246,6 @@ exit:
 status_t ikv_read_indent(FILE* file, ikv_read_value_t read_value, ikv_t ikv) {
   void* a;
   size_t i;
-  ikv_type_t value_type;
-  size_t i_start;
   ikv_key_t* key;
   char* line;
   size_t size;

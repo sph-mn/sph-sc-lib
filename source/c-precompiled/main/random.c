@@ -13,7 +13,6 @@ typedef struct {
 /** use the given u64 as a seed and set state with splitmix64 results.
    the same seed will lead to the same series of pseudo random numbers */
 sph_random_state_t sph_random_state_new(uint64_t seed) {
-  uint8_t i;
   uint64_t z;
   sph_random_state_t result;
   for (size_t i = 0; (i < 4); i += 1) {
@@ -33,7 +32,6 @@ sph_random_state_t sph_random_state_new(uint64_t seed) {
    require a lot of consecutive zero bits which is unlikely */
 uint64_t sph_random_u64(sph_random_state_t* state) {
   uint64_t a;
-  size_t i;
   uint64_t t;
   uint64_t* s;
   s = state->data;
@@ -80,7 +78,6 @@ uint64_t sph_random_u64_bounded(sph_random_state_t* state, uint64_t range) {
    implements xoshiro256+ from http://xoshiro.di.unimi.it/ */
 double sph_random_f64_bounded(sph_random_state_t* state, double range) {
   uint64_t a;
-  size_t i;
   uint64_t t;
   uint64_t* s;
   s = state->data;

@@ -13,7 +13,7 @@ status_t test_random() {
   s = sph_random_state_new(80);
   sph_random_f64_array((&s), 100, out);
   sph_random_f64_array((&s), 100, (100 + out));
-  test_helper_assert("f64", (f64_nearly_equal((0.945766), (out[199]), (1.0e-4))));
+  test_helper_assert("f64", (f64_nearly_equal((0.153695), (out[199]), (1.0e-4))));
   /* u64 */
   s = sph_random_state_new(80);
   sph_random_u64_array((&s), 100, out_u64);

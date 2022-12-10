@@ -7,7 +7,7 @@
   (set s (sph-random-state-new 80))
   (sph-random-f64-array &s 100 out)
   (sph-random-f64-array &s 100 (+ 100 out))
-  (test-helper-assert "f64" (f64-nearly-equal 0.945766 (array-get out 199) 1.0e-4))
+  (test-helper-assert "f64" (f64-nearly-equal 0.153695 (array-get out 199) 1.0e-4))
   (sc-comment "u64")
   (set s (sph-random-state-new 80))
   (sph-random-u64-array &s 100 out-u64)

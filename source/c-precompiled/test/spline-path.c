@@ -124,6 +124,40 @@ status_t test_spline_path_helpers() {
 exit:
   status_return;
 }
+status_t test_spline_path_bezier_arc() {
+  status_declare;
+  spline_path_point_t p1;
+  spline_path_point_t p2;
+  spline_path_point_t pc;
+  spline_path_value_t out[50];
+  uint8_t log_path_0;
+  spline_path_t path;
+  size_t i;
+  size_t end_x;
+  spline_path_value_t end_y;
+  spline_path_segment_t segments;
+  log_path_0 = 0;
+  end_x = 50;
+  end_y = 10;
+  p1.x = 0;
+  p1.y = 0;
+  p2.x = end_x;
+  p2.y = end_y;
+  pc = spline_path_perpendicular_point(p1, p2, (1.0));
+  /* (test-helper-assert perpendicular point (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))) */
+  reset_output(out, end_x);
+  segments = spline_path_circular_arc(0, end_x, end_y);
+  spline_path_set((&path), (&segments), 1);
+  spline_path_get((&path), 0, end_x, out);
+  spline_path_free(path);
+  if (log_path_0) {
+    printf("%f %f\n", (pc.x), (pc.y));
+    for (i = 0; (i < end_x); i += 1) {
+      printf("%lu %f\n", i, (out[i]));
+    };
+  };
+  status_return;
+}
 status_t test_spline_path_circular_arc() {
   status_declare;
   spline_path_point_t p1;
@@ -162,9 +196,10 @@ exit:
 }
 int main() {
   status_declare;
+  test_helper_test_one(test_spline_path_bezier_arc);
+  test_helper_test_one(test_spline_path_circular_arc);
   test_helper_test_one(test_spline_path);
   test_helper_test_one(test_spline_path_helpers);
-  test_helper_test_one(test_spline_path_circular_arc);
 exit:
   test_helper_display_summary();
   return ((status.id));

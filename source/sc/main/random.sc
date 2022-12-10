@@ -14,9 +14,8 @@
 (define (sph-random-state-new seed) (sph-random-state-t uint64-t)
   "use the given u64 as a seed and set state with splitmix64 results.
    the same seed will lead to the same series of pseudo random numbers"
-  (declare i uint8-t z uint64-t result sph-random-state-t)
-  (for-each-index i size-t
-    4
+  (declare z uint64-t result sph-random-state-t)
+  (for-each-index i size-t 4
     (set
       seed (+ seed (UINT64_C 11400714819323198485))
       z seed
@@ -31,7 +30,7 @@
    referenced by https://nullprogram.com/blog/2017/09/21/.
    note: most output numbers will be large because small numbers
    require a lot of consecutive zero bits which is unlikely"
-  (declare a uint64-t i size-t t uint64-t s uint64-t*)
+  (declare a uint64-t t uint64-t s uint64-t*)
   (set
     s state:data
     a (* 9 (rotl (* 5 (array-get s 1)) 7))
@@ -67,7 +66,7 @@
 (define (sph-random-f64-bounded state range) (double sph-random-state-t* double)
   "generate uniformly distributed 64 bit floating point numbers.
    implements xoshiro256+ from http://xoshiro.di.unimi.it/"
-  (declare a uint64-t i size-t t uint64-t s uint64-t*)
+  (declare a uint64-t t uint64-t s uint64-t*)
   (set
     s state:data
     a (+ (array-get s 0) (array-get s 3))

@@ -33,7 +33,7 @@
   (return result))
 
 (define (spline-path-i-circular-arc start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void* spline-path-value-t*)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   "p-rest length 2. circular arc interpolation formula from jacob rus,
    https://observablehq.com/@jrus/circle-arc-interpolation"
   (declare
@@ -47,7 +47,7 @@
     s-size spline-path-value-t
     t spline-path-value-t)
   (set
-    d (pointer-get (convert-type data spline-path-i-circular-arc-data-t*))
+    d (pointer-get (convert-type *data spline-path-i-circular-arc-data-t*))
     p-end (array-get p-rest 1)
     b-size (- end start)
     s-size (- p-end.x p-start.x)
@@ -56,7 +56,7 @@
     (begin
       (declare dp spline-path-i-circular-arc-data-t* m spline-path-point-t)
       (set
-        dp data
+        dp *data
         m (spline-path-perpendicular-point p-start p-end p-rest:y)
         dp:b-m (complex-difference p-end m)
         dp:m-a (complex-difference m p-start)
@@ -77,9 +77,10 @@
     (set+ i 1))
   (spline-path-set-missing-points out start end))
 
-(define (spline-path-circular-arc curvature x2 y2)
+(define (spline-path-circular-arc curvature x y)
   (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
-  "curvature is a real between -1..1, with the maximum being the edge of the segment"
+  "curvature is a real between -1..1, with the maximum being the edge of the segment.
+   the current implementation turned out to be extremely slow"
   (declare s spline-path-segment-t d spline-path-i-circular-arc-data-t*)
   (set d (malloc (sizeof spline-path-i-circular-arc-data-t)))
   (if d
@@ -89,7 +90,7 @@
       s.data d
       s.interpolator spline-path-i-circular-arc
       s.points:y curvature
-      (: (+ 1 s.points) x) x2
-      (: (+ 1 s.points) y) y2)
+      (: (+ 1 s.points) x) x
+      (: (+ 1 s.points) y) y)
     (set s.free 0 s.interpolator spline-path-i-constant))
   (return s))

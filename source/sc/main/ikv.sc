@@ -174,8 +174,6 @@
   (declare
     a void*
     i size-t
-    value-type ikv-type-t
-    i-start size-t
     key ikv-key-t*
     line char*
     size size-t
