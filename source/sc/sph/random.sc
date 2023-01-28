@@ -1,7 +1,7 @@
-(sc-comment "depends on <inttypes.h>. sph_ prefix is used because libc uses random")
+(pre-include "sph/random.h")
 
 (pre-define
-  (rotl x k) (bit-or (bit-shift-left x k) (bit-shift-right x (- 64 k)))
+  (sph-rotl x k) (bit-or (bit-shift-left x k) (bit-shift-right x (- 64 k)))
   (sph-random-f64-from-u64 a)
   (begin
     "guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely.
@@ -9,13 +9,12 @@
      0x1.0p-53 is a binary floating point constant for 2**-53"
     (* (bit-shift-right a 11) (sc-insert "0x1.0p-53"))))
 
-(declare sph-random-state-t (type (struct (data (array uint64-t 4)))))
-
 (define (sph-random-state-new seed) (sph-random-state-t uint64-t)
   "use the given u64 as a seed and set state with splitmix64 results.
    the same seed will lead to the same series of pseudo random numbers"
   (declare z uint64-t result sph-random-state-t)
-  (for-each-index i size-t 4
+  (for-each-index i size-t
+    4
     (set
       seed (+ seed (UINT64_C 11400714819323198485))
       z seed
@@ -33,14 +32,14 @@
   (declare a uint64-t t uint64-t s uint64-t*)
   (set
     s state:data
-    a (* 9 (rotl (* 5 (array-get s 1)) 7))
+    a (* 9 (sph-rotl (* 5 (array-get s 1)) 7))
     t (bit-shift-left (array-get s 1) 17)
     (array-get s 2) (bit-xor (array-get s 2) (array-get s 0))
     (array-get s 3) (bit-xor (array-get s 3) (array-get s 1))
     (array-get s 1) (bit-xor (array-get s 1) (array-get s 2))
     (array-get s 0) (bit-xor (array-get s 0) (array-get s 3))
     (array-get s 2) (bit-xor (array-get s 2) t)
-    (array-get s 3) (rotl (array-get s 3) 45))
+    (array-get s 3) (sph-rotl (array-get s 3) 45))
   (return a))
 
 (define (sph-random-u64-bounded state range) (uint64-t sph-random-state-t* uint64-t)
@@ -76,7 +75,7 @@
     (array-get s 1) (bit-xor (array-get s 1) (array-get s 2))
     (array-get s 0) (bit-xor (array-get s 0) (array-get s 3))
     (array-get s 2) (bit-xor (array-get s 2) t)
-    (array-get s 3) (rotl (array-get s 3) 45))
+    (array-get s 3) (sph-rotl (array-get s 3) 45))
   (return (* range (sph-random-f64-from-u64 a))))
 
 (define (sph-random-f64 state) (double sph-random-state-t*)

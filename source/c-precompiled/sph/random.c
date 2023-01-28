@@ -1,15 +1,13 @@
 
-/* depends on <inttypes.h>. sph_ prefix is used because libc uses random */
+#include <sph/random.h>
 
-#define rotl(x, k) ((x << k) | (x >> (64 - k)))
+#define sph_rotl(x, k) ((x << k) | (x >> (64 - k)))
 
 /** guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely.
      from http://xoshiro.di.unimi.it/
      0x1.0p-53 is a binary floating point constant for 2**-53 */
 #define sph_random_f64_from_u64(a) ((a >> 11) * 0x1.0p-53)
-typedef struct {
-  uint64_t data[4];
-} sph_random_state_t;
+
 /** use the given u64 as a seed and set state with splitmix64 results.
    the same seed will lead to the same series of pseudo random numbers */
 sph_random_state_t sph_random_state_new(uint64_t seed) {
@@ -35,14 +33,14 @@ uint64_t sph_random_u64(sph_random_state_t* state) {
   uint64_t t;
   uint64_t* s;
   s = state->data;
-  a = (9 * rotl((5 * s[1]), 7));
+  a = (9 * sph_rotl((5 * s[1]), 7));
   t = (s[1] << 17);
   s[2] = (s[2] ^ s[0]);
   s[3] = (s[3] ^ s[1]);
   s[1] = (s[1] ^ s[2]);
   s[0] = (s[0] ^ s[3]);
   s[2] = (s[2] ^ t);
-  s[3] = rotl((s[3]), 45);
+  s[3] = sph_rotl((s[3]), 45);
   return (a);
 }
 
@@ -88,7 +86,7 @@ double sph_random_f64_bounded(sph_random_state_t* state, double range) {
   s[1] = (s[1] ^ s[2]);
   s[0] = (s[0] ^ s[3]);
   s[2] = (s[2] ^ t);
-  s[3] = rotl((s[3]), 45);
+  s[3] = sph_rotl((s[3]), 45);
   return ((range * sph_random_f64_from_u64(a)));
 }
 double sph_random_f64(sph_random_state_t* state) { return ((sph_random_f64_from_u64((sph_random_u64(state))))); }

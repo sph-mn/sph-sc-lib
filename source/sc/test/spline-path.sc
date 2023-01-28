@@ -1,6 +1,4 @@
-(pre-include "inttypes.h" "string.h"
-  "../main/spline-path.h" "../main/spline-path.c" "../main/float.c" "./test.c")
-
+(pre-include "inttypes.h" "string.h" "./test.c" "sph/spline-path.c" "sph/float.c")
 (pre-define error-margin 0.1)
 
 (define (reset-output out length) (void spline-path-value-t* size-t)
@@ -36,14 +34,14 @@
   (spline-path-get &path 25 (+ 5 length) (+ 20 out))
   (if log-path-new-0
     (for ((set i 0) (< i length) (set+ i 1)) (printf "%lu %f\n" i (array-get out i))))
-  (test-helper-assert "path 0.0" (f64-nearly-equal 0 (array-get out 0) error-margin))
-  (test-helper-assert "path 0.4" (f64-nearly-equal 0 (array-get out 4) error-margin))
-  (test-helper-assert "path 0.5" (f64-nearly-equal 5 (array-get out 5) error-margin))
-  (test-helper-assert "path 0.15" (f64-nearly-equal 10 (array-get out 15) error-margin))
-  (test-helper-assert "path 0.16" (f64-nearly-equal 10.75 (array-get out 16) error-margin))
-  (test-helper-assert "path 0.34" (f64-nearly-equal 24.25 (array-get out 34) error-margin))
-  (test-helper-assert "path 0.35" (f64-nearly-equal 25 (array-get out 35) error-margin))
-  (test-helper-assert "path 0.49" (f64-nearly-equal 25 (array-get out 49) error-margin))
+  (test-helper-assert "path 0.0" (sph-f64-nearly-equal 0 (array-get out 0) error-margin))
+  (test-helper-assert "path 0.4" (sph-f64-nearly-equal 0 (array-get out 4) error-margin))
+  (test-helper-assert "path 0.5" (sph-f64-nearly-equal 5 (array-get out 5) error-margin))
+  (test-helper-assert "path 0.15" (sph-f64-nearly-equal 10 (array-get out 15) error-margin))
+  (test-helper-assert "path 0.16" (sph-f64-nearly-equal 10.75 (array-get out 16) error-margin))
+  (test-helper-assert "path 0.34" (sph-f64-nearly-equal 24.25 (array-get out 34) error-margin))
+  (test-helper-assert "path 0.35" (sph-f64-nearly-equal 25 (array-get out 35) error-margin))
+  (test-helper-assert "path 0.49" (sph-f64-nearly-equal 25 (array-get out 49) error-margin))
   (free path.segments)
   (sc-comment "path 0 new-get")
   (status-i-require (spline-path-segments-get segments segments-count 5 55 out-new-get))
@@ -60,11 +58,11 @@
   (if log-path-new-1
     (for ((set i 0) (< i 12) (set i (+ 1 i))) (printf "%lu %f\n" i (array-get out i))))
   (test-helper-assert "path 1.9 - should reach maximum at 9"
-    (f64-nearly-equal 4.5 (array-get out 9) error-margin))
+    (sph-f64-nearly-equal 4.5 (array-get out 9) error-margin))
   (test-helper-assert "path 1.10 - should not set the next start point"
-    (f64-nearly-equal 0 (array-get out 10) error-margin))
+    (sph-f64-nearly-equal 0 (array-get out 10) error-margin))
   (test-helper-assert "path 1.11 - should be zero after segments"
-    (f64-nearly-equal 0 (array-get out 11) error-margin))
+    (sph-f64-nearly-equal 0 (array-get out 11) error-margin))
   (free path.segments)
   (sc-comment "path 1 new-get")
   (status-i-require (spline-path-segments-get segments segments-count 0 12 out-new-get))
@@ -95,8 +93,8 @@
   (spline-path-set-copy &path segments 4)
   (spline-path-get &path 0 end-x out)
   (if log-path-0 (for ((set i 0) (< i end-x) (set+ i 1)) (printf "%lu %f\n" i (array-get out i))))
-  (test-helper-assert "helper path 0" (f64-nearly-equal 0 (array-get out 0) error-margin))
-  (test-helper-assert "helper path 49" (f64-nearly-equal 15 (array-get out 49) error-margin))
+  (test-helper-assert "helper path 0" (sph-f64-nearly-equal 0 (array-get out 0) error-margin))
+  (test-helper-assert "helper path 49" (sph-f64-nearly-equal 15 (array-get out 49) error-margin))
   (set
     (array-get segments2 0) (spline-path-line 5 10)
     (array-get segments2 1) (spline-path-path path))
@@ -122,7 +120,8 @@
   (set p1.x 0 p1.y 0 p2.x end-x p2.y end-y pc (spline-path-perpendicular-point p1 p2 1.0))
   (sc-comment
     (test-helper-assert "perpendicular point"
-      (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))))
+      (and (sph-f64-nearly-equal 31.73 pc.x error-margin)
+        (sph-f64-nearly-equal 9.94 pc.y error-margin))))
   (reset-output out end-x)
   (set segments (spline-path-circular-arc 0 end-x end-y))
   (spline-path-set &path &segments 1)
@@ -151,7 +150,8 @@
   (set p1.x 0 p1.y 0 p2.x end-x p2.y end-y pc (spline-path-perpendicular-point p1 p2 1.0))
   (sc-comment
     (test-helper-assert "perpendicular point"
-      (and (f64-nearly-equal 31.73 pc.x error-margin) (f64-nearly-equal 9.94 pc.y error-margin))))
+      (and (sph-f64-nearly-equal 31.73 pc.x error-margin)
+        (sph-f64-nearly-equal 9.94 pc.y error-margin))))
   (reset-output out end-x)
   (set segments (spline-path-circular-arc 1 end-x end-y))
   (spline-path-set &path &segments 1)

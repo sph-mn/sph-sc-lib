@@ -1,4 +1,4 @@
-(pre-include "../main/status.c" "stdio.h")
+(pre-include "sph/status.h" "stdio.h")
 
 (pre-define
   (test-helper-test-one func) (begin (printf "%s\n" (pre-stringify func)) (status-require (func)))

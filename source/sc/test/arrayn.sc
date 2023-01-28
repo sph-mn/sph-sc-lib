@@ -1,4 +1,4 @@
-(pre-include "inttypes.h" "./test.c" "../main/array3.c" "../main/array4.c")
+(pre-include "inttypes.h" "./test.c" "sph/array3.c" "sph/array4.c")
 (pre-define test-element-count 100)
 (array3-declare-type a3u64 uint64-t)
 (array4-declare-type a4u64 uint64-t)

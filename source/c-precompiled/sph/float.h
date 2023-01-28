@@ -1,7 +1,9 @@
 
-#include <float.h>
-#include <math.h>
-#define define_float_sum(prefix, type) \
+#ifndef sph_float_h
+#define sph_float_h
+
+#include <inttypes.h>
+#define sph_define_float_sum(prefix, type) \
   type prefix##_sum(type* numbers, size_t len) { \
     type temp; \
     type element; \
@@ -17,7 +19,7 @@
     }; \
     return ((correction + result)); \
   }
-#define define_float_array_nearly_equal(prefix, type) \
+#define sph_define_float_array_nearly_equal(prefix, type) \
   uint8_t prefix##_array_nearly_equal(type* a, size_t a_len, type* b, size_t b_len, type error_margin) { \
     size_t index = 0; \
     if (!(a_len == b_len)) { \
@@ -31,13 +33,10 @@
     }; \
     return (1); \
   }
-
-/** approximate float comparison. margin is a factor and is low for low accepted differences */
-uint8_t f64_nearly_equal(double a, double b, double margin) { return ((fabs((a - b)) < margin)); }
-
-/** approximate float comparison. margin is a factor and is low for low accepted differences */
-uint8_t f32_nearly_equal(float a, float b, float margin) { return ((fabs((a - b)) < margin)); }
-define_float_array_nearly_equal(f32, float)
-  define_float_array_nearly_equal(f64, double)
-    define_float_sum(f32, float)
-      define_float_sum(f64, double)
+uint8_t sph_f64_nearly_equal(double a, double b, double margin);
+uint8_t sph_f32_nearly_equal(float a, float b, float margin);
+uint8_t sph_f32_array_nearly_equal(float* a, size_t a_len, float* b, size_t b_len, float error_margin);
+uint8_t sph_f64_array_nearly_equal(double* a, size_t a_len, double* b, size_t b_len, double error_margin);
+float sph_f32_sum(float* numbers, size_t len);
+double sph_f64_sum(double* numbers, size_t len);
+#endif

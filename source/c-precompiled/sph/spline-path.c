@@ -1,7 +1,9 @@
 
-/* depends on spline-path-h.c */
+#include <float.h>
+#include <strings.h>
+#include <stdlib.h>
 #include <math.h>
-#include <stdio.h>
+#include <sph/spline-path.h>
 
 #define spline_path_min(a, b) ((a < b) ? a : b)
 #define spline_path_max(a, b) ((a > b) ? a : b)

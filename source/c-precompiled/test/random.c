@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include "./test.c"
-#include "../main/float.c"
-#include "../main/random.c"
+#include <sph/float.c>
+#include <sph/random.c>
 status_t test_random() {
   status_declare;
   sph_random_state_t s;
@@ -13,7 +13,7 @@ status_t test_random() {
   s = sph_random_state_new(80);
   sph_random_f64_array((&s), 100, out);
   sph_random_f64_array((&s), 100, (100 + out));
-  test_helper_assert("f64", (f64_nearly_equal((0.153695), (out[199]), (1.0e-4))));
+  test_helper_assert("f64", (sph_f64_nearly_equal((0.153695), (out[199]), (1.0e-4))));
   /* u64 */
   s = sph_random_state_new(80);
   sph_random_u64_array((&s), 100, out_u64);

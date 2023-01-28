@@ -1,4 +1,7 @@
 
+#ifndef sph_spline_path_h
+#define sph_spline_path_h
+
 /* * spline-path creates discrete 2d paths interpolated between some given points
  * maps from one independent value to one dependent continuous value
  * only the dependent value is returned
@@ -16,9 +19,6 @@
  * segments draw from the start point inclusive to end point exclusive
  * both dimensions are float types for precision with internal calculations */
 #include <inttypes.h>
-#include <float.h>
-#include <strings.h>
-#include <stdlib.h>
 
 /* spline-path-size-max must be a value that fits in spline-path-value-t and size-t */
 
@@ -31,7 +31,9 @@
 #ifndef spline_path_size_max
 #define spline_path_size_max (SIZE_MAX / 2)
 #endif
+#ifndef spline_path_segment_points_count
 #define spline_path_segment_points_count(s) (((spline_path_i_bezier == s.interpolator) || (spline_path_i_bezier_arc == s.interpolator)) ? 3 : ((spline_path_i_circular_arc == s.interpolator) ? 2 : 1))
+#endif
 typedef struct {
   spline_path_value_t x;
   spline_path_value_t y;
@@ -74,3 +76,4 @@ spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, sp
 spline_path_point_t spline_path_perpendicular_point(spline_path_point_t p1, spline_path_point_t p2, spline_path_value_t distance_factor);
 void spline_path_i_bezier_arc(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void** data, spline_path_value_t* out);
 spline_path_segment_t spline_path_bezier_arc(spline_path_value_t curvature, spline_path_value_t x, spline_path_value_t y);
+#endif

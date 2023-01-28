@@ -1,8 +1,8 @@
-(pre-include "float.h" "math.h")
+(pre-include-guard-begin sph-float-h)
+(pre-include "inttypes.h")
 
-(pre-define (define-float-sum prefix type)
+(pre-define (sph-define-float-sum prefix type)
   (define ((pre-concat prefix _sum) numbers len) (type type* size-t)
-    ; "sum numbers with rounding error compensation using kahan summation with neumaier modification"
     (declare temp type element type)
     (define correction type 0)
     (set len (- len 1))
@@ -18,7 +18,7 @@
         result temp))
     (return (+ correction result))))
 
-(pre-define (define-float-array-nearly-equal prefix type)
+(pre-define (sph-define-float-array-nearly-equal prefix type)
   (define ((pre-concat prefix _array-nearly-equal) a a-len b b-len error-margin)
     (uint8-t type* size-t type* size-t type)
     (define index size-t 0)
@@ -31,15 +31,14 @@
       (set index (+ 1 index)))
     (return #t)))
 
-(define (f64-nearly-equal a b margin) (uint8-t double double double)
-  "approximate float comparison. margin is a factor and is low for low accepted differences"
-  (return (< (fabs (- a b)) margin)))
+(declare
+  (sph-f64-nearly-equal a b margin) (uint8-t double double double)
+  (sph-f32-nearly-equal a b margin) (uint8-t float float float)
+  (sph-f32-array-nearly-equal a a-len b b-len error-margin)
+  (uint8-t float* size-t float* size-t float)
+  (sph-f64-array-nearly-equal a a-len b b-len error-margin)
+  (uint8-t double* size-t double* size-t double)
+  (sph-f32-sum numbers len) (float float* size-t)
+  (sph-f64-sum numbers len) (double double* size-t))
 
-(define (f32-nearly-equal a b margin) (uint8-t float float float)
-  "approximate float comparison. margin is a factor and is low for low accepted differences"
-  (return (< (fabs (- a b)) margin)))
-
-(define-float-array-nearly-equal f32 float)
-(define-float-array-nearly-equal f64 double)
-(define-float-sum f32 float)
-(define-float-sum f64 double)
+(pre-include-guard-end)

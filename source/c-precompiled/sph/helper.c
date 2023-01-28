@@ -1,8 +1,8 @@
 
-/* depends on sph/status.c and libc */
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <sph/status.h>
 enum { sph_helper_status_id_memory };
 #define sph_helper_status_group ((uint8_t*)("sph"))
 

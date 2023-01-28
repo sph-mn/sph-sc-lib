@@ -1,5 +1,4 @@
-(sc-comment "depends on sph/status.c and libc")
-(pre-include "stdlib.h" "inttypes.h" "stdio.h")
+(pre-include "stdlib.h" "inttypes.h" "stdio.h" "sph/status.h")
 (enum (sph-helper-status-id-memory))
 
 (pre-define

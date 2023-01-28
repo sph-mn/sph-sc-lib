@@ -24,6 +24,10 @@ c code is in source/c-precompiled. sc versions are in source/sc. the libraries a
 # license
 code is under gpl3+, documentation under cc-by-nc.
 
+# compilation
+* include "sph/library_name.c" for the full code of a library
+* include "sph/library_name.h" (if exists) if the full code is included in a shared library being used
+
 # status
 helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes
 
@@ -87,7 +91,7 @@ status_t: struct
 track memory allocations locally on the stack and free all allocations up to point easily
 
 ```c
-#include "memreg.c"
+#include "sph/memreg.c"
 
 int main() {
   memreg_init(2);
@@ -150,7 +154,7 @@ macro that defines hash-table data structures for custom key/value types.
 with hashtable.c in the same directory:
 
 ~~~
-#include "hashtable.c";
+#include "sph/hashtable.c";
 // name, key_type, value_type, hashtable_hash, hashtable_equal, size_factor
 hashtable_declare_type(mytype, uint64_t, uint32_t, hashtable_hash_integer, hashtable_equal_integer, 2);
 mytype_t ht;
@@ -200,7 +204,7 @@ macro that defines set data structures for custom value types.
 ## usage examples
 with set.c in the same directory:
 ~~~
-#include "set.c";
+#include "sph/set.c";
 // name, value_type, hash, equal, null, notnull, size_factor
 sph_set_declare_type(myset, int, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
 void main() {
@@ -394,8 +398,7 @@ if(0 = q.size) { printf("it's empty\n"); }
 # thread-pool
 ```c
 #include <inttypes.h>
-#include "queue.c"
-#include "thread-pool.c"
+#include "sph/thread-pool.c"
 
 void work(thread_pool_task_t* task) {
   // ... do things in parallel ...
@@ -427,8 +430,6 @@ depends on thread-pool.c
 
 ```c
 #include <inttypes.h>
-#include "queue.c"
-#include "thread-pool.c"
 #include "futures.c"
 
 void* future_work(void* data) {
@@ -555,7 +556,7 @@ void quicksort(
 #include <stdio.h>
 #include <inttypes.h>
 #include <sys/types.h>
-#include "quicksort.c"
+#include "sph/quicksort.c"
 
 uint8_t uint32_less_p(void* a, ssize_t b, ssize_t c) {
   // typecast "a" to the right pointer type and compare elements at indices b and c
@@ -597,7 +598,7 @@ unbiased bounding ([lemire](https://arxiv.org/abs/1805.10941), [o'neill](https:/
 ## usage
 ```c
 #include <inttypes.h>
-#include "random.c"
+#include "sph/random.c"
 
 sph_random_state_t s = sph_random_state_new(11223344);
 
@@ -669,7 +670,7 @@ key4 string7
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <inttypes.h>
-#include <sph/status.c>
+#include <sph/status.h>
 #include <sph/hashtable.c>
 #include <murmur3.c>
 #include <sph/ikv.c>

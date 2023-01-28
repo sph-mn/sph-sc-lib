@@ -1,3 +1,4 @@
+(pre-include-guard-begin sph-hashtable-h)
 (pre-include "stdlib.h" "string.h" "inttypes.h")
 
 (sc-comment
@@ -6,7 +7,7 @@
   "by defining macro variables and re-including the source."
   "prime numbers from https://planetmath.org/goodhashtableprimes")
 
-(declare hashtable-primes
+(declare sph-hashtable-primes
   (array uint32-t ()
     53 97 193
     389 769 1543
@@ -16,19 +17,20 @@
     1572869 3145739 6291469
     12582917 25165843 50331653 100663319 201326611 402653189 805306457 1610612741))
 
-(define hashtable-primes-end uint32-t* (+ hashtable-primes 25))
+(define sph-hashtable-primes-end uint32-t* (+ sph-hashtable-primes 25))
+(pre-include-guard-end)
 
 (pre-define
-  (hashtable-hash-integer key hashtable-size) (modulo key hashtable-size)
-  (hashtable-equal-integer key-a key-b) (= key-a key-b)
-  (hashtable-declare-type name key-type value-type hashtable-hash hashtable-equal size-factor)
+  (sph-hashtable-hash-integer key hashtable-size) (modulo key hashtable-size)
+  (sph-hashtable-equal-integer key-a key-b) (= key-a key-b)
+  (sph-hashtable-declare-type name key-type value-type hashtable-hash hashtable-equal size-factor)
   (begin
     (declare (pre-concat name _t)
       (type (struct (size size-t) (flags uint8-t*) (keys key-type*) (values value-type*))))
     (define ((pre-concat name _calculate-size) min-size) (size-t size-t)
       (set min-size (* size-factor min-size))
       (declare primes uint32-t*)
-      (for ((set primes hashtable-primes) (<= primes hashtable-primes-end) (set+ primes 1))
+      (for ((set primes sph-hashtable-primes) (<= primes sph-hashtable-primes-end) (set+ primes 1))
         (if (<= min-size *primes) (return *primes)))
       (sc-comment "if no prime has been found, make size at least an odd number")
       (return (bit-or 1 min-size)))

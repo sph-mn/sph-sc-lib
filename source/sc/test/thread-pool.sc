@@ -1,10 +1,10 @@
-(pre-include "inttypes.h" "./test.c" "../main/queue.c" "../main/thread-pool.c" "../main/futures.c")
+(pre-include "inttypes.h" "./test.c" "sph/futures.c")
 
 (define (test-thread-pool) status-t
   status-declare
-  (declare pool thread-pool-t)
-  (test-helper-assert "thread-pool new" (not (thread-pool-new 10 &pool)))
-  (test-helper-assert "thread-pool finish" (not (thread-pool-finish &pool 0 0)))
+  (declare pool sph-thread-pool-t)
+  (test-helper-assert "thread-pool new" (not (sph-thread-pool-new 10 &pool)))
+  (test-helper-assert "thread-pool finish" (not (sph-thread-pool-finish &pool 0 0)))
   (label exit status-return))
 
 (define (future-work data) (void* void*)
@@ -14,14 +14,14 @@
 
 (define (test-futures) status-t
   status-declare
-  (declare future future-t data uint8-t result uint8-t*)
+  (declare future sph-future-t data uint8-t result uint8-t*)
   (set data 8)
-  (test-helper-assert "future-init" (not (future-init 10)))
-  (future-new future-work &data &future)
-  (set result (convert-type (touch &future) uint8-t*))
+  (test-helper-assert "future-init" (not (sph-future-init 10)))
+  (sph-future-new future-work &data &future)
+  (set result (convert-type (sph-future-touch &future) uint8-t*))
   (test-helper-assert "touch result" (= (+ 2 data) *result))
   (free result)
-  (future-deinit)
+  (sph-future-deinit)
   (label exit status-return))
 
 (define (main) int

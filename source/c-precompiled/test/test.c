@@ -1,5 +1,5 @@
 
-#include "../main/status.c"
+#include <sph/status.h>
 #include <stdio.h>
 
 #define test_helper_test_one(func) \

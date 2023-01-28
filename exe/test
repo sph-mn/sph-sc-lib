@@ -4,13 +4,13 @@
 
 export MALLOC_CHECK_=3
 export LD_LIBRARY_PATH="$PWD/temp"
+./temp/test-queue
 ./temp/test-spline-path
 ./temp/test-arrayn
+./temp/test-mi-list
+./temp/test-quicksort
 ./temp/test-random
 ./temp/test-set
-./temp/test-mi-list
 ./temp/test-hashtable
-./temp/test-quicksort
-./temp/test-queue
 ./temp/test-thread-pool
 #./temp/test-ikv

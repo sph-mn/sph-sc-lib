@@ -1,6 +1,5 @@
 #!/bin/sh -e
 
-target=$1/usr/include/sph
-mkdir -p "$target"
-cp -rt "$target" source/c-precompiled/main/*
-chown -R 755 "$target"
+destination=$1/usr/include
+cp -rt "$destination" source/c-precompiled/sph
+chown -R 755 "$destination/sph"

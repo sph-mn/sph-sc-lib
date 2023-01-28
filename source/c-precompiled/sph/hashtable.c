@@ -1,4 +1,7 @@
 
+#ifndef sph_hashtable_h
+#define sph_hashtable_h
+
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
@@ -6,11 +9,13 @@
 with linear probing for collision resolve and hash and equal functions customisable
 by defining macro variables and re-including the source.
 prime numbers from https://planetmath.org/goodhashtableprimes */
-uint32_t hashtable_primes[] = { 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741 };
-uint32_t* hashtable_primes_end = (hashtable_primes + 25);
-#define hashtable_hash_integer(key, hashtable_size) (key % hashtable_size)
-#define hashtable_equal_integer(key_a, key_b) (key_a == key_b)
-#define hashtable_declare_type(name, key_type, value_type, hashtable_hash, hashtable_equal, size_factor) \
+uint32_t sph_hashtable_primes[] = { 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741 };
+uint32_t* sph_hashtable_primes_end = (sph_hashtable_primes + 25);
+#endif
+
+#define sph_hashtable_hash_integer(key, hashtable_size) (key % hashtable_size)
+#define sph_hashtable_equal_integer(key_a, key_b) (key_a == key_b)
+#define sph_hashtable_declare_type(name, key_type, value_type, hashtable_hash, hashtable_equal, size_factor) \
   typedef struct { \
     size_t size; \
     uint8_t* flags; \
@@ -20,7 +25,7 @@ uint32_t* hashtable_primes_end = (hashtable_primes + 25);
   size_t name##_calculate_size(size_t min_size) { \
     min_size = (size_factor * min_size); \
     uint32_t* primes; \
-    for (primes = hashtable_primes; (primes <= hashtable_primes_end); primes += 1) { \
+    for (primes = sph_hashtable_primes; (primes <= sph_hashtable_primes_end); primes += 1) { \
       if (min_size <= *primes) { \
         return ((*primes)); \
       }; \

@@ -1,8 +1,8 @@
 
 #include <inttypes.h>
 #include "./test.c"
-#include "../main/array3.c"
-#include "../main/array4.c"
+#include <sph/array3.c>
+#include <sph/array4.c>
 #define test_element_count 100
 array3_declare_type(a3u64, uint64_t);
 array4_declare_type(a4u64, uint64_t);

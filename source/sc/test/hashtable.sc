@@ -1,6 +1,8 @@
-(pre-include "stdio.h" "inttypes.h" "./test.c" "../main/hashtable.c")
+(pre-include "stdio.h" "inttypes.h" "./test.c" "sph/hashtable.c")
 (pre-define test-element-count 10000)
-(hashtable-declare-type testht uint64-t uint64-t hashtable-hash-integer hashtable-equal-integer 2)
+
+(sph-hashtable-declare-type testht uint64-t
+  uint64-t sph-hashtable-hash-integer sph-hashtable-equal-integer 2)
 
 (define (print-contents a) (void testht-t)
   (define i size-t 0)

@@ -12,7 +12,10 @@ compile_sc() {
   find -type f -name "*.sc" -exec sc --parents '{}' "$c" \;
   cd "$root"
   find "$c" -type f -exec ./exe/format-c -i '{}' \;
-  mv "$c/main/spline-path-h.c" "$c/main/spline-path.h"
+  for name in spline-path float thread-pool status queue random futures ikv
+  do
+    mv "$c/sph/$name.h.c" "$c/sph/$name.h"
+  done
   cp --target-directory="$c" --update --recursive "$cc"/*
 }
 

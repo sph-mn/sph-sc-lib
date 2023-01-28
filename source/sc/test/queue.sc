@@ -1,24 +1,24 @@
-(pre-include "inttypes.h" "./test.c" "../main/queue.c")
+(pre-include "./test.c" "../sph/queue.h")
 (pre-define test-element-count 10)
-(declare test-element-t (type (struct (data uint32-t) (q queue-node-t))))
+(declare test-element-t (type (struct (data uint32-t) (q sph-queue-node-t))))
 
 (define (test-queue) status-t
   status-declare
   (declare
-    a queue-t
+    a sph-queue-t
     e test-element-t*
     elements (array test-element-t test-element-count)
     i size-t
     j size-t)
-  (queue-init &a)
+  (sph-queue-init &a)
   (sc-comment "insert values")
   (for ((set j 0) (< j 1) (set j (+ 1 j)))
     (for ((set i 0) (< i test-element-count) (set i (+ 1 i)))
       (set e (+ elements i) e:data (- test-element-count i))
-      (queue-enq &a &e:q))
+      (sph-queue-enq &a &e:q))
     (test-helper-assert "size 1" (= test-element-count a.size))
     (for ((set i 0) (< i test-element-count) (set i (+ 1 i)))
-      (set e (queue-get (queue-deq &a) test-element-t q))
+      (set e (sph-queue-get (sph-queue-deq &a) test-element-t q))
       (test-helper-assert "dequeued value" (= (- test-element-count i) e:data)))
     (test-helper-assert "size 2" (= 0 a.size)))
   (label exit status-return))

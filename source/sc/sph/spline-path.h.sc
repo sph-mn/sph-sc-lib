@@ -1,3 +1,5 @@
+(pre-include-guard-begin sph-spline-path-h)
+
 (sc-comment
   "* spline-path creates discrete 2d paths interpolated between some given points
    * maps from one independent value to one dependent continuous value
@@ -16,15 +18,14 @@
    * segments draw from the start point inclusive to end point exclusive
    * both dimensions are float types for precision with internal calculations")
 
-(pre-include "inttypes.h" "float.h" "strings.h" "stdlib.h")
+(pre-include "inttypes.h")
 (sc-comment "spline-path-size-max must be a value that fits in spline-path-value-t and size-t")
 
 (pre-define-if-not-defined
   spline-path-value-t double
   spline-path-segment-count-t uint16-t
-  spline-path-size-max (/ SIZE_MAX 2))
-
-(pre-define (spline-path-segment-points-count s)
+  spline-path-size-max (/ SIZE_MAX 2)
+  (spline-path-segment-points-count s)
   (case* = s.interpolator
     ((spline-path-i-bezier spline-path-i-bezier-arc) 3)
     (spline-path-i-circular-arc 2)
@@ -91,3 +92,5 @@
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   (spline-path-bezier-arc curvature x y)
   (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t))
+
+(pre-include-guard-end)
