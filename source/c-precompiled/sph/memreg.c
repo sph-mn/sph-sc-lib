@@ -1,4 +1,7 @@
-pre_include_guard_start(sph_memreg_h);
+
+#ifndef sph_memreg_h
+#define sph_memreg_h
+
 /* memreg registers memory in a local variable, for example to free all memory allocated at point.
 the variables memreg_register and memreg_index will also be available.
 usage:

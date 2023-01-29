@@ -14,7 +14,7 @@
    * interpolators are called with path-relative start/end inside segment and with out positioned at offset for this start/end block
    * all segment types require a fixed number of given points. line: 1, bezier: 3, move: 1, constant: 0, path: 0
    * segments start at the previous point or (0 0)
-   * bezier and circular-arc interpolation assume that output array values are set to zero before use
+   * bezier interpolation assume that output array values are set to zero before use
    * segments draw from the start point inclusive to end point exclusive
    * both dimensions are float types for precision with internal calculations")
 
@@ -26,10 +26,7 @@
   spline-path-segment-count-t uint16-t
   spline-path-size-max (/ SIZE_MAX 2)
   (spline-path-segment-points-count s)
-  (case* = s.interpolator
-    ((spline-path-i-bezier spline-path-i-bezier-arc) 3)
-    (spline-path-i-circular-arc 2)
-    (else 1)))
+  (case* = s.interpolator ((spline-path-i-bezier spline-path-i-bezier-arc) 3) (else 1)))
 
 (declare
   spline-path-point-t (type (struct (x spline-path-value-t) (y spline-path-value-t)))
@@ -82,10 +79,6 @@
   (void spline-path-segment-t* spline-path-segment-count-t)
   (spline-path-size path) (size-t spline-path-t)
   (spline-path-free path) (void spline-path-t)
-  (spline-path-i-circular-arc start end p-start p-rest data out)
-  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
-  (spline-path-circular-arc curvature x y)
-  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
   (spline-path-perpendicular-point p1 p2 distance-factor)
   (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
   (spline-path-i-bezier-arc start end p-start p-rest data out)

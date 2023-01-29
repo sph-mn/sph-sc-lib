@@ -1,4 +1,4 @@
-(pre-include-guard-start sph-memreg-h)
+(pre-include-guard-begin sph-memreg-h)
 
 (sc-comment
   "memreg registers memory in a local variable, for example to free all memory allocated at point."

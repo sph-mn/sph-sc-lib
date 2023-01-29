@@ -6,6 +6,7 @@
 #include <sph/spline-path.c>
 #include <sph/float.h>
 #include <sph/float.c>
+#include <sph/spline-path-circular-arc.c>
 #define error_margin 0.1
 void reset_output(spline_path_value_t* out, size_t length) {
   for (size_t i = 0; (i < length); i += 1) {

@@ -353,4 +353,3 @@ void spline_path_free(spline_path_t path) {
     };
   };
 }
-#include "./spline-path-circular-arc.c"

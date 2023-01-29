@@ -312,5 +312,3 @@
   (for ((set i 0) (< i path.segments-count) (set+ i 1))
     (set s (+ i path.segments))
     (if s:free (s:free s:data))))
-
-(pre-include "./spline-path-circular-arc.c")

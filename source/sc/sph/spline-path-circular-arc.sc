@@ -1,3 +1,14 @@
+(sc-comment
+  (pre-define (spline-path-segment-points-count s)
+    (case* = s.interpolator
+      ((spline-path-i-bezier spline-path-i-bezier-arc) 3)
+      (spline-path-i-circular-arc 2)
+      (else 1)))
+  (spline-path-i-circular-arc start end p-start p-rest data out)
+  (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
+  (spline-path-circular-arc curvature x y)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t))
+
 (declare spline-path-i-circular-arc-data-t
   (type
     (struct

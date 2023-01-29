@@ -1,5 +1,6 @@
 (pre-include "inttypes.h" "string.h"
-  "./test.c" "sph/spline-path.h" "sph/spline-path.c" "sph/float.h" "sph/float.c")
+  "./test.c" "sph/spline-path.h" "sph/spline-path.c"
+  "sph/float.h" "sph/float.c" "sph/spline-path-circular-arc.c")
 
 (pre-define error-margin 0.1)
 

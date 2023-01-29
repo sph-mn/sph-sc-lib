@@ -1,5 +1,3 @@
-(pre-include "pthread.h")
-
 (define (sph-thread-pool-destroy a) (void sph-thread-pool-t*)
   (pthread-cond-destroy &a:queue-not-empty)
   (pthread-mutex-destroy &a:queue-mutex))

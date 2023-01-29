@@ -1,4 +1,5 @@
 (pre-include-guard-begin sph-thread-pool-h)
+(pre-include "pthread.h")
 
 (sc-comment
   "thread-pool that uses pthread condition variables to pause unused threads.

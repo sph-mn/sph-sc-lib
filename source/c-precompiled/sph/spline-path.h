@@ -15,7 +15,7 @@
  * interpolators are called with path-relative start/end inside segment and with out positioned at offset for this start/end block
  * all segment types require a fixed number of given points. line: 1, bezier: 3, move: 1, constant: 0, path: 0
  * segments start at the previous point or (0 0)
- * bezier and circular-arc interpolation assume that output array values are set to zero before use
+ * bezier interpolation assume that output array values are set to zero before use
  * segments draw from the start point inclusive to end point exclusive
  * both dimensions are float types for precision with internal calculations */
 #include <inttypes.h>
@@ -32,7 +32,7 @@
 #define spline_path_size_max (SIZE_MAX / 2)
 #endif
 #ifndef spline_path_segment_points_count
-#define spline_path_segment_points_count(s) (((spline_path_i_bezier == s.interpolator) || (spline_path_i_bezier_arc == s.interpolator)) ? 3 : ((spline_path_i_circular_arc == s.interpolator) ? 2 : 1))
+#define spline_path_segment_points_count(s) (((spline_path_i_bezier == s.interpolator) || (spline_path_i_bezier_arc == s.interpolator)) ? 3 : 1)
 #endif
 typedef struct {
   spline_path_value_t x;
@@ -71,8 +71,6 @@ spline_path_segment_t spline_path_path(spline_path_t path);
 void spline_path_prepare_segments(spline_path_segment_t* segments, spline_path_segment_count_t segments_count);
 size_t spline_path_size(spline_path_t path);
 void spline_path_free(spline_path_t path);
-void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void** data, spline_path_value_t* out);
-spline_path_segment_t spline_path_circular_arc(spline_path_value_t curvature, spline_path_value_t x, spline_path_value_t y);
 spline_path_point_t spline_path_perpendicular_point(spline_path_point_t p1, spline_path_point_t p2, spline_path_value_t distance_factor);
 void spline_path_i_bezier_arc(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void** data, spline_path_value_t* out);
 spline_path_segment_t spline_path_bezier_arc(spline_path_value_t curvature, spline_path_value_t x, spline_path_value_t y);
