@@ -4,10 +4,8 @@
 
 /* string-array-hash - a file format and hashtable type for named arrays, possibly nested.
 it uses getline which needs #define _GNU_SOURCE before including stdio.h.
-   murmu3.c must be included beforehand */
+   depends on status.h, hashtable.c, and murmu3.c */
 #include <inttypes.h>
-#include <sph/status.h>
-#include <sph/hashtable.c>
 
 #ifndef ikv_integer_t
 #define ikv_integer_t uintmax_t

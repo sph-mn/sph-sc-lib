@@ -12,7 +12,7 @@ compile_sc() {
   find -type f -name "*.sc" -exec sc --parents '{}' "$c" \;
   cd "$root"
   find "$c" -type f -exec ./exe/format-c -i '{}' \;
-  for name in spline-path float thread-pool status queue random futures ikv
+  for name in spline-path float thread-pool status queue random futures ikv helper
   do
     mv "$c/sph/$name.h.c" "$c/sph/$name.h"
   done

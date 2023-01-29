@@ -1,3 +1,5 @@
+(pre-include-guard-begin sph-set-h)
+
 (sc-comment
   "a macro that defines set data types and functions for arbitrary value types.
    * compared to hashtable.c, this uses less than half the space and operations are faster (about 20% in first tests)
@@ -24,6 +26,7 @@
     12582917 25165843 50331653 100663319 201326611 402653189 805306457 1610612741))
 
 (define sph-set-primes-end uint32-t* (+ sph-set-primes 25))
+(pre-include-guard-end)
 
 (pre-define
   (sph-set-hash-integer value hashtable-size) (modulo value hashtable-size)

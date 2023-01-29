@@ -1,5 +1,3 @@
-(pre-include "sph/ikv.h")
-
 (define (ikv-free-all a) (void ikv-t)
   (sc-comment "hash including all sub hashes and data")
   (declare i size-t j size-t b ikv-value-t)

@@ -1,5 +1,4 @@
-(sc-comment "for nanosleep")
-(pre-include "sph/thread-pool.c" "sph/futures.h")
+(sc-comment "depends thread-pool.c")
 (declare sph-futures-pool sph-thread-pool-t)
 (define sph-futures-pool-is-initialized uint8-t #f)
 

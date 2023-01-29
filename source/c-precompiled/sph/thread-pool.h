@@ -3,9 +3,9 @@
 #define sph_thread_pool_h
 
 /* thread-pool that uses pthread condition variables to pause unused threads.
-   based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing */
+   based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing.
+   depends on queue.h */
 #include <inttypes.h>
-#include <sph/queue.h>
 
 #ifndef sph_thread_pool_size_t
 #define sph_thread_pool_size_t uint8_t

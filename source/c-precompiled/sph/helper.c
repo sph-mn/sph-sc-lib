@@ -1,16 +1,7 @@
 
 #include <stdlib.h>
-#include <inttypes.h>
 #include <stdio.h>
-#include <sph/status.h>
-enum { sph_helper_status_id_memory };
-#define sph_helper_status_group ((uint8_t*)("sph"))
-
-/** add explicit type cast to prevent compiler warning */
-#define sph_helper_malloc(size, result) sph_helper_primitive_malloc(size, ((void**)(result)))
-#define sph_helper_malloc_string(size, result) sph_helper_primitive_malloc_string(size, ((uint8_t**)(result)))
-#define sph_helper_calloc(size, result) sph_helper_primitive_calloc(size, ((void**)(result)))
-#define sph_helper_realloc(size, result) sph_helper_primitive_realloc(size, ((void**)(result)))
+#include <sph/helper.h>
 uint8_t* sph_helper_status_description(status_t a) {
   uint8_t* b;
   if (sph_helper_status_id_memory == a.id) {

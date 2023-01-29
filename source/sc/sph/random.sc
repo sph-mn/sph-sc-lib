@@ -1,5 +1,3 @@
-(pre-include "sph/random.h")
-
 (pre-define
   (sph-rotl x k) (bit-or (bit-shift-left x k) (bit-shift-right x (- 64 k)))
   (sph-random-f64-from-u64 a)

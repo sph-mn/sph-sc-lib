@@ -1,4 +1,4 @@
-(pre-include "float.h" "strings.h" "stdlib.h" "math.h" "sph/spline-path.h")
+(pre-include "float.h" "strings.h" "stdlib.h" "math.h")
 
 (pre-define
   (spline-path-min a b) (if* (< a b) a b)

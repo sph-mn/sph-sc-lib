@@ -1,6 +1,10 @@
 
 #include <inttypes.h>
 #include "./test.c"
+#include <sph/queue.h>
+#include <sph/thread-pool.h>
+#include <sph/thread-pool.c>
+#include <sph/futures.h>
 #include <sph/futures.c>
 status_t test_thread_pool() {
   status_declare;

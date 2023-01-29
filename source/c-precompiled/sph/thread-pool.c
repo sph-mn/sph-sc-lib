@@ -1,6 +1,5 @@
 
 #include <pthread.h>
-#include <sph/thread-pool.h>
 void sph_thread_pool_destroy(sph_thread_pool_t* a) {
   pthread_cond_destroy((&(a->queue_not_empty)));
   pthread_mutex_destroy((&(a->queue_mutex)));

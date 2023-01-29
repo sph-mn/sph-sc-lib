@@ -3,9 +3,9 @@
 (sc-comment
   "string-array-hash - a file format and hashtable type for named arrays, possibly nested."
   "it uses getline which needs #define _GNU_SOURCE before including stdio.h.
-   murmu3.c must be included beforehand")
+   depends on status.h, hashtable.c, and murmu3.c")
 
-(pre-include "inttypes.h" "sph/status.h" "sph/hashtable.c")
+(pre-include "inttypes.h")
 
 (pre-define-if-not-defined
   ikv-integer-t uintmax-t

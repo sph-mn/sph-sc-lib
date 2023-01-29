@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include "./test.c"
+#include <sph/float.h>
 #include <sph/float.c>
+#include <sph/random.h>
 #include <sph/random.c>
 status_t test_random() {
   status_declare;

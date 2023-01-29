@@ -1,3 +1,5 @@
+(pre-include-guard-start sph-memreg-h)
+
 (sc-comment
   "memreg registers memory in a local variable, for example to free all memory allocated at point."
   "the variables memreg_register and memreg_index will also be available."
@@ -82,3 +84,4 @@
         address))))
 
 (declare memreg2-t (type (struct (address void*) (handler (function-pointer void void*)))))
+(pre-include-guard-end)

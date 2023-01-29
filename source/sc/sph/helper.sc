@@ -1,16 +1,4 @@
-(pre-include "stdlib.h" "inttypes.h" "stdio.h" "sph/status.h")
-(enum (sph-helper-status-id-memory))
-
-(pre-define
-  sph-helper-status-group (convert-type "sph" uint8-t*)
-  (sph-helper-malloc size result)
-  (begin
-    "add explicit type cast to prevent compiler warning"
-    (sph-helper-primitive-malloc size (convert-type result void**)))
-  (sph-helper-malloc-string size result)
-  (sph-helper-primitive-malloc-string size (convert-type result uint8-t**))
-  (sph-helper-calloc size result) (sph-helper-primitive-calloc size (convert-type result void**))
-  (sph-helper-realloc size result) (sph-helper-primitive-realloc size (convert-type result void**)))
+(pre-include "stdlib.h" "stdio.h" "sph/helper.h")
 
 (define (sph-helper-status-description a) (uint8-t* status-t)
   (declare b uint8-t*)

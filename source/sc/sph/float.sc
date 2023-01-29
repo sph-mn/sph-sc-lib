@@ -1,4 +1,4 @@
-(pre-include "math.h" "sph/float.h")
+(pre-include "math.h")
 
 (define (sph-f64-nearly-equal a b margin) (uint8-t double double double)
   "approximate float comparison. margin is a factor and is low for low accepted differences"

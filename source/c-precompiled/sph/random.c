@@ -1,6 +1,4 @@
 
-#include <sph/random.h>
-
 #define sph_rotl(x, k) ((x << k) | (x >> (64 - k)))
 
 /** guarantees that all dyadic rationals of the form (k / 2**−53) will be equally likely.

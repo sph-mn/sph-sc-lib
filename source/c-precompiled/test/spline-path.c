@@ -2,7 +2,9 @@
 #include <inttypes.h>
 #include <string.h>
 #include "./test.c"
+#include <sph/spline-path.h>
 #include <sph/spline-path.c>
+#include <sph/float.h>
 #include <sph/float.c>
 #define error_margin 0.1
 void reset_output(spline_path_value_t* out, size_t length) {

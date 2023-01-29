@@ -1,4 +1,6 @@
-(pre-include "inttypes.h" "string.h" "./test.c" "sph/spline-path.c" "sph/float.c")
+(pre-include "inttypes.h" "string.h"
+  "./test.c" "sph/spline-path.h" "sph/spline-path.c" "sph/float.h" "sph/float.c")
+
 (pre-define error-margin 0.1)
 
 (define (reset-output out length) (void spline-path-value-t* size-t)

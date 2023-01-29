@@ -25,8 +25,9 @@ c code is in source/c-precompiled. sc versions are in source/sc. the libraries a
 code is under gpl3+, documentation under cc-by-nc.
 
 # compilation
-* include "sph/library_name.c" for the full code of a library
-* include "sph/library_name.h" (if exists) if the full code is included in a shared library being used
+* include "sph/library_name.h" (if exists) if the .c file is included in a shared library being used
+* include "sph/library_name.c" for the rest of the code
+* if code files depend on others from this library, they have to be included beforehand. this is to allow users to include the code without dependencies on specific include paths in the files. see the c examples below or comments in the files for which libraries to include if necessary
 
 # status
 helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes
@@ -398,6 +399,7 @@ if(0 = q.size) { printf("it's empty\n"); }
 # thread-pool
 ```c
 #include <inttypes.h>
+#include "sph/queue.h"
 #include "sph/thread-pool.c"
 
 void work(thread_pool_task_t* task) {
@@ -430,6 +432,9 @@ depends on thread-pool.c
 
 ```c
 #include <inttypes.h>
+#include "queue.h"
+#include "thread-pool.h"
+#include "thread-pool.c"
 #include "futures.c"
 
 void* future_work(void* data) {
@@ -598,6 +603,7 @@ unbiased bounding ([lemire](https://arxiv.org/abs/1805.10941), [o'neill](https:/
 ## usage
 ```c
 #include <inttypes.h>
+#include "sph/random.h"
 #include "sph/random.c"
 
 sph_random_state_t s = sph_random_state_new(11223344);
@@ -673,6 +679,7 @@ key4 string7
 #include <sph/status.h>
 #include <sph/hashtable.c>
 #include <murmur3.c>
+#include <sph/ikv.h>
 #include <sph/ikv.c>
 
 int main() {

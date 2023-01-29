@@ -4,10 +4,10 @@
 
 /* fine-grain parallelism based on sph/thread-pool.c.
 provides task objects with functions executed in threads that can be waited for to get a result value.
-manages the memory of thread-pool task objects. */
+manages the memory of thread-pool task objects.
+   depends on thread-pool.h */
 #include <inttypes.h>
 #include <time.h>
-#include <sph/thread-pool.h>
 
 #ifndef sph_future_default_poll_interval
 #define sph_future_default_poll_interval \

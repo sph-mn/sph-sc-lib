@@ -4,6 +4,8 @@
 #include <inttypes.h>
 #include "./test.c"
 #include "../foreign/murmur3.c"
+#include <sph/hashtable.c>
+#include <sph/ikv.h>
 #include <sph/ikv.c>
 status_t test_ikv() {
   ikv_t a;

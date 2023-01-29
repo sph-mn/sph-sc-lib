@@ -1,4 +1,4 @@
-
+pre_include_guard_start(sph_memreg_h);
 /* memreg registers memory in a local variable, for example to free all memory allocated at point.
 the variables memreg_register and memreg_index will also be available.
 usage:
@@ -63,3 +63,4 @@ typedef struct {
   void* address;
   void (*handler)(void*);
 } memreg2_t;
+#endif

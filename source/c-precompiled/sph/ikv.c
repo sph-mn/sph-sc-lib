@@ -1,5 +1,3 @@
-
-#include <sph/ikv.h>
 void ikv_free_all(ikv_t a) {
   /* hash including all sub hashes and data */
   size_t i;

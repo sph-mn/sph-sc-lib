@@ -2,9 +2,10 @@
 
 (sc-comment
   "thread-pool that uses pthread condition variables to pause unused threads.
-   based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing")
+   based on the design of thread-pool.scm from sph-lib which has been stress tested in servers and digital signal processing.
+   depends on queue.h")
 
-(pre-include "inttypes.h" "sph/queue.h")
+(pre-include "inttypes.h")
 (pre-define-if-not-defined sph-thread-pool-size-t uint8-t sph-thread-pool-thread-limit 128)
 
 (declare
