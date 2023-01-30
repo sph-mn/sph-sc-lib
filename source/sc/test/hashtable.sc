@@ -1,4 +1,4 @@
-(pre-include "stdio.h" "inttypes.h" "./test.c" "sph/hashtable.c")
+(pre-include "stdio.h" "inttypes.h" "./test.c" "sph/hashtable.h")
 (pre-define test-element-count 10000)
 
 (sph-hashtable-declare-type testht uint64-t

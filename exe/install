@@ -3,4 +3,4 @@
 destination=$1/usr/include
 mkdir -p "$destination"
 cp -rt "$destination" source/c-precompiled/sph
-chown -R 755 "$destination/sph"
+chmod -R 755 "$destination/sph"

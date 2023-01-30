@@ -1,4 +1,4 @@
-(pre-include "stdio.h" "inttypes.h" "./test.c" "sph/set.c")
+(pre-include "stdio.h" "inttypes.h" "./test.c" "sph/set.h")
 (pre-define test-element-count 10000)
 (sph-set-declare-type set64 uint64-t sph-set-hash-integer sph-set-equal-integer 0 1 2)
 (sph-set-declare-type-nonull set64nn uint64-t sph-set-hash-integer sph-set-equal-integer 0 2)

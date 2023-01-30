@@ -1,4 +1,4 @@
-(pre-include "stdio.h" "inttypes.h" "sys/types.h" "./test.c" "sph/quicksort.c")
+(pre-include "stdio.h" "inttypes.h" "sys/types.h" "./test.c" "sph/quicksort.h")
 (pre-define test-element-count 10)
 (declare test-struct-t (type (struct (value uint32-t))))
 

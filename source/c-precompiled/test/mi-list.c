@@ -1,7 +1,7 @@
 
 #include <inttypes.h>
 #include "./test.c"
-#include <sph/mi-list.c>
+#include <sph/mi-list.h>
 #define test_element_count 100
 mi_list_declare_type(mi_list_64, uint64_t);
 void print_contents(mi_list_64_t* a) {

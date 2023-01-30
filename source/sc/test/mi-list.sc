@@ -1,4 +1,4 @@
-(pre-include "inttypes.h" "./test.c" "sph/mi-list.c")
+(pre-include "inttypes.h" "./test.c" "sph/mi-list.h")
 (pre-define test-element-count 100)
 (mi-list-declare-type mi-list-64 uint64-t)
 

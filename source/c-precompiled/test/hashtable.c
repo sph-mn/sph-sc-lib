@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include "./test.c"
-#include <sph/hashtable.c>
+#include <sph/hashtable.h>
 #define test_element_count 10000
 sph_hashtable_declare_type(testht, uint64_t, uint64_t, sph_hashtable_hash_integer, sph_hashtable_equal_integer, 2);
 void print_contents(testht_t a) {
