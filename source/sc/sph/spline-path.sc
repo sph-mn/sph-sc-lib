@@ -115,7 +115,7 @@
       p.y
       (spline-path-i-bezier-interpolate mt t
         p-start.y (struct-get (array-get p-rest 0) y) (struct-get (array-get p-rest 1) y) p-end.y)
-      ix (- (convert-point-x p.x start end) start)
+      ix (- (convert-point-x p.x start (- end 1)) start)
       (array-get out ix) p.y)
     (set+ i 1))
   (spline-path-set-missing-points out start end))
@@ -166,7 +166,7 @@
       s-end (struct-get (array-get s.points (- s._points-count 1)) x))
     (if (> s-start end)
       (if (or second-search (= 0 i)) break
-        (begin (sc-comment "to allow randomly ordered access") (set i 0 second-search #t) continue)))
+        (begin (sc-comment "to allow random access") (set i 0 second-search #t) continue)))
     (if (< s-end start) (begin (set+ i 1) continue))
     (set
       path:current-segment i
@@ -246,6 +246,7 @@
   (declare path spline-path-t)
   (spline-path-set &path segments segments-count)
   (spline-path-get &path start end out)
+  (spline-path-free path)
   (return 0))
 
 (define (spline-path-move x y) (spline-path-segment-t spline-path-value-t spline-path-value-t)

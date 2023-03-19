@@ -34,8 +34,10 @@
 (define (sph-future-deinit) void
   "can be called to stop and free the main thread-pool.
    waits till all active futures are finished"
-  (sph-thread-pool-finish &sph-futures-pool 0 0)
-  (sph-thread-pool-destroy &sph-futures-pool))
+  (if sph-futures-pool-is-initialized
+    (begin
+      (sph-thread-pool-finish &sph-futures-pool 0 0)
+      (sph-thread-pool-destroy &sph-futures-pool))))
 
 (define (sph-future-touch a) (void* sph-future-t*)
   "blocks until future is finished and returns its result"
