@@ -27,7 +27,7 @@
     a->size = new_size; \
     return (0); \
   }
-#define array2_declare(a, type) type a = { 0, 0, 0 }
+#define array2_declare(a, type) type a = { 0 }
 #define array2_set_null(a) \
   a.size = 0; \
   a.data = 0

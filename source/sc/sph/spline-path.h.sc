@@ -83,7 +83,7 @@
   (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
   (spline-path-i-bezier-arc start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
-  (spline-path-bezier-arc curvature x y)
+  (spline-path-bezier-arc x y curvature)
   (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t))
 
 (pre-include-guard-end)

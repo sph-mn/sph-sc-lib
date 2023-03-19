@@ -59,17 +59,17 @@
 
 (define (spline-path-i-move start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
-  "p-rest length 1"
+  "p_rest length 1"
   (memset out 0 (* (sizeof spline-path-value-t) (- end start))))
 
 (define (spline-path-i-constant start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
-  "p-rest length 0"
+  "p_rest length 0"
   (for ((define i size-t 0) (< i (- end start)) (set+ i 1)) (set (array-get out i) p-start.y)))
 
 (define (spline-path-i-line start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
-  "p-rest length 1"
+  "p_rest length 1"
   (declare
     p-end spline-path-point-t
     t spline-path-value-t
@@ -86,7 +86,7 @@
 
 (define (spline-path-i-bezier start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
-  "p-rest length 3"
+  "p_rest length 3"
   (declare
     b-size size-t
     i size-t
@@ -183,7 +183,7 @@
 
 (define (spline-path-i-path start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
-  "p-rest length 0. data is one spline-path-t"
+  "p_rest length 0. data is one spline_path_t"
   (spline-path-get *data (- start p-start.x) (- end p-start.x) out))
 
 (define (spline-path-start path) (spline-path-point-t spline-path-t)
@@ -226,13 +226,13 @@
 
 (define (spline-path-set path segments segments-count)
   (void spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
-  "set segments for a path and initialise it"
+  "set segments for a path and initialize it"
   (spline-path-prepare-segments segments segments-count)
   (set path:segments segments path:segments-count segments-count path:current-segment 0))
 
 (define (spline-path-set-copy path segments segments-count)
   (uint8-t spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
-  "like spline-path-set but copies segments to new memory in .segments that has to be freed
+  "like spline_path_set but copies segments to new memory in .segments that has to be freed
    when not needed anymore"
   (define s spline-path-segment-t* (malloc (* segments-count (sizeof spline-path-segment-t))))
   (if (not s) (return 1))
@@ -274,7 +274,7 @@
     (: (+ 2 s.points) y) y3)
   (return s))
 
-(define (spline-path-bezier-arc curvature x y)
+(define (spline-path-bezier-arc x y curvature)
   (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
   "curvature is a real between -1..1, with the maximum being the edge of the segment"
   (declare s spline-path-segment-t)

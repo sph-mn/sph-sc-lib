@@ -17,7 +17,7 @@
       (if (not data) (return 1))
       (set a:data data a:size new-size)
       (return 0)))
-  (array2-declare a type) (define a type (struct-literal 0 0 0))
+  (array2-declare a type) (define a type (struct-literal 0))
   (array2-set-null a) (set a.size 0 a.data 0)
   (array2-get a index) (array-get a.data index)
   (array2-size a) a.size
