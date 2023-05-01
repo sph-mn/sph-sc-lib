@@ -76,7 +76,7 @@ void spline_path_i_circular_arc(size_t start, size_t end, spline_path_point_t p_
       break;
     };
     p = complex_division((complex_linear_interpolation((d.ab_m), (d.bm_a), t)), (complex_linear_interpolation((d.b_m), (d.m_a), t)));
-    ix = (convert_point_x((p.x), start, end) - start);
+    ix = (convert_point_x((p.x), start, (end - 1)) - start);
     out[ix] = p.y;
     i += 1;
   };

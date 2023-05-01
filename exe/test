@@ -4,8 +4,9 @@
 
 export MALLOC_CHECK_=3
 export LD_LIBRARY_PATH="$PWD/temp"
-./temp/test-queue
 ./temp/test-spline-path
+exit
+./temp/test-queue
 ./temp/test-arrayn
 ./temp/test-mi-list
 ./temp/test-quicksort

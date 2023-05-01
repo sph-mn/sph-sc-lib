@@ -83,7 +83,7 @@
       p
       (complex-division (complex-linear-interpolation d.ab-m d.bm-a t)
         (complex-linear-interpolation d.b-m d.m-a t))
-      ix (- (convert-point-x p.x start end) start)
+      ix (- (convert-point-x p.x start (- end 1)) start)
       (array-get out ix) p.y)
     (set+ i 1))
   (spline-path-set-missing-points out start end))

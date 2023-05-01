@@ -102,21 +102,21 @@
     s-size (- p-end.x p-start.x)
     s-offset (- start p-start.x)
     b-size (- end start)
-    i 0
-    ix i)
-  (while (< ix b-size)
-    (set t (/ (+ i s-offset) s-size))
-    (if (>= t 1.0) break)
+    i s-offset)
+  (while (< i s-size)
     (set
-      mt (- 1 t)
+      t (/ i s-size)
+      mt (- 1.0 t)
       p.x
       (spline-path-i-bezier-interpolate mt t
         p-start.x (struct-get (array-get p-rest 0) x) (struct-get (array-get p-rest 1) x) p-end.x)
       p.y
       (spline-path-i-bezier-interpolate mt t
         p-start.y (struct-get (array-get p-rest 0) y) (struct-get (array-get p-rest 1) y) p-end.y)
-      ix (- (convert-point-x p.x start (- end 1)) start)
-      (array-get out ix) p.y)
+      ix (if* (< p.x start) 0 (- (spline-path-cheap-round-positive p.x) start)))
+    (if (>= ix b-size) break)
+    (sc-comment (printf "ix %lu %f %f\n" ix p.x p.y))
+    (set (array-get out ix) p.y)
     (set+ i 1))
   (spline-path-set-missing-points out start end))
 
@@ -150,36 +150,31 @@
    since x values are integers, a path from (0 0) to (10 20) for example would have reached 20 only at the 11th point.
    out memory is managed by the caller. the size required for out is end minus start"
   (sc-comment "find all segments that overlap with requested range")
-  (declare
-    i spline-path-segment-count-t
-    s spline-path-segment-t
-    s-start size-t
-    s-end size-t
-    out-start size-t
-    segments-count spline-path-segment-count-t
-    second-search uint8-t)
-  (set segments-count path:segments-count i path:current-segment second-search #f)
-  (while (< i segments-count)
+  (declare s spline-path-segment-t s-start size-t s-end size-t out-start size-t)
+  (for
+    ( (define
+        i spline-path-segment-count-t (if* (< start path:previous-start) 0 path:segment-index))
+      (< i path:segments-count) (set+ i 1))
     (set
       s (array-get path:segments i)
       s-start s._start.x
       s-end (struct-get (array-get s.points (- s._points-count 1)) x))
-    (if (> s-start end)
-      (if (or second-search (= 0 i)) break
-        (begin (sc-comment "to allow random access") (set i 0 second-search #t) continue)))
-    (if (< s-end start) (begin (set+ i 1) continue))
-    (set
-      path:current-segment i
-      out-start (if* (> s-start start) (- s-start start) 0)
-      s-start (if* (> s-start start) s-start start)
-      s-end (if* (< s-end end) s-end end))
-    (s.interpolator s-start s-end s._start s.points &s.data (+ out-start out))
-    (set+ i 1))
-  (sc-comment "outside points are zero")
-  (if (> end s-end)
-    (begin
-      (set out-start (if* (> start s-end) 0 (- s-end start)))
-      (memset (+ out out-start) 0 (* (- end out-start) (sizeof spline-path-value-t))))))
+    (if (and (> s-end start) (< s-start end))
+      (begin
+        (set
+          path:segment-index i
+          path:previous-start s-start
+          out-start (if* (> s-start start) (- s-start start) 0)
+          s-start (if* (> s-start start) s-start start)
+          s-end (if* (< s-end end) s-end end))
+        (s.interpolator s-start s-end s._start s.points &s.data (+ out-start out))
+        (if (= s-end end) return)
+        (if (= i (- path:segments-count 1))
+          (begin
+            (sc-comment "outside points are zero")
+            (set out-start (if* (> start s-end) 0 (- s-end start)))
+            (memset (+ out out-start) 0 (* (- end out-start) (sizeof spline-path-value-t)))
+            return))))))
 
 (define (spline-path-i-path start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
@@ -228,7 +223,7 @@
   (void spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
   "set segments for a path and initialize it"
   (spline-path-prepare-segments segments segments-count)
-  (set path:segments segments path:segments-count segments-count path:current-segment 0))
+  (set path:segments segments path:segments-count segments-count path:segment-index 0))
 
 (define (spline-path-set-copy path segments segments-count)
   (uint8-t spline-path-t* spline-path-segment-t* spline-path-segment-count-t)

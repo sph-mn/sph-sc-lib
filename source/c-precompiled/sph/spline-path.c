@@ -108,17 +108,18 @@ void spline_path_i_bezier(size_t start, size_t end, spline_path_point_t p_start,
   s_size = (p_end.x - p_start.x);
   s_offset = (start - p_start.x);
   b_size = (end - start);
-  i = 0;
-  ix = i;
-  while ((ix < b_size)) {
-    t = ((i + s_offset) / s_size);
-    if (t >= 1.0) {
-      break;
-    };
-    mt = (1 - t);
+  i = s_offset;
+  while ((i < s_size)) {
+    t = (i / s_size);
+    mt = (1.0 - t);
     p.x = spline_path_i_bezier_interpolate(mt, t, (p_start.x), ((p_rest[0]).x), ((p_rest[1]).x), (p_end.x));
     p.y = spline_path_i_bezier_interpolate(mt, t, (p_start.y), ((p_rest[0]).y), ((p_rest[1]).y), (p_end.y));
-    ix = (convert_point_x((p.x), start, (end - 1)) - start);
+    ix = ((p.x < start) ? 0 : (spline_path_cheap_round_positive((p.x)) - start));
+    if (ix >= b_size) {
+      break;
+    };
+    /* (printf ix %lu %f %f
+     ix p.x p.y) */
     out[ix] = p.y;
     i += 1;
   };
@@ -151,45 +152,31 @@ void spline_path_i_bezier_arc(size_t start, size_t end, spline_path_point_t p_st
    out memory is managed by the caller. the size required for out is end minus start */
 void spline_path_get(spline_path_t* path, size_t start, size_t end, spline_path_value_t* out) {
   /* find all segments that overlap with requested range */
-  spline_path_segment_count_t i;
   spline_path_segment_t s;
   size_t s_start;
   size_t s_end;
   size_t out_start;
-  spline_path_segment_count_t segments_count;
-  uint8_t second_search;
-  segments_count = path->segments_count;
-  i = path->current_segment;
-  second_search = 0;
-  while ((i < segments_count)) {
+  for (spline_path_segment_count_t i = ((start < path->previous_start) ? 0 : path->segment_index); (i < path->segments_count); i += 1) {
     s = (path->segments)[i];
     s_start = s._start.x;
     s_end = ((s.points)[(s._points_count - 1)]).x;
-    if (s_start > end) {
-      if (second_search || (0 == i)) {
-        break;
-      } else {
-        /* to allow random access */
-        i = 0;
-        second_search = 1;
-        continue;
+    if ((s_end > start) && (s_start < end)) {
+      path->segment_index = i;
+      path->previous_start = s_start;
+      out_start = ((s_start > start) ? (s_start - start) : 0);
+      s_start = ((s_start > start) ? s_start : start);
+      s_end = ((s_end < end) ? s_end : end);
+      (s.interpolator)(s_start, s_end, (s._start), (s.points), (&(s.data)), (out_start + out));
+      if (s_end == end) {
+        return;
+      };
+      if (i == (path->segments_count - 1)) {
+        /* outside points are zero */
+        out_start = ((start > s_end) ? 0 : (s_end - start));
+        memset((out + out_start), 0, ((end - out_start) * sizeof(spline_path_value_t)));
+        return;
       };
     };
-    if (s_end < start) {
-      i += 1;
-      continue;
-    };
-    path->current_segment = i;
-    out_start = ((s_start > start) ? (s_start - start) : 0);
-    s_start = ((s_start > start) ? s_start : start);
-    s_end = ((s_end < end) ? s_end : end);
-    (s.interpolator)(s_start, s_end, (s._start), (s.points), (&(s.data)), (out_start + out));
-    i += 1;
-  };
-  /* outside points are zero */
-  if (end > s_end) {
-    out_start = ((start > s_end) ? 0 : (s_end - start));
-    memset((out + out_start), 0, ((end - out_start) * sizeof(spline_path_value_t)));
   };
 }
 
@@ -252,7 +239,7 @@ void spline_path_set(spline_path_t* path, spline_path_segment_t* segments, splin
   spline_path_prepare_segments(segments, segments_count);
   path->segments = segments;
   path->segments_count = segments_count;
-  path->current_segment = 0;
+  path->segment_index = 0;
 }
 
 /** like spline_path_set but copies segments to new memory in .segments that has to be freed

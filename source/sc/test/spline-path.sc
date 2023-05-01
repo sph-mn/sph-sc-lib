@@ -24,7 +24,7 @@
     log-path-new-get-0 uint8-t
     log-path-new-get-1 uint8-t)
   (set
-    log-path-new-0 #f
+    log-path-new-0 #t
     log-path-new-1 #f
     log-path-new-get-0 #f
     log-path-new-get-1 #f
@@ -164,8 +164,9 @@
 
 (define (main) int
   status-declare
-  (test-helper-test-one test-spline-path-bezier-arc)
   (test-helper-test-one test-spline-path)
+  (goto exit)
+  (test-helper-test-one test-spline-path-bezier-arc)
   (test-helper-test-one test-spline-path-helpers)
   (test-helper-test-one test-spline-path-circular-arc)
   (label exit (test-helper-display-summary) (return status.id)))

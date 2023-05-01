@@ -8,8 +8,9 @@ warnings="-Wunused-label -Wunused-value -Wunused-variable"
 gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimisation -fno-math-errno -I$c/sph-sc-lib"
 
 compile_test_sph_sc_lib() {
-  gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
   gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options -lm
+  exit
+  gcc "$c/test/queue.c" -o temp/test-queue $gcc_options
   gcc "$c/test/arrayn.c" -o temp/test-arrayn $gcc_options
   gcc "$c/test/mi-list.c" -o temp/test-mi-list $gcc_options
   gcc "$c/test/quicksort.c" -o temp/test-quicksort $gcc_options

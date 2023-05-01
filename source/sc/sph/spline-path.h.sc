@@ -48,7 +48,8 @@
     (struct
       (segments-count spline-path-segment-count-t)
       (segments spline-path-segment-t*)
-      (current-segment spline-path-segment-count-t)))
+      (segment-index spline-path-segment-count-t)
+      (previous-start size-t)))
   (spline-path-i-move start end p-start p-rest data out)
   (void size-t size-t spline-path-point-t spline-path-point-t* void** spline-path-value-t*)
   (spline-path-i-constant start end p-start p-rest data out)

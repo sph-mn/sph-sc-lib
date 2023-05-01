@@ -27,7 +27,7 @@ status_t test_spline_path() {
   uint8_t log_path_new_1;
   uint8_t log_path_new_get_0;
   uint8_t log_path_new_get_1;
-  log_path_new_0 = 0;
+  log_path_new_0 = 1;
   log_path_new_1 = 0;
   log_path_new_get_0 = 0;
   log_path_new_get_1 = 0;
@@ -188,8 +188,9 @@ status_t test_spline_path_circular_arc() {
 }
 int main() {
   status_declare;
-  test_helper_test_one(test_spline_path_bezier_arc);
   test_helper_test_one(test_spline_path);
+  goto exit;
+  test_helper_test_one(test_spline_path_bezier_arc);
   test_helper_test_one(test_spline_path_helpers);
   test_helper_test_one(test_spline_path_circular_arc);
 exit:

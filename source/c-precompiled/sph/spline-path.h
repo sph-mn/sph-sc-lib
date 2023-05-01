@@ -50,7 +50,8 @@ typedef struct {
 typedef struct {
   spline_path_segment_count_t segments_count;
   spline_path_segment_t* segments;
-  spline_path_segment_count_t current_segment;
+  spline_path_segment_count_t segment_index;
+  size_t previous_start;
 } spline_path_t;
 void spline_path_i_move(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void** data, spline_path_value_t* out);
 void spline_path_i_constant(size_t start, size_t end, spline_path_point_t p_start, spline_path_point_t* p_rest, void** data, spline_path_value_t* out);

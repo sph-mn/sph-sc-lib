@@ -85,8 +85,7 @@
       "add if not already exists. returns the address of the existing or new value or 0 if no space is left"
       (declare i size-t hash-i size-t)
       (if (set-equal null value) (begin (set *a.values notnull) (return a.values)))
-      (set hash-i (+ 1 (set-hash value (- a.size 1))))
-      (set i hash-i)
+      (set hash-i (+ 1 (set-hash value (- a.size 1))) i hash-i)
       (while (< i a.size)
         (if (set-equal null (array-get a.values i))
           (begin
