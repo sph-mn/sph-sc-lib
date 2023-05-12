@@ -3,7 +3,8 @@
 #include <stdio.h>
 
 #define test_helper_test_one(func) \
-  printf("%s\n", #func); \
+  /* (printf %s \
+   (pre-stringify func)) */ \
   status_require((func()))
 #define test_helper_assert(description, expression) \
   if (!expression) { \
@@ -12,7 +13,9 @@
   }
 #define test_helper_display_summary() \
   if (status_is_success) { \
-    printf(("--\ntests finished successfully.\n")); \
+    /* (printf -- \
+    tests finished successfully. \
+    ) */ \
   } else { \
     printf(("\ntests failed. %d\n"), (status.id)); \
   }
