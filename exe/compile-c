@@ -5,7 +5,7 @@ target_dir=temp
 c=source/c-precompiled
 optimisation=3
 warnings="-Wunused-label -Wunused-value -Wunused-variable"
-gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimisation -fno-math-errno -I$c/sph-sc-lib"
+gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimisation -fno-math-errno -I$c"
 
 compile_test_sph_sc_lib() {
   gcc "$c/test/spline-path.c" -o temp/test-spline-path $gcc_options -lm

@@ -3,8 +3,7 @@
 
 (sc-comment
   "a macro that defines hash-table data types for arbitrary key/value types,"
-  "with linear probing for collision resolve and hash and equal functions customisable"
-  "by defining macro variables and re-including the source."
+  "with linear probing for collision resolve and customizable hash and equal functions."
   "prime numbers from https://planetmath.org/goodhashtableprimes")
 
 (declare sph-hashtable-primes
@@ -18,7 +17,6 @@
     12582917 25165843 50331653 100663319 201326611 402653189 805306457 1610612741))
 
 (define sph-hashtable-primes-end uint32-t* (+ sph-hashtable-primes 25))
-(pre-include-guard-end)
 
 (pre-define
   (sph-hashtable-hash-integer key hashtable-size) (modulo key hashtable-size)
@@ -89,3 +87,5 @@
       (define value value-type* ((pre-concat name _get) a key))
       (if value (begin (set (array-get a.flags (- value a.values)) 0) (return 0)) (return 1)))
     (define ((pre-concat name _clear) a) (void (pre-concat name _t)) (memset a.flags 0 a.size))))
+
+(pre-include-guard-end)

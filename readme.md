@@ -148,25 +148,28 @@ macro that defines hash-table data structures for custom key/value types.
 * three arrays (flags, keys, values)
 * no empty key needed, because the flags array is used to check existence
 * no null value needed, because hashtable_get returns addresses
-* first version under 150 lines
+* less than 150 lines of code
 * the hashtable size does not automatically grow. a new hashtable has to be created should the specified size later turn out to be insufficient
 
 ## usage examples
-with hashtable.c in the same directory:
-
 ~~~
-#include "sph/hashtable.c";
-// name, key_type, value_type, hashtable_hash, hashtable_equal, size_factor
-hashtable_declare_type(mytype, uint64_t, uint32_t, hashtable_hash_integer, hashtable_equal_integer, 2);
-mytype_t ht;
-mytype_new(200, &ht);
-mytype_set(ht, 44, 5);
-mytype_get(ht, 44);
-mytype_remove(ht, 44);
-mytype_free(ht);
+#include "sph/hashtable.h"
+
+// name, key_type, value_type, hash_function_or_macro, equal_function_or_macro, size_factor
+sph_hashtable_declare_type(mytype, uint64_t, uint32_t, sph_hashtable_hash_integer, sph_hashtable_equal_integer, 2);
+
+void main() {
+  mytype_t ht;
+  mytype_new(200, &ht);
+  mytype_set(ht, 44, 5);
+  mytype_get(ht, 44);
+  mytype_remove(ht, 44);
+  mytype_free(ht);
+}
 ~~~
 
-hashtable_declare_type defines these functions:
+sph_hashtable_declare_type defines the following functions. ## stands for concatenation, for example name##_new could be mytype_new.
+
 ~~~
 // returns 1 on success or 0 if the memory allocation failed.
 uint8_t name##_new(size_t min_size, name##_t* result);
@@ -185,8 +188,8 @@ void name##_free(name##_t a);
 
 the provided example hash functions are:
 ```
-#define hashtable_hash_integer(key, hashtable-size) (key % hashtable-size)
-#define hashtable_equal_integer(key_a, key_b) (key_a == key_b)
+#define sph_hashtable_hash_integer(key, hashtable_size) (key % hashtable_size)
+#define sph_hashtable_equal_integer(key_a, key_b) (key_a == key_b)
 ```
 
 # set
@@ -205,9 +208,11 @@ macro that defines set data structures for custom value types.
 ## usage examples
 with set.c in the same directory:
 ~~~
-#include "sph/set.c";
+#include "sph/set.h"
+
 // name, value_type, hash, equal, null, notnull, size_factor
 sph_set_declare_type(myset, int, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
+
 void main() {
   myset_t a;
   if(myset_new(3, &a)) {
