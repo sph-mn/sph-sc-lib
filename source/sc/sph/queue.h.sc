@@ -31,7 +31,7 @@
   (type (struct (size sph-queue-size-t) (first sph-queue-node-t*) (last sph-queue-node-t*))))
 
 (define (sph-queue-init a) (void sph-queue-t*)
-  "initialise a queue or remove all elements"
+  "initialize a queue or remove all elements"
   (set a:first 0 a:last 0 a:size 0))
 
 (define (sph-queue-enq a node) (void sph-queue-t* sph-queue-node-t*)

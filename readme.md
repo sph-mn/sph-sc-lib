@@ -1,7 +1,7 @@
 # sph-sc-lib
 
 various small standalone c utility libraries.
-c code is in source/c-precompiled. sc versions are in source/sc. the libraries are developed in sc and then translated to normal, readable c formatted with clang-format
+c code is in source/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions are in source/sc. the libraries are developed in sc and then translated to normal, readable c, formatted with clang-format
 
 # included libraries
 * [futures](#futures): fine-grained parallelism with objects that can be waited on for results
@@ -147,7 +147,7 @@ macro that defines hash-table data structures for custom key/value types.
 * linear probing for collision resolve
 * three arrays (flags, keys, values)
 * no empty key needed, because the flags array is used to check existence
-* no null value needed, because hashtable_get returns addresses
+* no extra null value needed, because hashtable_get returns addresses
 * less than 150 lines of code
 * the hashtable size does not automatically grow. a new hashtable has to be created should the specified size later turn out to be insufficient
 
@@ -200,7 +200,7 @@ macro that defines set data structures for custom value types.
 * linear probing for collision resolve
 * insert/delete/search should all be o(1)
 * the set size does not automatically grow. a new set has to be created should the specified size later turn out to be insufficient
-* example hash functions that work with integers
+* includes example hash functions that work with integers
 
 ## dependencies
 * the c standard library (stdlib.h and inttypes.h)
@@ -258,8 +258,7 @@ sph_set_declare_type_nonull takes one less argument - it does not need a notnull
 
 ### memory usage
 the memory allocated for the set is at least the requested size times set_factor, possibly rounded to a next higher prime.
-set size factor approaching 1 leads to more efficient memory usage, with 1 being the lowest possible, where only as much space as the elements need by themselves is allocated.
-the downside is that the insert/delete/search performance is more likely to approach and reach o(n).
+one is the minimum set size factor with the least memory usage. greater sizes reduce the possibility of collisions and thereby increase access performance.
 
 ## modularity and implementation
 * declared "name##_t" set types are structures (.size, .values). "values" is a one-dimensional array that stores values at indices determined by a hash function
@@ -382,9 +381,8 @@ typedef struct name##_struct {
 
 # queue
 a fifo queue with the operations enqueue and dequeue that can enqueue structs of mixed types.
-for elements what is needed is a struct with a queue_node_t field with a custom name. a queue_node_t object to be added must not already be in the queue.
-the queue does not need to allocate memory. depends on queue.c
-
+elements need to be a struct with a field queue_node_t with a specific name. a queue_node_t object to be added must not already be in the queue.
+the queue will use and reference the queue_node field and does not need to allocate new memory. depends on queue.c
 
 ## example usage
 ```c
@@ -477,7 +475,7 @@ gcc "$c/test/thread-pool.c" -o temp/test-thread-pool -lpthread -D _DEFAULT_SOURC
 ```
 
 # spline-path
-spline-path creates discrete 2d paths with segments that interpolate between some given points.
+spline-path creates discrete 2d paths with segments that interpolate between given points.
 paths can be composed to construct more complex paths.
 
 implemented segment types and interpolation methods
@@ -488,7 +486,7 @@ implemented segment types and interpolation methods
 * path: another spline path as a segment
 
 features
-* extremely fast through only supporting 2d, with only selected and optimised interpolators, limited segment count and sampling portions of paths at once instead of only single points
+* extremely fast through only supporting 2d, with only selected and optimized interpolators, limited segment count and sampling portions of paths at once instead of only single points
 * maps from one independent discrete value to one dependent continuous value and only the dependent value is returned
 * paths are stateless and the same path object can be used by multiple threads
 * multidimensional interpolation can be archieved with separate calls for additional dimensions
@@ -602,7 +600,7 @@ int main() {
 ```
 
 # random
-[xoshiro256**](http://xoshiro.di.unimi.it/) and xoshiro256+ implementation (also referenced [here](https://nullprogram.com/blog/2017/09/21/)).
+[xoshiro256**](http://xoshiro.di.unimi.it/) and xoshiro256+ implementation (article about the algorithm [here](https://nullprogram.com/blog/2017/09/21/)).
 unbiased bounding ([lemire](https://arxiv.org/abs/1805.10941), [o'neill](https://www.pcg-random.org/posts/bounded-rands.html)).
 
 ## usage

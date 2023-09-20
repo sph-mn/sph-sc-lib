@@ -1,5 +1,7 @@
 (sc-comment "depends on sys/types.h for ssize_t")
 
+(sc-comment "! there may be a current segfaulting bug with small arrays of around size two.")
+
 (define (quicksort less? swap array left right)
   (void (function-pointer uint8-t void* ssize-t ssize-t) (function-pointer void void* ssize-t ssize-t) void* ssize-t ssize-t)
   "a generic quicksort implementation that works with any array type.
@@ -11,11 +13,12 @@
   (define l ssize-t left)
   (define r ssize-t right)
   (while #t
-    (while (less? array l pivot) (set l (+ 1 l)))
-    (while (less? array pivot r) (set r (- r 1)))
+    (while (less? array l pivot) (set+ l 1))
+    (while (less? array pivot r) (set- r 1))
     (if (> l r) break)
     (cond ((= pivot l) (set pivot r)) ((= pivot r) (set pivot l)))
     (swap array l r)
-    (set l (+ 1 l) r (- r 1)))
+    (set+ l 1)
+    (set- r 1))
   (quicksort less? swap array left r)
   (quicksort less? swap array l right))
