@@ -1,10 +1,10 @@
-(sc-comment "depends thread-pool.c")
+(sc-comment "depends on thread-pool.c")
 (declare sph-futures-pool sph-thread-pool-t)
 (define sph-futures-pool-is-initialized uint8-t #f)
 
 (define (sph-future-init thread-count) (int sph-thread-pool-size-t)
   "call once to initialize the future thread pool that persists for
-   the whole process or until sph-future-deinit is called.
+   the whole process or until sph_future_deinit is called.
    can be called multiple times and just returns if the thread pool already exists.
    returns zero on success"
   (declare status int)
@@ -16,7 +16,6 @@
 
 (define (sph-future-eval task) (void sph-thread-pool-task-t*)
   "internal future worker.
-   a->f returns because modifying data likely needs extra type conversions inside a->f.
    thread-pool does not have a finished field by default so that tasks can themselves free
    their object when they finish"
   (declare a sph-future-t*)
@@ -26,7 +25,7 @@
     a:finished #t))
 
 (define (sph-future-new f data out) (void sph-future-f-t void* sph-future-t*)
-  "prepare a future in out and possibly start evaluation in parallel.
+  "prepare a future in \"out\" and possibly start evaluation in parallel.
    the given function receives data as its sole argument"
   (set out:finished #f out:f f out:task.f sph-future-eval out:task.data data)
   (sph-thread-pool-enqueue &sph-futures-pool &out:task))
