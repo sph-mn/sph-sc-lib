@@ -1,16 +1,16 @@
 #!/bin/sh -e
 # the shared library must have already been compiled,
-# the compiled one from the temp directory is used
+# the compiled one from the tmp directory is used
 
 export MALLOC_CHECK_=3
-export LD_LIBRARY_PATH="$PWD/temp"
-./temp/test-spline-path
-./temp/test-queue
-./temp/test-arrayn
-./temp/test-mi-list
-./temp/test-quicksort
-./temp/test-random
-./temp/test-set
-./temp/test-hashtable
-./temp/test-thread-pool
-#./temp/test-ikv
+export LD_LIBRARY_PATH="$PWD/tmp"
+./tmp/test-spline-path
+./tmp/test-queue
+./tmp/test-arrayn
+./tmp/test-mi-list
+./tmp/test-quicksort
+./tmp/test-random
+./tmp/test-set
+./tmp/test-hashtable
+./tmp/test-thread-pool
+#./tmp/test-ikv

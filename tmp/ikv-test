@@ -1,0 +1,9 @@
+key1 0 1 2 3 4
+key2 0.100000 5.000000 6.330000 7.000000 8.000000
+key3 string1 string2 string3
+nest1
+  nest11
+    nest111 string4 string5
+  nest12 9
+  nest13 string6
+key4 string7
