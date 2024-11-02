@@ -1,7 +1,7 @@
 # sph-sc-lib
 
 various small standalone c utility libraries.
-c code is in source/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions are in source/sc. the libraries are developed in sc and then translated to normal, readable c, formatted with clang-format
+c code is in src/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions are in src/sc. the libraries are developed in sc and then translated to normal, readable c, formatted with clang-format
 
 # included libraries
 * [futures](#futures): fine-grained parallelism with objects that can be waited on for results
@@ -413,17 +413,17 @@ void work(thread_pool_task_t* task) {
 
 int main() {
   int error;
-  thread_pool_t pool;
-  thread_pool_task_t* task;
-  error = thread_pool_new(10, &pool);
+  sph_thread_pool_t pool;
+  sph_thread_pool_task_t* task;
+  error = sph_thread_pool_new(10, &pool);
   if(error) return error;
-  task = malloc(sizeof(thread_pool_task_t));
+  task = malloc(sizeof(sph_thread_pool_task_t));
   if(!task) return 1;
   task->f = work;
-  thread_pool_enqueue(a, task);
+  sph_thread_pool_enqueue(a, task);
   // when the thread pool is not needed anymore then all threads can be closed.
   // arguments: thread_pool, no_wait, discard_queue
-  thread_pool_finish(&pool, 0, 0);
+  sph_thread_pool_finish(&pool, 0, 0);
   return 0;
 }
 ```
@@ -442,7 +442,7 @@ depends on thread-pool.c
 
 void* future_work(void* data) {
   // return value is a void pointer.
-  // just for example this returns a new object. data could be modified and the pointer returned
+  // just for example this returns a new object. the data could be modified instead
   uint8_t* a;
   a = malloc(sizeof(uint8_t));
   *a = 2 + *(uint8_t*)(data);
@@ -471,7 +471,7 @@ int main() {
 ```
 
 ```
-gcc "$c/test/thread-pool.c" -o temp/test-thread-pool -lpthread -D _DEFAULT_SOURCE
+gcc "$c/test/thread-pool.c" -o tmp/test-thread-pool -lpthread -D _DEFAULT_SOURCE
 ```
 
 # spline-path
@@ -693,10 +693,10 @@ int main() {
   status_i_require(ikv_new(100, &a));
   /* read/write */
   status_require(ikv_read_file("other/ikv-test-data", a));
-  ikv_write_file(a, "temp/ikv-test");
+  ikv_write_file(a, "tmp/ikv-test");
   ikv_free_all(a);
   status_i_require(ikv_new(100, &a));
-  status_require(ikv_read_file("temp/ikv-test", a));
+  status_require(ikv_read_file("tmp/ikv-test", a));
   /* access top level */
   value = ikv_get(a, "key4");
   printf("key4 string: %s\n", ikv_value_get_string(value, 0));

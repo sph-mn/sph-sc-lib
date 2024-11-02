@@ -2,5 +2,5 @@
 
 destination=$1/usr/include
 mkdir -p "$destination"
-cp -frst "$destination" $PWD/source/c-precompiled/sph
+cp -frst "$destination" $PWD/src/c-precompiled/sph
 chmod -R 755 "$destination/"

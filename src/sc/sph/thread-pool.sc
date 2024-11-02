@@ -3,7 +3,7 @@
   (pthread-mutex-destroy &a:queue-mutex))
 
 (define (sph-thread-finish task) (void sph-thread-pool-task-t*)
-  "if enqueued call pthread-exit to end the thread it was dequeued in"
+  "this is a special task that exits the thread it is being executed in"
   (free task)
   (pthread-exit 0))
 
@@ -22,27 +22,7 @@
    and it is unclear when it can be used to free some final resources.
    if discard_queue is true then the current queue is emptied, but note
    that if enqueued tasks free their task object these tasks wont get called anymore"
-  (declare
-    exit-value void*
-    i sph-thread-pool-size-t
-    size sph-thread-pool-size-t
-    task sph-thread-pool-task-t*)
-  (if discard-queue
-    (begin
-      (pthread-mutex-lock &a:queue-mutex)
-      (sph-queue-init &a:queue)
-      (pthread-mutex-unlock &a:queue-mutex)))
-  (set size a:size)
-  (for ((set i 0) (< i size) (set i (+ 1 i)))
-    (set task (malloc (sizeof sph-thread-pool-task-t)))
-    (if (not task) (return 1))
-    (set task:f sph-thread-finish)
-    (sph-thread-pool-enqueue a task))
-  (if (not no-wait)
-    (for ((set i 0) (< i size) (set i (+ 1 i)))
-      (if (= 0 (pthread-join (array-get a:threads i) &exit-value))
-        (begin (set a:size (- a:size 1)) (if (= 0 a:size) (sph-thread-pool-destroy a))))))
-  (return 0))
+  (return (sph-thread-pool-resize a 0 no-wait discard-queue)))
 
 (define (sph-thread-pool-worker a) (void* sph-thread-pool-t*)
   "internal worker routine"
@@ -57,6 +37,46 @@
     (task:f task)
     (goto get-task)))
 
+(define (sph-thread-pool-resize a size no-wait discard-queue)
+  (int sph-thread-pool-t* sph-thread-pool-size-t uint8-t uint8-t)
+  (declare
+    attr pthread-attr-t
+    error int
+    exit-value void*
+    i sph-thread-pool-size-t
+    task sph-thread-pool-task-t*)
+  (if (> size a:size)
+    (begin
+      (if (> size sph-thread-pool-thread-limit) (return -1))
+      (pthread-attr-init &attr)
+      (pthread-attr-setdetachstate &attr PTHREAD_CREATE_JOINABLE)
+      (for ((set i a:size) (< i size) (set+ i 1))
+        (set error
+          (pthread-create (+ i a:threads) &attr
+            (convert-type sph-thread-pool-worker (function-pointer void* void*))
+            (convert-type a void*)))
+        (if error (begin (set size i) break)))
+      (pthread-attr-destroy &attr)
+      (set a:size size)
+      (return error))
+    (begin
+      (if discard-queue
+        (begin
+          (pthread-mutex-lock &a:queue-mutex)
+          (sph-queue-init &a:queue)
+          (pthread-mutex-unlock &a:queue-mutex)))
+      (for ((set i size) (< i a:size) (set+ i 1))
+        (set task (malloc (sizeof sph-thread-pool-task-t)))
+        (if (not task) (return 1))
+        (set task:f sph-thread-finish)
+        (sph-thread-pool-enqueue a task))
+      (if (not no-wait)
+        (for ((set i size) (< i a:size) (set+ i 1))
+          (if (not (pthread-join (array-get a:threads i) &exit-value))
+            (if (= i (- a:size 1)) (sph-thread-pool-destroy a)))))
+      (set a:size size)
+      (return 0))))
+
 (define (sph-thread-pool-new size a) (int sph-thread-pool-size-t sph-thread-pool-t*)
   "returns zero when successful and a non-zero pthread error code otherwise"
   (declare i sph-thread-pool-size-t attr pthread-attr-t error int)
@@ -66,7 +86,7 @@
   (pthread-cond-init &a:queue-not-empty 0)
   (pthread-attr-init &attr)
   (pthread-attr-setdetachstate &attr PTHREAD-CREATE-JOINABLE)
-  (for ((set i 0) (< i size) (set i (+ 1 i)))
+  (for ((set i 0) (< i size) (set+ i 1))
     (set error
       (pthread-create (+ i a:threads) &attr
         (convert-type sph-thread-pool-worker (function-pointer void* void*)) (convert-type a void*)))

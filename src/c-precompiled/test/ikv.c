@@ -15,10 +15,10 @@ status_t test_ikv() {
   status_i_require((ikv_new(100, (&a))));
   /* read/write */
   status_require((ikv_read_file("other/ikv-test-data", a)));
-  ikv_write_file(a, "temp/ikv-test");
+  ikv_write_file(a, "tmp/ikv-test");
   ikv_free_all(a);
   status_i_require((ikv_new(100, (&a))));
-  status_require((ikv_read_file("temp/ikv-test", a)));
+  status_require((ikv_read_file("tmp/ikv-test", a)));
   /* top level */
   value = ikv_get(a, "key4");
   test_helper_assert("key4 string", (0 == strcmp("string7", (ikv_value_get_string(value, 0)))));

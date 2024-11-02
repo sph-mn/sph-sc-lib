@@ -3,4 +3,4 @@
 # run tests and check for memory errors with valgrind
 
 options="--leak-check=yes --leak-check=full --show-leak-kinds=all"
-valgrind --tool=memcheck $options ./temp/test-spline-path $@
+valgrind --tool=memcheck $options ./tmp/test-spline-path $@

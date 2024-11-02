@@ -1,9 +1,9 @@
 #!/bin/sh -e
 
 root="$PWD"
-s="source/sc"
-c="$root/source/c-precompiled"
-cc="source/c"
+s="src/sc"
+c="$root/src/c-precompiled"
+cc="src/c"
 export SC_LOAD_PATH="$root/$s"
 
 compile_sc() {
