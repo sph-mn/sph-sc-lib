@@ -12,6 +12,16 @@
   (pointer-get
     (convert-type (+ field-offset (convert-type (+ points index) uint8-t*)) spline-path-value-t*)))
 
+(define (spline-path-alloc-segment gen x y out data-size)
+  ((static spline-path-segment-t) (function-pointer void size-t size-t spline-path-segment-t* spline-path-value-t*) spline-path-value-t spline-path-value-t void* size-t)
+  (spline-path-declare-segment s)
+  (struct-set s generate gen points-count 2)
+  (struct-set (array-get s.points 1) x x y y)
+  (set s.data (malloc data-size))
+  (if s.data (memcpy s.data out data-size) (return (spline-path-constant)))
+  (set s.free free)
+  (return s))
+
 (define (spline-path-get path start end out)
   (void spline-path-t* size-t size-t spline-path-value-t*)
   "get values on path between start (inclusive) and end (exclusive).
@@ -207,6 +217,69 @@
   (void size-t size-t spline-path-segment-t* spline-path-value-t*)
   (spline-path-beziern-generate spline-path-bezier2-interpolate-points start end s out))
 
+(define (spline-path-power-generate start end s out)
+  (void size-t size-t spline-path-segment-t* spline-path-value-t*)
+  (declare
+    p0 spline-path-point-t
+    p1 spline-path-point-t
+    span spline-path-value-t
+    off size-t
+    gamma spline-path-value-t
+    i size-t
+    t spline-path-value-t
+    f spline-path-value-t)
+  (set
+    p0 (array-get s:points 0)
+    p1 (array-get s:points (- s:points-count 1))
+    span (- p1.x p0.x)
+    off (- start p0.x)
+    gamma (if* s:data (pointer-get (convert-type s:data spline-path-value-t*)) 1.0))
+  (for ((set i 0) (< i (- end start)) (set+ i 1))
+    (set
+      t (/ (+ i off) span)
+      f (spline-path-pow t gamma)
+      (array-get out i) (linearly-interpolate p0.y p1.y f))))
+
+(define (spline-path-exponential-generate start end s out)
+  (void size-t size-t spline-path-segment-t* spline-path-value-t*)
+  (declare
+    p0 spline-path-point-t
+    p1 spline-path-point-t
+    span spline-path-value-t
+    off size-t
+    gamma spline-path-value-t
+    denom spline-path-value-t
+    i size-t
+    t spline-path-value-t
+    f spline-path-value-t)
+  (set
+    p0 (array-get s:points 0)
+    p1 (array-get s:points (- s:points-count 1))
+    span (- p1.x p0.x)
+    off (- start p0.x)
+    gamma (if* s:data (pointer-get (convert-type s:data spline-path-value-t*)) 0.0)
+    denom (if* (< (spline-path-fabs gamma) DBL_EPSILON) 1.0 (- (spline-path-exp gamma) 1.0)))
+  (for ((set i 0) (< i (- end start)) (set+ i 1))
+    (set
+      t (/ (+ i off) span)
+      f
+      (if* (< (spline-path-fabs gamma) DBL_EPSILON) t
+        (/ (- (spline-path-exp (* gamma t)) 1.0) denom))
+      (array-get out i) (linearly-interpolate p0.y p1.y f))))
+
+(define (spline-path-power x y gamma)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
+  "power-curve interpolation. y = y0 + (y1 - y0) * t ** gamma"
+  (return
+    (spline-path-alloc-segment spline-path-power-generate x y &gamma (sizeof spline-path-value-t))))
+
+(define (spline-path-exponential x y gamma)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
+  "y = y0 + (y1 - y0) * ((e ** (gamma * t) - 1) / (e ** gamma - 1))"
+  (return
+    (spline-path-alloc-segment spline-path-exponential-generate x
+      y &gamma (sizeof spline-path-value-t))))
+
 (define (spline-path-move x y) (spline-path-segment-t spline-path-value-t spline-path-value-t)
   "returns a move segment to move to the specified point"
   (spline-path-declare-segment s)
@@ -298,7 +371,7 @@
         (set i2.y b2.y i2.x (+ c.x (* t2.y d.x))))))
   (sc-comment "normalized direction vector")
   (set
-    m (sqrt (+ (* d.x d.x) (* d.y d.y)))
+    m (spline-path-sqrt (+ (* d.x d.x) (* d.y d.y)))
     d.x (/ (- i2.x i1.x) m)
     d.y (/ (- i2.y i1.y) m)
     result.x (+ c.x (* 0.5 distance m d.x))

@@ -25,7 +25,11 @@
   spline-path-value-t double
   spline-path-segment-count-t uint16-t
   spline-path-size-max (/ SIZE_MAX 2)
-  spline-path-point-max 4)
+  spline-path-point-max 4
+  spline-path-fabs fabs
+  spline-path-exp exp
+  spline-path-pow pow
+  spline-path-sqrt sqrt)
 
 (declare
   spline-path-point-t (type (struct (x spline-path-value-t) (y spline-path-value-t)))
@@ -74,6 +78,10 @@
     spline-path-value-t spline-path-value-t)
   (spline-path-bezier2 x1 y1 x2 y2 x3 y3)
   (spline-path-segment-t spline-path-value-t spline-path-value-t
-    spline-path-value-t spline-path-value-t spline-path-value-t spline-path-value-t))
+    spline-path-value-t spline-path-value-t spline-path-value-t spline-path-value-t)
+  (spline-path-power x y gamma)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
+  (spline-path-exponential x y gamma)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t))
 
 (pre-include-guard-end)
