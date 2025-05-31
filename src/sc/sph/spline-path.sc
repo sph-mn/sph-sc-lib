@@ -59,7 +59,11 @@
   (return p.x))
 
 (define (spline-path-path-prepare s) (uint8-t spline-path-segment-t*)
-  (set (array-get s:points 1) (spline-path-end (pointer-get (convert-type s:data spline-path-t*))))
+  (define
+    path-end spline-path-point-t (spline-path-end (pointer-get (convert-type s:data spline-path-t*))))
+  (set
+    (struct-get (array-get s:points 1) x) (+ (struct-get (array-get s:points 0) x) path-end.x)
+    (struct-get (array-get s:points 1) y) path-end.y)
   (return 0))
 
 (define (spline-path-constant-prepare s) (uint8-t spline-path-segment-t*)
@@ -263,7 +267,7 @@
     (set
       t (/ (+ i off) span)
       f
-      (if* (< (spline-path-fabs gamma) DBL_EPSILON) t
+      (if* (< (spline-path-fabs gamma) DBL-EPSILON) t
         (/ (- (spline-path-exp (* gamma t)) 1.0) denom))
       (array-get out i) (linearly-interpolate p0.y p1.y f))))
 
@@ -306,12 +310,12 @@
    the path does not necessarily connect and is drawn as it would be on its own starting from the preceding segment"
   (spline-path-declare-segment s)
   (set s.data (malloc (sizeof spline-path-t)))
-  (if s.data (set (pointer-get (convert-type s.data spline-path-t*)) path)
-    (return (spline-path-constant)))
+  (if (not s.data) (return (spline-path-constant)))
+  (set (pointer-get (convert-type s.data spline-path-t*)) path)
   (struct-set s
     free free
     generate spline-path-path-generate
-    points-count 1
+    points-count 2
     prepare spline-path-path-prepare)
   (return s))
 

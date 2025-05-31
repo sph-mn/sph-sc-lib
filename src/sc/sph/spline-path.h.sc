@@ -82,6 +82,11 @@
   (spline-path-power x y gamma)
   (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
   (spline-path-exponential x y gamma)
-  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t))
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
+  (spline-path-bezier-arc x y curvature)
+  (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
+  (spline-path-get path start end out) (void spline-path-t* size-t size-t spline-path-value-t*)
+  (spline-path-path-generate start end s out)
+  (void size-t size-t spline-path-segment-t* spline-path-value-t*))
 
 (pre-include-guard-end)

@@ -16,6 +16,16 @@ void reset_output(spline_path_value_t* out, size_t length) {
     out[i] = 0;
   };
 }
+
+/** display a sample array in one line */
+void display_array(spline_path_value_t* a, size_t len) {
+  size_t i;
+  printf(("%.17g"), (a[0]));
+  for (i = 1; (i < len); i = (1 + i)) {
+    printf((" %.17g"), (a[i]));
+  };
+  printf("\n");
+}
 status_t test_spline_path() {
   status_declare;
   spline_path_value_t out[test_spline_path_length];
@@ -148,8 +158,83 @@ status_t test_spline_path_bezier_arc() {
   };
   status_return;
 }
+status_t test_spline_path_power() {
+  status_declare;
+  spline_path_value_t out[11];
+  spline_path_t path;
+  spline_path_segment_t segments[1];
+  spline_path_segment_count_t segments_count = 1;
+  spline_path_value_t x = 10;
+  spline_path_value_t y = 20;
+  spline_path_value_t gamma = 2.0;
+  spline_path_value_t expected_mid = (y * pow((0.5), gamma));
+  segments[0] = spline_path_power(x, y, gamma);
+  status_i_require((spline_path_set_copy((&path), segments, segments_count)));
+  spline_path_get((&path), 0, 10, out);
+  test_helper_assert("power start", (feq((out[0]), (0.0))));
+  test_helper_assert("power mid", (feq((out[5]), expected_mid)));
+  test_helper_assert("power end-1", (out[8] < y));
+  test_helper_assert("power end", (feq((out[9]), (16.2))));
+  spline_path_free(path);
+  free((path.segments));
+exit:
+  status_return;
+}
+status_t test_spline_path_exponential() {
+  status_declare;
+  spline_path_value_t out[11];
+  spline_path_t path;
+  spline_path_segment_t segments[1];
+  spline_path_segment_count_t segments_count = 1;
+  spline_path_value_t x = 10;
+  spline_path_value_t y = 20;
+  spline_path_value_t gamma = 2.0;
+  spline_path_value_t t = 0.5;
+  spline_path_value_t denom = (exp(gamma) - 1.0);
+  spline_path_value_t expected_mid = ((denom < 1.0e-12) ? (0.5 * y) : (((exp((gamma * t)) - 1.0) / denom) * y));
+  segments[0] = spline_path_exponential(x, y, gamma);
+  status_i_require((spline_path_set_copy((&path), segments, segments_count)));
+  spline_path_get((&path), 0, 10, out);
+  spline_path_get((&path), 10, 11, (&(out[10])));
+  test_helper_assert("exponential start", (feq((out[0]), (0.0))));
+  test_helper_assert("exponential mid", (feq((out[5]), expected_mid)));
+  test_helper_assert("exponential end-1", (out[8] < y));
+  test_helper_assert("exponential end", (feq((out[9]), (15.80717835693481))));
+  spline_path_free(path);
+  free((path.segments));
+exit:
+  status_return;
+}
+status_t test_spline_path_path_segment() {
+  status_declare;
+  spline_path_value_t out[test_spline_path_length];
+  spline_path_segment_t inner_segments[2];
+  spline_path_segment_t outer_segments[2];
+  spline_path_t inner_path;
+  spline_path_t outer_path;
+  reset_output(out, test_spline_path_length);
+  inner_segments[0] = spline_path_line(10, 10);
+  status_i_require((spline_path_set_copy((&inner_path), inner_segments, 1)));
+  outer_segments[0] = spline_path_move(0, 0);
+  outer_segments[1] = spline_path_path(inner_path);
+  status_i_require((spline_path_set_copy((&outer_path), outer_segments, 2)));
+  spline_path_get((&outer_path), 0, 12, out);
+  spline_path_free(inner_path);
+  spline_path_free(outer_path);
+  free((inner_path.segments));
+  free((outer_path.segments));
+  test_helper_assert("path segment y=0 before", (feq((out[0]), 0)));
+  test_helper_assert("path segment linear mid", ((out[5] > 4) && (out[5] < 6)));
+  test_helper_assert("path segment y=10 end", (feq((out[9]), 9)));
+  test_helper_assert("path segment after end", (feq((out[11]), 0)));
+exit:
+  status_return;
+}
 int main() {
   status_declare;
+  test_helper_test_one(test_spline_path_path_segment);
+  test_helper_test_one(test_spline_path_power);
+  test_helper_test_one(test_spline_path_exponential);
   test_helper_test_one(test_spline_path);
   test_helper_test_one(test_spline_path_bezier_arc);
   test_helper_test_one(test_spline_path_perpendicular_point);

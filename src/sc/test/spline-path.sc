@@ -10,6 +10,13 @@
 (define (reset-output out length) (void spline-path-value-t* size-t)
   (for ((define i size-t 0) (< i length) (set+ i 1)) (set (array-get out i) 0)))
 
+(define (display-array a len) (void spline-path-value-t* size-t)
+  "display a sample array in one line"
+  (declare i size-t)
+  (printf "%.17g" (array-get a 0))
+  (for ((set i 1) (< i len) (set i (+ 1 i))) (printf " %.17g" (array-get a i)))
+  (printf "\n"))
+
 (define (test-spline-path) status-t
   status-declare
   (declare
@@ -115,8 +122,89 @@
   (if log-path-0 (for ((set i 0) (< i end-x) (set+ i 1)) (printf "%lu %f\n" i (array-get out i))))
   status-return)
 
+(define (test-spline-path-power) (status_t)
+  status-declare
+  (declare
+    out (array spline-path-value-t 11)
+    path spline-path-t
+    segments (array spline-path-segment-t 1))
+  (define
+    segments-count spline-path-segment-count-t 1
+    x spline-path-value-t 10
+    y spline-path-value-t 20
+    gamma spline-path-value-t 2.0
+    expected-mid spline-path-value-t (* y (pow 0.5 gamma)))
+  (set
+    (array-get segments 0)
+    (spline-path-power x y gamma))
+  (status-i-require (spline-path-set-copy (address-of path) segments segments-count))
+  (spline-path-get (address-of path) 0 10 out)
+  (test-helper-assert "power start" (feq (array-get out 0) 0.0))
+  (test-helper-assert "power mid" (feq (array-get out 5) expected-mid))
+  (test-helper-assert "power end-1" (< (array-get out 8) y))
+  (test-helper-assert "power end" (feq (array-get out 9) 16.2))
+  (spline-path-free path)
+  (free (struct-get path segments))
+  (label exit status-return))
+
+(define (test-spline-path-exponential) (status_t)
+  status-declare
+  (declare
+    out (array spline-path-value-t 11)
+    path spline-path-t
+    segments (array spline-path-segment-t 1))
+  (define
+    segments-count spline-path-segment-count-t 1
+    x spline-path-value-t 10
+    y spline-path-value-t 20
+    gamma spline-path-value-t 2.0
+    t spline-path-value-t 0.5
+    denom spline-path-value-t (- (exp gamma) 1.0)
+    expected-mid spline-path-value-t
+    (if* (< denom 1.0e-12) (* 0.5 y) (* (/ (- (exp (* gamma t)) 1.0) denom) y)))
+  (set (array-get segments 0) (spline-path-exponential x y gamma))
+  (status-i-require (spline-path-set-copy (address-of path) segments segments-count))
+  (spline-path-get (address-of path) 0 10 out)
+  (spline-path-get (address-of path) 10 11 (address-of (array-get out 10)))
+  (test-helper-assert "exponential start" (feq (array-get out 0) 0.0))
+  (test-helper-assert "exponential mid" (feq (array-get out 5) expected-mid))
+  (test-helper-assert "exponential end-1" (< (array-get out 8) y))
+  (test-helper-assert "exponential end" (feq (array-get out 9) 15.807178356934809))
+  (spline-path-free path)
+  (free (struct-get path segments))
+  (label exit status-return))
+
+(define (test-spline-path-path-segment) (status-t)
+  status-declare
+  (declare
+    out (array spline-path-value-t test-spline-path-length)
+    inner-segments (array spline-path-segment-t 2)
+    outer-segments (array spline-path-segment-t 2))
+  (declare inner-path spline-path-t outer-path spline-path-t)
+  (reset-output out test-spline-path-length)
+  (set (array-get inner-segments 0) (spline-path-line 10 10))
+  (status-i-require (spline-path-set-copy (address-of inner-path) inner-segments 1))
+  (set
+    (array-get outer-segments 0) (spline-path-move 0 0)
+    (array-get outer-segments 1) (spline-path-path inner-path))
+  (status-i-require (spline-path-set-copy (address-of outer-path) outer-segments 2))
+  (spline-path-get (address-of outer-path) 0 12 out)
+  (spline-path-free inner-path)
+  (spline-path-free outer-path)
+  (free (struct-get inner-path segments))
+  (free (struct-get outer-path segments))
+  (test-helper-assert "path segment y=0 before" (feq (array-get out 0) 0))
+  (test-helper-assert "path segment linear mid"
+    (and (> (array-get out 5) 4) (< (array-get out 5) 6)))
+  (test-helper-assert "path segment y=10 end" (feq (array-get out 9) 9))
+  (test-helper-assert "path segment after end" (feq (array-get out 11) 0))
+  (label exit status-return))
+
 (define (main) int
   status-declare
+  (test-helper-test-one test-spline-path-path-segment)
+  (test-helper-test-one test-spline-path-power)
+  (test-helper-test-one test-spline-path-exponential)
   (test-helper-test-one test-spline-path)
   (test-helper-test-one test-spline-path-bezier-arc)
   (test-helper-test-one test-spline-path-perpendicular-point)

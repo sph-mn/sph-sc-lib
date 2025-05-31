@@ -9,5 +9,5 @@
   (if (not expression) (begin (printf "%s failed\n" description) (status-set-goto status.group 1)))
   (test-helper-display-summary)
   (if status-is-success
-    (sc-comment (printf "--\ntests finished successfully.\n"))
+    (printf "--\ntests finished successfully.\n")
     (printf "\ntests failed. %d\n" status.id)))

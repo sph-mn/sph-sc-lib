@@ -71,7 +71,9 @@ size_t spline_path_size(spline_path_t path) {
   return ((p.x));
 }
 uint8_t spline_path_path_prepare(spline_path_segment_t* s) {
-  (s->points)[1] = spline_path_end((*((spline_path_t*)(s->data))));
+  spline_path_point_t path_end = spline_path_end((*((spline_path_t*)(s->data))));
+  ((s->points)[1]).x = (((s->points)[0]).x + path_end.x);
+  ((s->points)[1]).y = path_end.y;
   return (0);
 }
 uint8_t spline_path_constant_prepare(spline_path_segment_t* s) {
@@ -309,14 +311,13 @@ spline_path_segment_t spline_path_constant() {
 spline_path_segment_t spline_path_path(spline_path_t path) {
   spline_path_declare_segment(s);
   s.data = malloc((sizeof(spline_path_t)));
-  if (s.data) {
-    *((spline_path_t*)(s.data)) = path;
-  } else {
+  if (!s.data) {
     return ((spline_path_constant()));
   };
+  *((spline_path_t*)(s.data)) = path;
   s.free = free;
   s.generate = spline_path_path_generate;
-  s.points_count = 1;
+  s.points_count = 2;
   s.prepare = spline_path_path_prepare;
   return (s);
 }

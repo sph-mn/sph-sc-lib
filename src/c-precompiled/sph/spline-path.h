@@ -84,4 +84,7 @@ spline_path_segment_t spline_path_bezier1(spline_path_value_t x1, spline_path_va
 spline_path_segment_t spline_path_bezier2(spline_path_value_t x1, spline_path_value_t y1, spline_path_value_t x2, spline_path_value_t y2, spline_path_value_t x3, spline_path_value_t y3);
 spline_path_segment_t spline_path_power(spline_path_value_t x, spline_path_value_t y, spline_path_value_t gamma);
 spline_path_segment_t spline_path_exponential(spline_path_value_t x, spline_path_value_t y, spline_path_value_t gamma);
+spline_path_segment_t spline_path_bezier_arc(spline_path_value_t x, spline_path_value_t y, spline_path_value_t curvature);
+void spline_path_get(spline_path_t* path, size_t start, size_t end, spline_path_value_t* out);
+void spline_path_path_generate(size_t start, size_t end, spline_path_segment_t* s, spline_path_value_t* out);
 #endif

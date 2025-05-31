@@ -13,9 +13,7 @@
   }
 #define test_helper_display_summary() \
   if (status_is_success) { \
-    /* (printf -- \
-    tests finished successfully. \
-    ) */ \
+    printf(("--\ntests finished successfully.\n")); \
   } else { \
     printf(("\ntests failed. %d\n"), (status.id)); \
   }
