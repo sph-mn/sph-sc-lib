@@ -484,6 +484,8 @@ implemented segment types and interpolation methods
 * move: gap, moves the point the next segment starts on
 * constant: repeats the last value as a flat line to infinity
 * path: another spline path as a segment
+* power: power-curve interpolation. 'y = y0 + (y1 - y0) * t ** gamma'
+* exponential: 'y = y0 + (y1 - y0) * ((e ** (gamma * t) - 1) / (e ** gamma - 1))'
 
 features
 * extremely fast through only supporting 2d, with only selected and optimized interpolators, limited segment count and sampling portions of paths at once instead of only single points

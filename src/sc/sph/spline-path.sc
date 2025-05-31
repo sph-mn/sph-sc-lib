@@ -12,6 +12,71 @@
   (pointer-get
     (convert-type (+ field-offset (convert-type (+ points index) uint8-t*)) spline-path-value-t*)))
 
+(define (spline-path-debug-print path indent) (void spline-path-t* uint8-t)
+  (define type uint8-t* 0)
+  (declare pad (array uint8-t 32))
+  (memset pad #\space (sizeof pad))
+  (set (array-get pad (if* (< indent 30) indent 30)) 0)
+  (printf "%spath segments: %u\n" pad (struct-pointer-get path segments-count))
+  (for ((define i size-t 0) (< i path:segments-count) (set+ i 1))
+    (define
+      s spline-path-segment-t* (address-of (array-get (struct-pointer-get path segments) i))
+      p0 spline-path-point-t* (address-of (array-get (struct-pointer-get s points) 0))
+      p1 spline-path-point-t*
+      (address-of
+        (array-get (struct-pointer-get s points) (- (struct-pointer-get s points-count) 1))))
+    (case = s:generate
+      (spline-path-line-generate (set type "line"))
+      (spline-path-move-generate (set type "move"))
+      (spline-path-constant-generate (set type "constant"))
+      (spline-path-bezier1-generate (set type "bezier1"))
+      (spline-path-bezier2-generate (set type "bezier2"))
+      (spline-path-power-generate (set type "power"))
+      (spline-path-exponential-generate (set type "exponential"))
+      (spline-path-path-generate (set type "path"))
+      (else (set type "custom")))
+    (printf "%s  %s %.3f %.3f -> %.3f %.3f\n" pad
+      type (struct-pointer-get p0 x) (struct-pointer-get p0 y)
+      (struct-pointer-get p1 x) (struct-pointer-get p1 y))
+    (if (and (= s:generate spline-path-path-generate) s:data)
+      (begin
+        (define sub spline-path-t* (convert-type (struct-pointer-get s data) spline-path-t*))
+        (spline-path-debug-print sub (+ indent 2)))))
+  return)
+
+(define (spline-path-validate path log) (uint8-t spline-path-t* uint8-t)
+  (if
+    (or (not path) (not (struct-pointer-get path segments))
+      (= (struct-pointer-get path segments-count) 0))
+    (begin
+      (if log (fprintf stderr "spline_path_validate: invalid path pointer or empty segment list\n"))
+      (return 1)))
+  (for ((define i size-t 0) (< i path:segments-count) (set+ i 1))
+    (define
+      s spline-path-segment-t* (address-of (array-get path:segments i))
+      p0 spline-path-point-t* (address-of (array-get s:points 0))
+      p1 spline-path-point-t* (address-of (array-get s:points 1)))
+    (if (or (< s:points-count 2) (> s:points-count spline-path-point-max))
+      (begin
+        (if log (fprintf stderr "segment %u: invalid points count %u\n" i s:points-count))
+        (return 1)))
+    (if (< p1:x p0:x)
+      (begin
+        (if log (fprintf stderr "segment %u: end x (%f) < start x (%f)\n" i p1:x p0:x))
+        (return 1)))
+    (if (not s:generate)
+      (begin (if log (fprintf stderr "segment %u: missing generate function\n" i)) (return 1)))
+    (if (= s:generate spline-path-path-generate)
+      (begin
+        (define sub spline-path-t* (convert-type s:data spline-path-t*))
+        (if (or (not sub) (not sub:segments) (= sub:segments-count 0))
+          (begin (if log (fprintf stderr "segment %u: invalid nested path\n" i)) (return 1)))
+        (if (spline-path-validate sub log)
+          (begin
+            (if log (fprintf stderr "segment %u: nested path validation failed\n" i))
+            (return 1))))))
+  (return 0))
+
 (define (spline-path-alloc-segment gen x y out data-size)
   ((static spline-path-segment-t) (function-pointer void size-t size-t spline-path-segment-t* spline-path-value-t*) spline-path-value-t spline-path-value-t void* size-t)
   (spline-path-declare-segment s)
@@ -147,7 +212,8 @@
 
 (define (spline-path-path-generate start end s out)
   (void size-t size-t spline-path-segment-t* spline-path-value-t*)
-  (spline-path-get (convert-type s:data spline-path-t*) (- start s:points:x) (- end s:points:x) out))
+  (spline-path-get (convert-type s:data spline-path-t*) (- start (convert-type s:points:x size-t))
+    (- end (convert-type s:points:x size-t)) out))
 
 (define (spline-path-beziern-generate interpolator start end s out)
   (void (function-pointer spline-path-value-t spline-path-value-t spline-path-value-t spline-path-point-t* size-t) size-t size-t spline-path-segment-t* spline-path-value-t*)
