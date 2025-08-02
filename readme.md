@@ -401,6 +401,8 @@ if(0 = q.size) { printf("it's empty\n"); }
 ```
 
 # test
+[test.h](https://github.com/sph-mn/sph-sc-lib/blob/master/src/c-precompiled/sph/test.h)
+
 convenient testing with just a few tiny macros.
 
 each assertion and test prints its result to standard output.
