@@ -15,6 +15,7 @@ c code is in src/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions 
 * [set](#set): sets for any key/value type
 * [spline-path](#spline-path): interpolated 2d paths between given points
 * [status](#status): return-status and error handling using a tiny object with status/error id and source library id
+* [test](#test): test runner macros
 * [thread-pool](#thread-pool): task queue with pthread threads and wait conditions for pausing inactive threads
 * [ikv](#ikv): file format for nested named arrays, for example for text configuration
 * experimental
@@ -397,6 +398,30 @@ queue_init(&q);
 queue_enq(&q, &e.queue_node);
 queue_get(queue_deq(&q), element_t, queue_node);
 if(0 = q.size) { printf("it's empty\n"); }
+```
+
+# test
+convenient testing with just a few tiny macros.
+
+each assertion and test prints its result to standard output.
+
+```c
+#include "sph/status.h"
+#include "sph/test.h"
+
+status_t test_example() {
+  test_helper_assert("my assertion", 1 == 1)
+exit:
+  status_return;
+}
+
+int main() {
+  status_declare;
+  test_helper_test_one(test_example);
+exit:
+  test_helper_display_summary();
+  return status.id;
+}
 ```
 
 # thread-pool
