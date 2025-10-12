@@ -17,7 +17,7 @@
   (test-helper-assert "a4 get 2" (= 101 (array4-get-at a4 (- a4.current 1))))
   (array4-rewind a4)
   (test-helper-assert "a4 get 3" (= 2 (array4-get a4)))
-  (array3-free a3)
+  (a3u64-free &a3)
   (array4-free a4)
   (label exit status-return))
 

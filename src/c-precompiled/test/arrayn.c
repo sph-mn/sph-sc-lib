@@ -25,7 +25,7 @@ status_t test_arrayn() {
   test_helper_assert("a4 get 2", (101 == array4_get_at(a4, (a4.current - 1))));
   array4_rewind(a4);
   test_helper_assert("a4 get 3", (2 == array4_get(a4)));
-  array3_free(a3);
+  a3u64_free((&a3));
   array4_free(a4);
 exit:
   status_return;
