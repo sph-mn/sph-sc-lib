@@ -6,12 +6,13 @@
   "manages the memory of thread-pool task objects.
    depends on thread-pool.h")
 
-(pre-include "inttypes.h" "time.h")
+(pre-include "inttypes.h" "time.h" "stdatomic.h")
 (pre-define-if-not-defined sph-future-default-poll-interval (struct-literal 0 200000000))
 
 (declare
   sph-future-f-t (type (function-pointer void* void*))
-  sph-future-t (type (struct (task sph-thread-pool-task-t) (finished uint8-t) (f sph-future-f-t)))
+  sph-future-t
+  (type (struct (task sph-thread-pool-task-t) (finished (_Atomic uint8-t)) (f sph-future-f-t)))
   (sph-future-init thread-count) (int sph-thread-pool-size-t)
   (sph-future-eval task) (void sph-thread-pool-task-t*)
   (sph-future-new f data out) (void sph-future-f-t void* sph-future-t*)
