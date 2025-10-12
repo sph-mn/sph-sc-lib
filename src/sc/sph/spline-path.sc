@@ -1,8 +1,7 @@
-(pre-include "float.h" "strings.h" "stdlib.h" "math.h" "stddef.h")
+(pre-include "float.h" "strings.h" "stdlib.h" "math.h" "stddef.h" "stdio.h" "string.h")
 
 (pre-define
   spline-path-bezier-resolution 2
-  (spline-path-cheap-round-positive a) (convert-type (+ 0.5 a) size-t)
   (linearly-interpolate a b t) (+ a (* t (- b a)))
   (spline-path-bezier2-interpolate t mt a b c d)
   (+ (* a mt mt mt) (* b 3 mt mt t) (* c 3 mt t t) (* d t t t))
@@ -17,7 +16,7 @@
   (declare pad (array uint8-t 32))
   (memset pad #\space (sizeof pad))
   (set (array-get pad (if* (< indent 30) indent 30)) 0)
-  (printf "%spath segments: %u\n" pad (struct-pointer-get path segments-count))
+  (printf "%spath segments: %zu\n" pad (convert-type path:segments-count size-t))
   (for ((define i size-t 0) (< i path:segments-count) (set+ i 1))
     (define
       s spline-path-segment-t* (address-of (array-get (struct-pointer-get path segments) i))
@@ -36,7 +35,7 @@
       (spline-path-path-generate (set type "path"))
       (else (set type "custom")))
     (printf "%s  %s %.3f %.3f -> %.3f %.3f\n" pad
-      type (struct-pointer-get p0 x) (struct-pointer-get p0 y)
+      (convert-type type char*) (struct-pointer-get p0 x) (struct-pointer-get p0 y)
       (struct-pointer-get p1 x) (struct-pointer-get p1 y))
     (if (and (= s:generate spline-path-path-generate) s:data)
       (begin
@@ -58,22 +57,24 @@
       p1 spline-path-point-t* (address-of (array-get s:points 1)))
     (if (or (< s:points-count 2) (> s:points-count spline-path-point-max))
       (begin
-        (if log (fprintf stderr "segment %u: invalid points count %u\n" i s:points-count))
+        (if log
+          (fprintf stderr "segment %zu: invalid points count %zu\n"
+            i (convert-type s:points-count size-t)))
         (return 1)))
     (if (< p1:x p0:x)
       (begin
-        (if log (fprintf stderr "segment %u: end x (%f) < start x (%f)\n" i p1:x p0:x))
+        (if log (fprintf stderr "segment %zu: end x (%f) < start x (%f)\n" i p1:x p0:x))
         (return 1)))
     (if (not s:generate)
-      (begin (if log (fprintf stderr "segment %u: missing generate function\n" i)) (return 1)))
+      (begin (if log (fprintf stderr "segment %zu: missing generate function\n" i)) (return 1)))
     (if (= s:generate spline-path-path-generate)
       (begin
         (define sub spline-path-t* (convert-type s:data spline-path-t*))
         (if (or (not sub) (not sub:segments) (= sub:segments-count 0))
-          (begin (if log (fprintf stderr "segment %u: invalid nested path\n" i)) (return 1)))
+          (begin (if log (fprintf stderr "segment %zu: invalid nested path\n" i)) (return 1)))
         (if (spline-path-validate sub log)
           (begin
-            (if log (fprintf stderr "segment %u: nested path validation failed\n" i))
+            (if log (fprintf stderr "segment %zu: nested path validation failed\n" i))
             (return 1))))))
   (return 0))
 
@@ -159,7 +160,7 @@
 
 (define (spline-path-set-copy path segments segments-count)
   (uint8-t spline-path-t* spline-path-segment-t* spline-path-segment-count-t)
-  "like spline_path_set but copies segments to new memory which has to be freed after use"
+  "like spline_path_set but copies segments to new memory which has to be freed explicitly after use"
   (define s spline-path-segment-t* (malloc (* segments-count (sizeof spline-path-segment-t))))
   (if (not s) (return 1))
   (memcpy s segments (* segments-count (sizeof spline-path-segment-t)))
@@ -220,19 +221,24 @@
   "quadratic bezier curve with one control point.
    bezier interpolation also interpolates x. higher resolution sampling and linear interpolation are used to fill gaps"
   (declare
+    b-size size-t
+    i size-t
+    j size-t
     mt spline-path-value-t
     p-end spline-path-point-t
     p-start spline-path-point-t
     s-size spline-path-value-t
     t spline-path-value-t
-    b-size size-t
-    x size-t
     x-previous size-t
+    x size-t
     y-previous spline-path-value-t
-    i size-t
-    j size-t
-    y spline-path-value-t)
+    y spline-path-value-t
+    mt-prev spline-path-value-t
+    t-prev spline-path-value-t
+    xj size-t
+    j-start size-t)
   (set
+    x start
     p-start (array-get s:points 0)
     p-end (array-get s:points (- s:points-count 1))
     b-size (* spline-path-bezier-resolution (- end start))
@@ -245,19 +251,24 @@
       mt (- 1.0 t)
       x (round (interpolator t mt s:points (offsetof spline-path-point-t x)))
       y (interpolator t mt s:points (offsetof spline-path-point-t y)))
-    (if (< x end) (set (array-get out (- x start)) y))
+    (if (and (>= x start) (< x end)) (set (array-get out (- x start)) y))
     (if (> 2 (- x x-previous)) continue)
     (if (< start x-previous) (set y-previous (array-get out (- x-previous start)))
       (begin
         (sc-comment "gap at the beginning. find value for x before start")
+        (set t-prev 0 mt-prev 1)
         (for ((set j i) j (set- j 1))
           (set
             t (/ j s-size)
             mt (- 1.0 t)
-            x-previous (round (interpolator t mt s:points (offsetof spline-path-point-t x))))
-          (if (< x-previous x) break))
-        (if j (set y-previous p-start.y) (set y-previous p-start.y x-previous p-start.x))))
-    (for ((set j 1) (< j (- x x-previous)) (set+ j 1))
+            xj (round (interpolator t mt s:points (offsetof spline-path-point-t x))))
+          (if (< xj x) (begin (set x-previous xj t-prev t mt-prev mt) break)))
+        (if j
+          (set y-previous (interpolator t-prev mt-prev s:points (offsetof spline-path-point-t y)))
+          (set y-previous p-start.y x-previous p-start.x))))
+    (set j-start 1)
+    (if (< (+ x-previous j-start) start) (set j-start (- start x-previous)))
+    (for ((set j j-start) (and (< j (- x x-previous)) (< (+ x-previous j) end)) (set+ j 1))
       (set
         t (/ j (convert-type (- x x-previous) spline-path-value-t))
         (array-get out (- (+ x-previous j) start)) (linearly-interpolate y-previous y t)))))
@@ -457,7 +468,8 @@
 (define (spline-path-bezier-arc x y curvature)
   (spline-path-segment-t spline-path-value-t spline-path-value-t spline-path-value-t)
   "curvature is a real between -1..1, with the maximum at the sides of
-   a rectangle with the points as diagonally opposing edges"
+   a rectangle with the points as diagonally opposing edges.
+   interpolates with a quadratic bezier with a midpoint sagitta proportional to chord length"
   (declare s spline-path-segment-t)
   (if (= 0.0 curvature) (set s (spline-path-line x y))
     (set s (spline-path-bezier1 0 curvature x y) s.prepare spline-path-bezier-arc-prepare))
