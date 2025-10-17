@@ -1,5 +1,5 @@
 (pre-include-guard-begin sph-filesystem-h)
-(pre-include "unistd.h" "sys/stat.h" "sys/types.h" "libgen.h" "errno.h" "sph/string.c")
+(pre-include "unistd.h" "sys/stat.h" "sys/types.h" "libgen.h" "errno.h" "sph/string.h")
 (pre-define (file-exists path) (not (= (access path F-OK) -1)))
 
 (define (dirname-2 a) (uint8-t* uint8-t*)

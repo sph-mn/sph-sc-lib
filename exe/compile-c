@@ -3,9 +3,9 @@
 root="$PWD"
 target_dir=tmp
 c=src/c-precompiled
-optimisation=3
+optimization=3
 warnings="-Wunused-label -Wunused-value -Wunused-variable"
-gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimisation -fno-math-errno -I$c"
+gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimization -fno-math-errno -I$c"
 
 compile_test_sph_sc_lib() {
   gcc "$c/test/spline-path.c" -o tmp/test-spline-path $gcc_options -lm

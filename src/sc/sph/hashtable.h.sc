@@ -1,12 +1,6 @@
 (pre-include-guard-begin sph-hashtable-h)
 (pre-include "stdlib.h" "string.h" "inttypes.h")
 
-(sc-comment
-  "a macro that defines hash-table data types for arbitrary key/value types,"
-  "with linear probing for collision resolve and customizable hash and equal functions."
-  "the hash function must return return an index limited by hashtable-size."
-  "prime numbers from https://planetmath.org/goodhashtableprimes")
-
 (pre-if (> SIZE_MAX 0xffffffffu)
   (pre-define (sph-hashtable-calculate-size-extra n) (set n (bit-or n (bit-shift-right n 32))))
   (pre-define (sph-hashtable-calculate-size-extra n)))

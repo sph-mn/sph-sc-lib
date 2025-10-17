@@ -54,7 +54,6 @@ uint8_t* string_join(uint8_t** strings, size_t strings_len, uint8_t* delimiter, 
   uint8_t* cursor;
   size_t total_size;
   size_t part_size;
-  size_t i;
   size_t delimiter_len;
   delimiter_len = strlen(((char*)(delimiter)));
   total_size = (1 + (delimiter_len * (strings_len - 1)));
@@ -81,10 +80,9 @@ uint8_t* string_join(uint8_t** strings, size_t strings_len, uint8_t* delimiter, 
   return (result);
 }
 void sph_display_bits_u8(uint8_t a) {
-  uint8_t i;
   printf("%u", (1 & a));
   for (uint8_t i = 1; (i < 8); i += 1) {
-    printf("%u", (((shift_left(((uint8_t)(1)), i) & a) != 0) ? 1 : 0));
+    printf("%u", ((((((uint8_t)(1)) << i) & a) != 0) ? 1 : 0));
   };
 }
 void sph_display_bits(void* a, size_t size) {

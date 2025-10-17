@@ -1,4 +1,5 @@
-(pre-include "float.h" "strings.h" "stdlib.h" "math.h" "stddef.h" "stdio.h" "string.h")
+(pre-include "float.h" "strings.h"
+  "stdlib.h" "math.h" "stddef.h" "stdio.h" "string.h" "sph/spline-path.h")
 
 (pre-define
   spline-path-bezier-resolution 2

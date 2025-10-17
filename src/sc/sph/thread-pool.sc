@@ -1,5 +1,5 @@
 (pre-include-guard-begin sph-thread-pool)
-(pre-include "errno.h" "stdlib.h")
+(pre-include "errno.h" "stdlib.h" "sph/thread-pool.h")
 
 (define (sph-thread-pool-destroy a) (int sph-thread-pool-t*)
   (define result int 0)

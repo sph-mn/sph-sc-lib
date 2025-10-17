@@ -4,23 +4,25 @@ various small standalone c utility libraries.
 c code is in src/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions are in src/sc. the libraries are developed in sc and then translated to normal, readable c, formatted with clang-format
 
 # included libraries
+* [array](#array): structs for arrays that include size or a count of used content
 * [futures](#futures): fine-grained parallelism with objects that can be waited on for results
 * [hashtable](#hashtable): hash-tables for any key/value type
-* [arrays](#arrays): structs for arrays that include size or a count of used content
 * [memreg](#memreg): track heap memory allocations in function scope
-* [mi-list](#mi-list): a basic, macro-based linked list
+* [memory](#memory): allocate or register memory using status_t
 * [queue](#queue): a queue for any data type
 * [quicksort](#quicksort): a generic implementation for arrays of any type
 * [random](#random): pseudo random number generation
 * [set](#set): sets for any key/value type
 * [spline-path](#spline-path): interpolated 2d paths between given points
 * [status](#status): return-status and error handling using a tiny object with status/error id and source library id
-* [test](#test): test runner macros
+* [test](#test): minimalistic test runner macros
 * [thread-pool](#thread-pool): task queue with pthread threads and wait conditions for pausing inactive threads
+
+## more experimental
+* [mi-list](#mi-list): a basic, macro-based linked list
 * [ikv](#ikv): file format for nested named arrays, for example for text configuration
-* experimental
-  * one: miscellaneous helpers
-  * guile: a few helpers for working with guile
+* one: miscellaneous helpers
+* guile: a few helpers for working with guile
 
 # license
 code is under gpl3+, documentation under cc-by-nc.
@@ -28,7 +30,227 @@ code is under gpl3+, documentation under cc-by-nc.
 # compilation
 * include "sph/library_name.h" (if exists) if the .c file is included in a shared library being used
 * include "sph/library_name.c" for the rest of the code
-* if code files depend on others from this library, they have to be included beforehand. this is to allow users to include the code without dependencies on specific include paths in the files. see the c examples below or comments in the files for which libraries to include if necessary
+
+# array
+macro that defines a generic dynamic array type for arbitrary element types.
+
+## characteristics
+
+* structure layout: `{ .data, .size, .used }`
+* `.data` points to allocated memory
+* `.size` is the allocated element capacity
+* `.used` tracks how many elements are currently stored
+* supports variable-length data within a fixed-size memory block
+* uses `malloc` and `free` by default; custom allocators may be substituted
+* fixed capacity unless explicitly resized
+* minimal code size and suitable for inclusion-based builds
+
+## dependencies
+
+* c standard library: `stdlib.h`, `inttypes.h`
+
+## usage examples
+
+```
+#include "sph/array.h"
+
+sph_array_declare_type(my_type, int);
+
+int main(void) {
+  status_declare;
+  my_type_t a;
+  status_require(my_type_new(4, &a));
+  sph_array_add(a, 1);
+  sph_array_add(a, 2);
+  for (size_t i = 0; i < a.used; i += 1) {
+    sph_array_get(a, i);
+  }
+  my_type_free(a);
+exit:
+  status_return;
+}
+```
+
+`sph_array_declare_type` defines:
+
+```c
+// returns 0 on success, 1 if allocation failed
+uint8_t name##_new(size_t initial_size, name##_t *result);
+
+// increases capacity, preserving data
+uint8_t name##_resize(name##_t *a, size_t new_size);
+
+// adds a value; may resize internally if supported
+void sph_array_add(name##_t a, element_type value);
+
+// retrieves element at index
+element_type sph_array_get(name##_t a, size_t index);
+
+// releases allocated memory
+void name##_free(name##_t a);
+```
+
+## layout and sizing
+
+* each declared array type is named `name##_t`
+* the array may be resized or reused without reallocating a new object
+* `.used` can be reset manually for reuse
+* memory allocation is linear in element size and capacity
+
+# futures
+provides task objects with functions that are executed in parallel with a thread-pool.
+calling touch on an object waits for its completion and returns its result.
+depends on thread-pool.c
+
+```c
+#include <inttypes.h>
+#include "queue.h"
+#include "thread-pool.h"
+#include "thread-pool.c"
+#include "futures.c"
+
+void* future_work(void* data) {
+  // return value is a void pointer.
+  // just for example this returns a new object. the data could be modified instead
+  uint8_t* a;
+  a = malloc(sizeof(uint8_t));
+  *a = 2 + *(uint8_t*)(data);
+  return a;
+};
+
+int main() {
+  future_t* future;
+  uint8_t data;
+  uint8_t* result;
+  data = 8;
+  // this must be called at least once somewhere before futures can be used
+  future_init(10);
+
+  // create a new future and get the result later with touch
+  future = future_new(future_work, &data);
+  if(!future) return 1;
+  result = (uint8_t*)(touch(future));
+
+  // result is 10
+  free(result);
+  // this frees the thread-pool in case futures are not needed anymore in the process or before exit
+  future_deinit();
+  return 0;
+}
+```
+
+```
+gcc "$c/test/thread-pool.c" -o tmp/test-thread-pool -lpthread -D _DEFAULT_SOURCE
+```
+
+# hashtable
+
+macro that defines open-addressing hash-table data structures for arbitrary key/value types.
+
+## dependencies
+
+* c standard library (`stdlib.h`, `string.h`, `inttypes.h`)
+
+## implementation
+
+* linear probing for collision resolution
+* separate arrays for flags, keys, and values
+* flags encode slot state, so no sentinel key or null value is needed
+* lookups and insertions operate in constant expected time
+* minimal implementation (<150 loc)
+* tables are fixed-size after creation; reallocation requires constructing a new table and reinserting entries
+
+## usage examples
+```
+#include "sph/hashtable.h"
+
+// name, key_type, value_type, hash_function, equal_function, size_factor
+sph_hashtable_declare_type(mytype, uint64_t, uint32_t,
+  sph_hashtable_hash_integer, sph_hashtable_equal_integer, 2);
+
+int main(void) {
+  mytype_t ht;
+  if (mytype_new(200, &ht)) return 1;
+  mytype_set(ht, 44, 5);
+  mytype_get(ht, 44);
+  mytype_remove(ht, 44);
+  mytype_free(ht);
+  return 0;
+}
+```
+
+`sph_hashtable_declare_type` generates these functions
+(`##` denotes token concatenation; e.g., `name##_new` → `mytype_new`):
+
+```c
+// returns 0 on success, 1 on allocation failure
+uint8_t name##_new(size_t min_size, name##_t *result);
+
+// returns pointer to inserted or existing value, 0 if table full
+value_type *name##_set(name##_t a, key_type key, value_type value);
+
+// returns pointer to stored value, 0 if not found
+value_type *name##_get(name##_t a, key_type key);
+
+// returns 0 if removed, 1 if not found
+uint8_t name##_remove(name##_t a, key_type key);
+
+void name##_free(name##_t a);
+```
+
+example hash and equality macros:
+
+```c
+#define sph_hashtable_hash_integer(key, size) ((key) % (size))
+#define sph_hashtable_equal_integer(a, b) ((a) == (b))
+```
+
+# memreg
+track memory allocations locally on the stack and free all allocations up to point easily.
+
+* memreg: fixed store, caller-sized
+* memreg2: fixed store, caller-sized, custom free handler
+* memreg-heap: heap-owned, fixed-size unless resized manually
+* memreg-grow: heap-owned, auto-growing, ensure semantics, multiple stores, per-entry handler
+
+```c
+#include "sph/memreg.c"
+
+int main() {
+  memreg_init(2);
+  int* data_a = malloc(12 * sizeof(int));
+  if(!data_a) goto exit;  // have to free nothing
+  memreg_add(data_a);
+  // more code ...
+  char* data_b = malloc(20 * sizeof(char));
+  if(!data_b) goto exit;  // have to free "data_a"
+  memreg_add(data_b);
+  // ...
+  if(is_error) goto exit;  // have to free "data_a" and "data_b"
+  // ...
+exit:
+  memreg_free;
+  return 0;
+}
+```
+
+introduces two local variables: memreg_register, an array for addresses, and memreg_index, the next index.
+memreg_init size must be a static value
+
+## memreg_named
+``memreg.c`` also contains a *_named variant that supports multiple concurrent registers identified by name
+
+```c
+memreg_init_named(testname, 1);
+memreg_add_named(testname, &variable);
+memreg_free_named(testname);
+```
+
+# memory
+
+
+
+
 
 # status
 helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes
@@ -89,263 +311,78 @@ status_t: struct
   group: uint8_t*
 ```
 
-# memreg
-track memory allocations locally on the stack and free all allocations up to point easily.
+# set
 
-* memreg: fixed store, caller-sized
-* memreg2: fixed store, caller-sized, custom free handler
-* memreg-heap: heap-owned, fixed-size unless resized manually
-* memreg-grow: heap-owned, auto-growing, ensure semantics, multiple stores, per-entry handler
+macro that defines open-addressing set data structures for arbitrary value types.
 
+## characteristics
+* linear probing for lookup and insertion
+* backward-shift deletion to preserve probe continuity
+* expected constant-time insert, remove, and lookup
+* fixed capacity; to expand, create a larger set and reinsert values
+* occupancy tracked with a bitset, no tombstone markers
+* supports one special "null" value as a valid element using a nullable flag
 
+## dependencies
+* c standard library: `stdlib.h`, `string.h`, `inttypes.h`
 
-```c
-#include "sph/memreg.c"
+## usage examples
 
-int main() {
-  memreg_init(2);
-  int* data_a = malloc(12 * sizeof(int));
-  if(!data_a) goto exit;  // have to free nothing
-  memreg_add(data_a);
-  // more code ...
-  char* data_b = malloc(20 * sizeof(char));
-  if(!data_b) goto exit;  // have to free "data_a"
-  memreg_add(data_b);
-  // ...
-  if(is_error) goto exit;  // have to free "data_a" and "data_b"
-  // ...
-exit:
-  memreg_free;
+```
+#include "sph/set.h"
+
+// name, value_type, hash, equal, null_value, size_factor
+sph_set_declare_type(myset, int, sph_set_hash_integer,
+  sph_set_equal_integer, 0, 2);
+
+int main(void) {
+  myset_t a;
+  if (myset_new(3, &a)) return 1;
+  myset_add(&a, 3);
+  myset_add(&a, 5);
+  myset_remove(&a, 3);
+  myset_get(a, 5);
+  myset_free(a);
   return 0;
 }
 ```
 
-introduces two local variables: memreg_register, an array for addresses, and memreg_index, the next index.
-memreg_init size must be a static value
-
-## memreg_named
-``memreg.c`` also contains a *_named variant that supports multiple concurrent registers identified by name
+`sph_set_declare_type` defines these functions:
 
 ```c
-memreg_init_named(testname, 1);
-memreg_add_named(testname, &variable);
-memreg_free_named(testname);
-```
+// returns 0 on success, 1 if memory allocation failed
+uint8_t name##_new(size_t min_size, name##_t *result);
 
-## memreg_heap
-``memreg_heap.c`` is similar to the previously mentioned memreg but uses a special array4 based heap allocated array type ``memreg_register_t`` that can be passed between functions. also supports register sizes given by variables.
+// clears all entries
+void name##_clear(name##_t *a);
 
-```c
-memreg_heap_declare(allocations);
-if(memreg_heap_allocate(2, allocations)) {
-  // allocation error
-}
-memreg_heap_add(allocations, &variable1);
-memreg_heap_add(allocations, &variable2);
-memreg_heap_free(allocations);
-```
+// returns a pointer to the stored value, or 0 if not found
+// if the value equals the null value, returns a.values if present, otherwise 0
+value_type *name##_get(name##_t a, value_type value);
 
-# hashtable
-macro that defines hash-table data structures for custom key/value types.
+// inserts the value if not present and returns its address, or 0 if no space remains
+// if the value equals the null value, sets a->nullable and returns a->values
+value_type *name##_add(name##_t *a, value_type value);
 
-## dependencies
-* the c standard library (stdlib.h and inttypes.h)
-
-## implementation
-* linear probing for collision resolve
-* three arrays (flags, keys, values)
-* no empty key needed, because the flags array is used to check existence
-* no extra null value needed, because hashtable_get returns addresses
-* less than 150 lines of code
-* the hashtable size does not automatically grow. a new hashtable has to be created should the specified size later turn out to be insufficient
-
-## usage examples
-~~~
-#include "sph/hashtable.h"
-
-// name, key_type, value_type, hash_function_or_macro, equal_function_or_macro, size_factor
-sph_hashtable_declare_type(mytype, uint64_t, uint32_t, sph_hashtable_hash_integer, sph_hashtable_equal_integer, 2);
-
-void main() {
-  mytype_t ht;
-  mytype_new(200, &ht);
-  mytype_set(ht, 44, 5);
-  mytype_get(ht, 44);
-  mytype_remove(ht, 44);
-  mytype_free(ht);
-}
-~~~
-
-sph_hashtable_declare_type defines the following functions. ## stands for concatenation, for example name##_new could be mytype_new.
-
-~~~
-// returns 1 on success or 0 if the memory allocation failed.
-uint8_t name##_new(size_t min_size, name##_t* result);
-
-// returns the address of the added or already included value, 0 if there is no space left in the hash table
-value_type* name##_set(name##_t a, key_type key, value_type value);
-
-// returns the address of the value in the hash table, 0 if it was not found
-value_type* name##_get(name##_t a, key_type key);
-
-// returns 0 if the element was removed, 1 if it was not found
-uint8_t name##_remove(name##_t a, key_type key);
+// removes the value and returns 0 on success, 1 if not found
+// if the value equals the null value, clears a->nullable
+uint8_t name##_remove(name##_t *a, value_type value);
 
 void name##_free(name##_t a);
-~~~
-
-the provided example hash functions are:
-```
-#define sph_hashtable_hash_integer(key, hashtable_size) (key % hashtable_size)
-#define sph_hashtable_equal_integer(key_a, key_b) (key_a == key_b)
 ```
 
-# set
-macro that defines set data structures for custom value types.
+example hash and equality macros:
 
-* can easily deal with millions of values on common hardware
-* compared to hashtable.c, set.c uses less than half of the space and operations are faster (about 20% in first tests)
-* linear probing for collision resolve
-* insert/delete/search should all be o(1)
-* the set size does not automatically grow. a new set has to be created should the specified size later turn out to be insufficient
-* includes example hash functions that work with integers
-
-## dependencies
-* the c standard library (stdlib.h and inttypes.h)
-
-## usage examples
-with set.c in the same directory:
-~~~
-#include "sph/set.h"
-
-// name, value_type, hash, equal, null, notnull, size_factor
-sph_set_declare_type(myset, int, sph_set_hash_integer, sph_set_equal_integer, 0, 1, 2);
-
-void main() {
-  myset_t a;
-  if(myset_new(3, &a)) {
-    // memory allocation failed
-  }
-  myset_add(a, 3);
-  myset_add(a, 5);
-  myset_remove(a, 3);
-  myset_get(a, 5);
-  myset_free(a);
-}
-~~~
-
-sph_set_declare_type defines these functions:
-~~~
-// 0 on success, 1 on memory allocation error
-uint8_t name##_new(size_t min_size, name##_t* result);
-
-// returns the address of the value or 0 if it was not found.
-// if sph_set_allow_empty_value is true and the value is included, then address points to a sph_set_true_value
-value_type* name##_get(name##_t a, value_type value);
-
-// returns the address of the value or 0 if no space is left
-value_type* name##_add(name##_t a, value_type value);
-
-// returns 0 if the element was removed, 1 if it was not found
-uint8_t name##_remove(name##_t a, value_type value);
-
-void name##_free(name##_t a);
-~~~
-
-the provided example hash functions are:
-~~~
-#define sph_set_equal_hash(value, hashtable_size) (value % hashtable_size)
-#define sph_set_equal_integer(value_a, value_b) (value_a == value_b)
-~~~
-
-### exclude empty value
-by default, the null value is a valid value that can be included in the set. but as an optimisation, to make operations a tiny bit faster, this can be disabled by using sph_set_declare_type_nonull instead of
-sph_set_declare_type.
-the empty value can then not be part of the set; it wont be found.
-sph_set_declare_type_nonull takes one less argument - it does not need a notnull value.
-
-### memory usage
-the memory allocated for the set is at least the requested size times set_factor, possibly rounded to a next higher prime.
-one is the minimum set size factor with the least memory usage. greater sizes reduce the possibility of collisions and thereby increase access performance.
-
-## modularity and implementation
-* declared "name##_t" set types are structures (.size, .values). "values" is a one-dimensional array that stores values at indices determined by a hash function
-* for sph_set_declare_type, values start at index 1 and index 0 is notnull if the null value is in the set
-* for sph_set_declare_type_nonull, values start at index 0
-
-# arrays
-array types that combine values that are often passed to functions as separate arguments.
-most bindings are generic macros that will work on any arrayn type.
-
-## dependencies
-* the c standard library (stdlib.h)
-
-## array3
-struct {.data, .size, .used} that combines pointer, length and used length in one object.
-the \"used\" property is to support variable length data in a fixed size memory area.
-
-### usage example
 ```c
-// arguments: custom_name, element_type
-array3_declare_type(my_type, int);
-my_type_t a;
-if(my_type_new(4, &a)) {
-  // memory allocation error
-}
-array3_add(a, 1);
-array3_add(a, 2);
-size_t i = 0;
-for(i = 0; i < a.size; i += 1) {
-  array3_get(a, i);
-}
-array3_free(a);
+#define sph_set_hash_integer(value, size) ((value) % (size))
+#define sph_set_equal_integer(a, b) ((a) == (b))
 ```
 
-### bindings
-~~~c
-array3_new_custom_##name(size_t:size, malloc, name##_t:result)
-array3_new_##name(size_t:size, name##_t:result)
-array3_resize_custom_##name(name##_t:a, size_t:new_size, realloc)
-array3_resize_##name(name##_t:result, size_t:new_size)
-array3_add(a, value)
-array3_clear(a)
-array3_declare(a, type)
-array3_declare_type(name, element_type)
-array3_free(a)
-array3_get(a, index)
-array3_is_full(a)
-array3_is_not_full(a)
-array3_max_size(a)
-array3_remove(a)
-array3_set_null(a)
-array3_size(a)
-array3_take(a, data, size, used)
-```
-
-## array4
-struct {.current, .data, .size, .used} that combines pointer, length, used length and iteration index in one object.
-includes all properties of array3 and the additional index can be used to make iteration easier to code, track some offset or
-use the array similar to a linked list. array4_add and array4_forward go from left to right.
-
-### usage example
-like array3 without the need to declare an iteration index counter:
-~~~c
-while(array4_in_range(a)) {
-  array4_get(a);
-  array4_forward(a);
-}
-~~~
-
-### bindings
-all bindings of array3 with array4 prefix and the following additions:
-
-~~~c
-array4_in_range(a)
-array4_get(a)
-array4_get_at(a, index)
-array4_forward(a)
-array4_rewind(a)
-~~~
+## layout and sizing
+* declared type: `name##_t` contains `.size`, `.mask`, `.values`, `.occupied`, `.nullable`
+* the null element, if present, is tracked through `.nullable`, and its storage address is `a.values`
+* the number of elements allocated equals the next power of two greater than or equal to `(size_factor × requested_size)`
+* the hash function must return an index within the range from zero up to but not including the table size
 
 # mi-list
 a basic linked list with custom element types.
@@ -460,52 +497,6 @@ int main() {
   sph_thread_pool_finish(&pool, 0, 0);
   return 0;
 }
-```
-
-# futures
-provides task objects with functions that are executed in parallel with a thread-pool.
-calling touch on an object waits for its completion and returns its result.
-depends on thread-pool.c
-
-```c
-#include <inttypes.h>
-#include "queue.h"
-#include "thread-pool.h"
-#include "thread-pool.c"
-#include "futures.c"
-
-void* future_work(void* data) {
-  // return value is a void pointer.
-  // just for example this returns a new object. the data could be modified instead
-  uint8_t* a;
-  a = malloc(sizeof(uint8_t));
-  *a = 2 + *(uint8_t*)(data);
-  return a;
-};
-
-int main() {
-  future_t* future;
-  uint8_t data;
-  uint8_t* result;
-  data = 8;
-  // this must be called at least once somewhere before futures can be used
-  future_init(10);
-
-  // create a new future and get the result later with touch
-  future = future_new(future_work, &data);
-  if(!future) return 1;
-  result = (uint8_t*)(touch(future));
-
-  // result is 10
-  free(result);
-  // this frees the thread-pool in case futures are not needed anymore in the process or before exit
-  future_deinit();
-  return 0;
-}
-```
-
-```
-gcc "$c/test/thread-pool.c" -o tmp/test-thread-pool -lpthread -D _DEFAULT_SOURCE
 ```
 
 # spline-path

@@ -34,13 +34,7 @@
   (uint8-t* uint8-t** size-t uint8-t* size-t*)
   "join strings into one string with each input string separated by delimiter.
    zero if strings-len is zero or memory could not be allocated"
-  (declare
-    result uint8-t*
-    cursor uint8-t*
-    total-size size-t
-    part-size size-t
-    i size-t
-    delimiter-len size-t)
+  (declare result uint8-t* cursor uint8-t* total-size size-t part-size size-t delimiter-len size-t)
   (set
     delimiter-len (strlen (convert-type delimiter char*))
     total-size (+ 1 (* delimiter-len (- strings-len 1))))
@@ -61,10 +55,9 @@
   (return result))
 
 (define (sph-display-bits-u8 a) (void uint8-t)
-  (declare i uint8-t)
   (printf "%u" (bit-and 1 a))
   (for-each-index-from 1 i
-    uint8-t 8 (printf "%u" (if* (!= (bit-and (shift-left (convert-type 1 uint8-t) i) a) 0) 1 0))))
+    uint8-t 8 (printf "%u" (if* (!= (bit-and (bit-shift-left (convert-type 1 uint8-t) i) a) 0) 1 0))))
 
 (define (sph-display-bits a size) (void void* size-t)
   (for-each-index i size-t size (sph-display-bits-u8 (array-get (convert-type a uint8-t*) i)))
