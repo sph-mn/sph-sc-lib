@@ -1,4 +1,7 @@
 
+#ifndef sph_array3_h
+#define sph_array3_h
+
 /* "array3" - dynamic array as a struct {.data, .size, .used} that combines memory pointer, length and used length in one object.
    the "used" property is to support variable length data in a fixed size memory area.
    custom allocators can be used. uses malloc by default.
@@ -16,6 +19,7 @@
      }
      my_type_free(a); */
 
+#define array3_growth_factor 2
 #define array3_declare_type(name, element_type) array3_declare_type_custom(name, element_type, malloc, realloc, free)
 #define array3_declare_type_custom(name, element_type, array3_alloc, array3_realloc, array3_free) \
   typedef struct { \
@@ -47,7 +51,8 @@
     a->used = ((new_size < a->used) ? new_size : a->used); \
     return (0); \
   } \
-  void name##_free(name##_t* a) { array3_free((a->data)); }
+  void name##_free(name##_t* a) { array3_free((a->data)); } \
+  uint8_t name##_ensure(name##_t* a, size_t needed) { return ((a->data ? (((a->size - a->used) < needed) ? name##_resize(a, (array3_growth_factor * a->size)) : 0) : name##_new(needed, a))); }
 #define array3_declare(a, type) type a = { 0, 0, 0 }
 #define array3_add(a, value) \
   (a.data)[a.used] = value; \
@@ -75,3 +80,4 @@
   name.data = name##_data; \
   name.size = array_size; \
   name.used = 0
+#endif

@@ -1,5 +1,6 @@
-(pre-include "stddef.h")
-(sc-comment "depends on thread-pool.c")
+(pre-include-guard-begin sph-futures)
+
+(pre-include "stddef.h" "sph/thread-pool.c")
 (declare sph-futures-pool sph-thread-pool-t)
 (define sph-futures-pool-is-initialized uint8-t #f)
 
@@ -43,3 +44,5 @@
   (define poll-interval (const struct timespec) sph-future-default-poll-interval)
   (while (not (atomic-load-explicit &a:finished memory-order-acquire)) (nanosleep &poll-interval 0))
   (return a:task.data))
+
+(pre-include-guard-end)

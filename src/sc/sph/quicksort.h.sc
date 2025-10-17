@@ -1,4 +1,5 @@
-(sc-comment "depends on sys/types.h for ssize_t")
+(pre-include-guard-begin sph-quicksort-h)
+(pre-include "sys/types.h")
 
 (define (quicksort less? swap array left right)
   (void (function-pointer uint8-t void* ssize-t ssize-t) (function-pointer void void* ssize-t ssize-t) void* ssize-t ssize-t)
@@ -20,3 +21,5 @@
         (set- r 1))))
   (if (< left r) (quicksort less? swap array left r))
   (if (< l right) (quicksort less? swap array l right)))
+
+(pre-include-guard-end)

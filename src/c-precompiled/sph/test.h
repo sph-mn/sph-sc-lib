@@ -1,5 +1,8 @@
 
-/* depends on status.h */
+#ifndef sph_test_h
+#define sph_test_h
+
+#include <sph/status.h>
 
 #define test_helper_test_one(func) \
   printf("%s\n", #func); \
@@ -15,3 +18,4 @@
   } else { \
     printf(("\ntests failed. %d %s\n"), (status.id), (sp_status_description(status))); \
   }
+#endif

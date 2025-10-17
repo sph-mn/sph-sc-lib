@@ -90,7 +90,14 @@ status_t: struct
 ```
 
 # memreg
-track memory allocations locally on the stack and free all allocations up to point easily
+track memory allocations locally on the stack and free all allocations up to point easily.
+
+* memreg: fixed store, caller-sized
+* memreg2: fixed store, caller-sized, custom free handler
+* memreg-heap: heap-owned, fixed-size unless resized manually
+* memreg-grow: heap-owned, auto-growing, ensure semantics, multiple stores, per-entry handler
+
+
 
 ```c
 #include "sph/memreg.c"

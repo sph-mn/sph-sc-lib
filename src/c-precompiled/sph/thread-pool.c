@@ -1,4 +1,7 @@
 
+#ifndef sph_thread_pool
+#define sph_thread_pool
+
 #include <errno.h>
 #include <stdlib.h>
 int sph_thread_pool_destroy(sph_thread_pool_t* a) {
@@ -166,3 +169,4 @@ int sph_thread_pool_resize(sph_thread_pool_t* a, sph_thread_pool_size_t size, ui
   };
   return (0);
 }
+#endif

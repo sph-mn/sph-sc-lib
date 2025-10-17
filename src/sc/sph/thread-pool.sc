@@ -1,3 +1,4 @@
+(pre-include-guard-begin sph-thread-pool)
 (pre-include "errno.h" "stdlib.h")
 
 (define (sph-thread-pool-destroy a) (int sph-thread-pool-t*)
@@ -124,3 +125,5 @@
       (set a:size size)
       (pthread-mutex-unlock &a:queue-mutex)))
   (return 0))
+
+(pre-include-guard-end)

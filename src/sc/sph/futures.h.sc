@@ -3,10 +3,9 @@
 (sc-comment
   "fine-grain parallelism based on sph/thread-pool.c."
   "provides task objects with functions executed in threads that can be waited for to get a result value."
-  "manages the memory of thread-pool task objects.
-   depends on thread-pool.h")
+  "manages the memory of thread-pool task objects")
 
-(pre-include "inttypes.h" "time.h" "stdatomic.h")
+(pre-include "inttypes.h" "time.h" "stdatomic.h" "sph/thread-pool.h")
 (pre-define-if-not-defined sph-future-default-poll-interval (struct-literal 0 200000000))
 
 (declare

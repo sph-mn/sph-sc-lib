@@ -1,3 +1,5 @@
+(pre-include-guard-begin sph-array3-h)
+
 (sc-comment
   "\"array3\" - dynamic array as a struct {.data, .size, .used} that combines memory pointer, length and used length in one object.
    the \"used\" property is to support variable length data in a fixed size memory area.
@@ -17,6 +19,7 @@
      my_type_free(a);")
 
 (pre-define
+  array3-growth-factor 2
   (array3-declare-type name element-type)
   (array3-declare-type-custom name element-type malloc realloc free)
   (array3-declare-type-custom name element-type array3-alloc array3-realloc array3-free)
@@ -35,7 +38,14 @@
       (if (not data) (return 1))
       (set a:data data a:size new-size a:used (if* (< new-size a:used) new-size a:used))
       (return 0))
-    (define ((pre-concat name _free) a) (void (pre-concat name _t*)) (array3-free a:data)))
+    (define ((pre-concat name _free) a) (void (pre-concat name _t*)) (array3-free a:data))
+    (define ((pre-concat name _ensure) a needed) (uint8-t (pre-concat name _t*) size-t)
+      (return
+        (if* a:data
+          (if* (< (- a:size a:used) needed)
+            ((pre-concat name _resize) a (* array3-growth-factor a:size))
+            0)
+          ((pre-concat name _new) needed a)))))
   (array3-declare a type) (define a type (struct-literal 0 0 0))
   (array3-add a value) (begin (set (array-get a.data a.used) value) (set+ a.used 1))
   (array3-set-null a) (set a.used 0 a.size 0 a.data 0)
@@ -53,3 +63,5 @@
   (begin
     (declare (pre-concat name _data) (array value-t array-size) name type-t)
     (set name.data (pre-concat name _data) name.size array-size name.used 0)))
+
+(pre-include-guard-end)

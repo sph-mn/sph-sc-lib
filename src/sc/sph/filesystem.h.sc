@@ -1,5 +1,5 @@
-(sc-comment "depends on sph/string.c")
-(pre-include "unistd.h" "sys/stat.h" "sys/types.h" "libgen.h" "errno.h")
+(pre-include-guard-begin sph-filesystem-h)
+(pre-include "unistd.h" "sys/stat.h" "sys/types.h" "libgen.h" "errno.h" "sph/string.c")
 (pre-define (file-exists path) (not (= (access path F-OK) -1)))
 
 (define (dirname-2 a) (uint8-t* uint8-t*)
@@ -15,3 +15,5 @@
       (define status uint8-t (ensure-directory-structure path-dirname mkdir-mode))
       (free path-dirname)
       (return (and status (or (= EEXIST errno) (= 0 (mkdir path mkdir-mode))))))))
+
+(pre-include-guard-end)
