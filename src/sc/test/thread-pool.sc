@@ -1,4 +1,4 @@
-(pre-include "inttypes.h" "./test.c"
+(pre-include "inttypes.h" "sph/test.h"
   "sph/queue.h" "sph/thread-pool.h" "sph/thread-pool.c" "sph/futures.h" "sph/futures.c")
 
 (define (test-thread-pool) status-t

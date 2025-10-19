@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <inttypes.h>
-#include "./test.c"
+#include <sph/test.h>
 #include <sph/set.h>
 #define test_element_count 10000
 sph_set_declare_type(set64, uint64_t, sph_set_hash_integer, sph_set_equal_integer, 0, 2);

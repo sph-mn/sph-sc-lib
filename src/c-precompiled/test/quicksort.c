@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <sys/types.h>
-#include "./test.c"
+#include <sph/test.h>
 #include <sph/quicksort.h>
 #define test_element_count 10
 typedef struct {

@@ -1,5 +1,5 @@
 (pre-include "inttypes.h" "string.h"
-  "./test.c" "sph/spline-path.h" "sph/spline-path.c" "sph/float.h" "sph/float.c")
+  "sph/test.h" "sph/spline-path.h" "sph/spline-path.c" "sph/float.h" "sph/float.c")
 
 (pre-define
   error-margin 0.1
@@ -208,4 +208,4 @@
   (test-helper-test-one test-spline-path)
   (test-helper-test-one test-spline-path-bezier-arc)
   (test-helper-test-one test-spline-path-perpendicular-point)
-  (label exit (test-helper-display-summary) (return status.id)))
+  (label exit (test-helper-display-summary-id) (return status.id)))

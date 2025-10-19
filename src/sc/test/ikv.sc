@@ -1,7 +1,7 @@
 (pre-define _GNU_SOURCE)
 
 (pre-include "stdio.h" "inttypes.h"
-  "./test.c" "../foreign/murmur3.c" "sph/hashtable.h" "sph/ikv.h" "sph/ikv.c")
+  "sph/test.h" "../foreign/murmur3.c" "sph/hashtable.h" "sph/ikv.h" "sph/ikv.c")
 
 (define (test-ikv) status-t
   (declare a ikv-t b ikv-t value ikv-value-t*)

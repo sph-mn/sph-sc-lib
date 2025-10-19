@@ -7,6 +7,7 @@ c code is in src/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions 
 * [array](#array): structs for arrays that include size or a count of used content
 * [futures](#futures): fine-grained parallelism with objects that can be waited on for results
 * [hashtable](#hashtable): hash-tables for any key/value type
+* [list](#list): slist, a minimal singly-linked stack allocator-bound list and dlist, an intrusive doubly-linked list
 * [memreg](#memreg): track heap memory allocations in function scope
 * [memory](#memory): allocate or register memory using status_t
 * [queue](#queue): a queue for any data type
@@ -19,7 +20,6 @@ c code is in src/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions 
 * [thread-pool](#thread-pool): task queue with pthread threads and wait conditions for pausing inactive threads
 
 ## more experimental
-* [mi-list](#mi-list): a basic, macro-based linked list
 * [ikv](#ikv): file format for nested named arrays, for example for text configuration
 * one: miscellaneous helpers
 * guile: a few helpers for working with guile
@@ -45,12 +45,7 @@ macro that defines a generic dynamic array type for arbitrary element types.
 * fixed capacity unless explicitly resized
 * minimal code size and suitable for inclusion-based builds
 
-## dependencies
-
-* c standard library: `stdlib.h`, `inttypes.h`
-
 ## usage examples
-
 ```
 #include "sph/array.h"
 
@@ -147,12 +142,7 @@ gcc "$c/test/thread-pool.c" -o tmp/test-thread-pool -lpthread -D _DEFAULT_SOURCE
 
 macro that defines open-addressing hash-table data structures for arbitrary key/value types.
 
-## dependencies
-
-* c standard library (`stdlib.h`, `string.h`, `inttypes.h`)
-
 ## implementation
-
 * linear probing for collision resolution
 * separate arrays for flags, keys, and values
 * flags encode slot state, so no sentinel key or null value is needed
@@ -205,13 +195,56 @@ example hash and equality macros:
 #define sph_hashtable_equal_integer(a, b) ((a) == (b))
 ```
 
+# list
+macros for generic singly and doubly linked lists with inline utility functions.
+
+## singly list
+`sph_slist_declare_type(name, element_type)` defines:
+* `typedef struct name##_node { struct name##_node *next; element_type value; } name##_t;`
+* `name##_t *name##_add_front(name##_t *head, element_type value);`
+  * allocate node, prepend, return new head
+* `name##_t *name##_remove_front(name##_t *head);`
+  * free head, return next
+* `void name##_destroy(name##_t *head);`
+  * free full chain
+* `size_t name##_count(name##_t *head);`
+  * count nodes
+* `void name##_append(name##_t *head, name##_t *tail);`
+  * set `head->next = tail`
+
+## doubly list
+`sph_dlist_declare_type(name, element_type)` defines:
+* `typedef struct name##_node { struct name##_node *previous; struct name##_node *next; element_type value; } name##_t;`
+* `void name##_reverse(name##_t **head);`
+  * reverse links in place
+* `void name##_validate(name##_t *head);`
+  * print link errors with index
+* `void name##_unlink(name##_t **head, name##_t *node);`
+  * detach node from list
+* `void name##_print(name##_t *head);`
+  * print link layout per node
+
+## example
+```
+#include "sph/list.h"
+sph_slist_declare_type(slist_int, int)
+int main(void) {
+  slist_int_t *head = 0;
+  head = slist_int_add_front(head, 3);
+  head = slist_int_add_front(head, 2);
+  head = slist_int_add_front(head, 1);
+  printf("%zu\n", slist_int_count(head));
+  head = slist_int_remove_front(head);
+  slist_int_destroy(head);
+  return 0;
+}
+```
+
 # memreg
 track memory allocations locally on the stack and free all allocations up to point easily.
 
 * memreg: fixed store, caller-sized
 * memreg2: fixed store, caller-sized, custom free handler
-* memreg-heap: heap-owned, fixed-size unless resized manually
-* memreg-grow: heap-owned, auto-growing, ensure semantics, multiple stores, per-entry handler
 
 ```c
 #include "sph/memreg.c"
@@ -247,10 +280,149 @@ memreg_free_named(testname);
 ```
 
 # memory
+functions and macros for dynamic memory allocation and tracked memory management.
 
+## basic allocation
 
+```
+status_t sph_memory_malloc(size_t size, void **result);
+status_t sph_memory_malloc_string(size_t length, uint8_t **result);
+status_t sph_memory_calloc(size_t size, void **result);
+status_t sph_memory_realloc(size_t size, void **memory);
+```
 
+* `malloc` allocates `size` bytes
+* `malloc_string` allocates `length+1` bytes and null-terminates
+* `calloc` allocates `size` bytes cleared to zero
+* `realloc` resizes memory and updates pointer
 
+return value: `status_t` (0 on success, error status otherwise)
+
+## memory tracking
+
+```
+status_t sph_memory_add_with_handler(sph_memory_t *a, void *address, void (*handler)(void *));
+void sph_memory_destroy(sph_memory_t *a);
+```
+
+* `sph_memory_add_with_handler` registers `address` with its release `handler`
+* `sph_memory_destroy` calls all registered handlers and clears array
+
+## convenience macros
+
+```
+#define sph_malloc(size, result) sph_memory_malloc(size, (void **)(result))
+#define sph_malloc_string(size, result) sph_memory_malloc_string(size, (uint8_t **)(result))
+#define sph_calloc(size, result) sph_memory_calloc(size, (void **)(result))
+#define sph_realloc(size, result) sph_memory_realloc(size, (void **)(result))
+#define sph_memory_init(a) a.data = 0
+```
+
+## example
+
+```
+#include "sph/memory.h"
+
+int main(void) {
+  status_declare;
+  uint8_t *buf;
+  status_require(sph_malloc_string(32, &buf));
+  sph_memory_t mem;
+  sph_memory_init(mem);
+  sph_memory_add_with_handler(&mem, buf, free);
+  sph_memory_destroy(&mem);
+exit:
+  status_return;
+}
+```
+
+# queue
+a fifo queue with the operations enqueue and dequeue that can enqueue structs of mixed types.
+elements need to be a struct with a field queue_node_t with a specific name. a queue_node_t object to be added must not already be in the queue.
+the queue will use and reference the queue_node field and does not need to allocate new memory. depends on queue.c
+
+## example usage
+```c
+typedef struct {
+  // custom field definitions ...
+  queue_node_t queue_node;
+} element_t;
+
+element_t e;
+queue_t q;
+queue_init(&q);
+queue_enq(&q, &e.queue_node);
+queue_get(queue_deq(&q), element_t, queue_node);
+if(0 = q.size) { printf("it's empty\n"); }
+```
+
+# set
+macro that defines open-addressing set data structures for arbitrary value types.
+
+## characteristics
+* linear probing for lookup and insertion
+* backward-shift deletion to preserve probe continuity
+* expected constant-time insert, remove, and lookup
+* fixed capacity; to expand, create a larger set and reinsert values
+* occupancy tracked with a bitset, no tombstone markers
+* supports one special "null" value as a valid element using a nullable flag
+
+## usage examples
+```
+#include "sph/set.h"
+
+// name, value_type, hash, equal, null_value, size_factor
+sph_set_declare_type(myset, int, sph_set_hash_integer,
+  sph_set_equal_integer, 0, 2);
+
+int main(void) {
+  myset_t a;
+  if (myset_new(3, &a)) return 1;
+  myset_add(&a, 3);
+  myset_add(&a, 5);
+  myset_remove(&a, 3);
+  myset_get(a, 5);
+  myset_free(a);
+  return 0;
+}
+```
+
+`sph_set_declare_type` defines these functions:
+
+```c
+// returns 0 on success, 1 if memory allocation failed
+uint8_t name##_new(size_t min_size, name##_t *result);
+
+// clears all entries
+void name##_clear(name##_t *a);
+
+// returns a pointer to the stored value, or 0 if not found
+// if the value equals the null value, returns a.values if present, otherwise 0
+value_type *name##_get(name##_t a, value_type value);
+
+// inserts the value if not present and returns its address, or 0 if no space remains
+// if the value equals the null value, sets a->nullable and returns a->values
+value_type *name##_add(name##_t *a, value_type value);
+
+// removes the value and returns 0 on success, 1 if not found
+// if the value equals the null value, clears a->nullable
+uint8_t name##_remove(name##_t *a, value_type value);
+
+void name##_free(name##_t a);
+```
+
+example hash and equality macros:
+
+```c
+#define sph_set_hash_integer(value, size) ((value) % (size))
+#define sph_set_equal_integer(a, b) ((a) == (b))
+```
+
+## layout and sizing
+* declared type: `name##_t` contains `.size`, `.mask`, `.values`, `.occupied`, `.nullable`
+* the null element, if present, is tracked through `.nullable`, and its storage address is `a.values`
+* the number of elements allocated equals the next power of two greater than or equal to `(size_factor × requested_size)`
+* the hash function must return an index within the range from zero up to but not including the table size
 
 # status
 helpers for error and return status code handling with a routine local goto label and a tiny status object that includes the status id and an id for the library it belongs to, for when multiple libraries can return possibly overlapping error codes
@@ -309,139 +481,6 @@ status_set_goto(group_id, status_id): like status_set but goes to exit
 status_t: struct
   id: int
   group: uint8_t*
-```
-
-# set
-
-macro that defines open-addressing set data structures for arbitrary value types.
-
-## characteristics
-* linear probing for lookup and insertion
-* backward-shift deletion to preserve probe continuity
-* expected constant-time insert, remove, and lookup
-* fixed capacity; to expand, create a larger set and reinsert values
-* occupancy tracked with a bitset, no tombstone markers
-* supports one special "null" value as a valid element using a nullable flag
-
-## dependencies
-* c standard library: `stdlib.h`, `string.h`, `inttypes.h`
-
-## usage examples
-
-```
-#include "sph/set.h"
-
-// name, value_type, hash, equal, null_value, size_factor
-sph_set_declare_type(myset, int, sph_set_hash_integer,
-  sph_set_equal_integer, 0, 2);
-
-int main(void) {
-  myset_t a;
-  if (myset_new(3, &a)) return 1;
-  myset_add(&a, 3);
-  myset_add(&a, 5);
-  myset_remove(&a, 3);
-  myset_get(a, 5);
-  myset_free(a);
-  return 0;
-}
-```
-
-`sph_set_declare_type` defines these functions:
-
-```c
-// returns 0 on success, 1 if memory allocation failed
-uint8_t name##_new(size_t min_size, name##_t *result);
-
-// clears all entries
-void name##_clear(name##_t *a);
-
-// returns a pointer to the stored value, or 0 if not found
-// if the value equals the null value, returns a.values if present, otherwise 0
-value_type *name##_get(name##_t a, value_type value);
-
-// inserts the value if not present and returns its address, or 0 if no space remains
-// if the value equals the null value, sets a->nullable and returns a->values
-value_type *name##_add(name##_t *a, value_type value);
-
-// removes the value and returns 0 on success, 1 if not found
-// if the value equals the null value, clears a->nullable
-uint8_t name##_remove(name##_t *a, value_type value);
-
-void name##_free(name##_t a);
-```
-
-example hash and equality macros:
-
-```c
-#define sph_set_hash_integer(value, size) ((value) % (size))
-#define sph_set_equal_integer(a, b) ((a) == (b))
-```
-
-## layout and sizing
-* declared type: `name##_t` contains `.size`, `.mask`, `.values`, `.occupied`, `.nullable`
-* the null element, if present, is tracked through `.nullable`, and its storage address is `a.values`
-* the number of elements allocated equals the next power of two greater than or equal to `(size_factor × requested_size)`
-* the hash function must return an index within the range from zero up to but not including the table size
-
-# mi-list
-a basic linked list with custom element types.
-
-## dependencies
-* the c standard library (stdlib.h and inttypes.h)
-
-## usage example
-```c
-mi_list_declare_type(list_64, uint64_t);
-list_64_t* a;
-a = list_64_add(a, 112);
-mi_list_first(a);
-mi_list_first_address(a);
-mi_list_rest(a);
-list_64_length(a);
-list_64_destroy(a);
-```
-
-## bindings
-```c
-{name}_add
-{name}_destroy
-{name}_drop
-{name}_length
-{name}_struct
-{name}_t
-mi_list_first
-mi_list_first_address
-mi_list_rest
-```
-
-## type
-{name}_t is a struct:
-```c
-typedef struct name##_struct {
-  struct name##_struct* link;
-  element_type data;
-} name##_t;
-```
-
-# queue
-a fifo queue with the operations enqueue and dequeue that can enqueue structs of mixed types.
-elements need to be a struct with a field queue_node_t with a specific name. a queue_node_t object to be added must not already be in the queue.
-the queue will use and reference the queue_node field and does not need to allocate new memory. depends on queue.c
-
-## example usage
-```c
-typedef struct {
-  // custom field definitions ...
-  queue_node_t queue_node;
-} element_t;
-
-element_t e;
-queue_t q;
-queue_init(&q);
-queue_enq(&q, &e.queue_node);
-queue_get(queue_deq(&q), element_t, queue_node);
-if(0 = q.size) { printf("it's empty\n"); }
 ```
 
 # test

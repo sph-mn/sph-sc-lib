@@ -9,15 +9,13 @@ gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimization -fno-math-errno -
 
 compile_test_sph_sc_lib() {
   gcc "$c/test/spline-path.c" -o tmp/test-spline-path $gcc_options -lm
-  gcc "$c/test/queue.c" -o tmp/test-queue $gcc_options
-  gcc "$c/test/arrayn.c" -o tmp/test-arrayn $gcc_options
-  gcc "$c/test/mi-list.c" -o tmp/test-mi-list $gcc_options
   gcc "$c/test/quicksort.c" -o tmp/test-quicksort $gcc_options
   gcc "$c/test/random.c" -o tmp/test-random $gcc_options
   gcc "$c/test/set.c" -o tmp/test-set $gcc_options
   gcc "$c/test/hashtable.c" -o tmp/test-hashtable $gcc_options
   gcc "$c/test/thread-pool.c" -o tmp/test-thread-pool $gcc_options -lpthread -D _DEFAULT_SOURCE
   gcc "$c/test/ikv.c" -o tmp/test-ikv $gcc_options
+  gcc "$c/test/other.c" -o tmp/test-other $gcc_options
 }
 
 mkdir -p "$target_dir" &&

@@ -1,7 +1,7 @@
 
 #include <inttypes.h>
 #include <string.h>
-#include "./test.c"
+#include <sph/test.h>
 #include <sph/spline-path.h>
 #include <sph/spline-path.c>
 #include <sph/float.h>
@@ -239,6 +239,6 @@ int main() {
   test_helper_test_one(test_spline_path_bezier_arc);
   test_helper_test_one(test_spline_path_perpendicular_point);
 exit:
-  test_helper_display_summary();
+  test_helper_display_summary_id();
   return ((status.id));
 }

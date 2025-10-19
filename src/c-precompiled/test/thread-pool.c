@@ -1,6 +1,6 @@
 
 #include <inttypes.h>
-#include "./test.c"
+#include <sph/test.h>
 #include <sph/queue.h>
 #include <sph/thread-pool.h>
 #include <sph/thread-pool.c>

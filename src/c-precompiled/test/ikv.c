@@ -2,7 +2,7 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <inttypes.h>
-#include "./test.c"
+#include <sph/test.h>
 #include "../foreign/murmur3.c"
 #include <sph/hashtable.h>
 #include <sph/ikv.h>

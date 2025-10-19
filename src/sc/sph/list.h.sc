@@ -1,0 +1,78 @@
+(pre-include-guard-begin sph-list-h)
+(pre-include "inttypes.h" "stdlib.h" "stdio.h")
+
+(pre-define (sph-slist-declare-type name element-type)
+  (begin
+    (declare (pre-concat name _t)
+      (type
+        (struct
+          (pre-concat name _node)
+          (next (struct (pre-concat name -node*)))
+          (value element-type))))
+    (define ((pre-concat name -add-front) head value)
+      ((pre-concat name _t*) (pre-concat name _t*) element-type)
+      (declare node (pre-concat name _t*))
+      (set node (calloc 1 (sizeof (pre-concat name _t))))
+      (if (not node) (return 0))
+      (set node:value value node:next head)
+      (return node))
+    (define ((pre-concat name -remove-front) head) ((pre-concat name _t*) (pre-concat name _t*))
+      (declare next (pre-concat name _t*))
+      (if (not head) (return 0))
+      (set next head:next)
+      (free head)
+      (return next))
+    (define ((pre-concat name -destroy) head) (void (pre-concat name _t*))
+      (declare next (pre-concat name _t*))
+      (while head (set next head:next) (free head) (set head next)))
+    (define ((pre-concat name -count) head) (size_t (pre-concat name _t*))
+      (define count size_t 0)
+      (while head (set+ count 1) (set head head:next))
+      (return count))
+    (define ((pre-concat name -append) head tail)
+      (void (pre-concat name _t*) (pre-concat name _t*))
+      (if head (set head:next tail)))))
+
+(pre-define (sph-dlist-declare-type name element-type)
+  (begin
+    (declare (pre-concat name _t)
+      (type
+        (struct
+          (pre-concat name -node)
+          (previous (struct (pre-concat name -node*)))
+          (next (struct (pre-concat name -node*)))
+          (value element-type))))
+    (define ((pre-concat name _reverse) head) (void (pre-concat name _t**))
+      (declare node (pre-concat name _t*) next (pre-concat name _t*) last (pre-concat name _t*))
+      (if (not head) (return))
+      (set node *head last 0)
+      (while node
+        (set next node:next node:next node:previous node:previous next last node node next))
+      (set *head last))
+    (define ((pre-concat name -validate) head) (void (pre-concat name _t*))
+      (declare index size-t node (pre-concat name _t*) previous (pre-concat name _t*))
+      (set index 0 previous 0 node head)
+      (while node
+        (if (not (= previous node:previous))
+          (begin
+            (printf "invalid previous link at index %zu, node %p\n" index (convert-type node void*))
+            return))
+        (if (and (= node:next node:previous) (not node:next))
+          (begin
+            (printf "circular link at index %zu, node %p\n" index (convert-type node void*))
+            return))
+        (set previous node node node:next)
+        (set+ index 1)))
+    (define ((pre-concat name _unlink) head node)
+      (void (pre-concat name _t**) (pre-concat name _t*))
+      (if (not node) return)
+      (if node:previous (set node:previous:next node:next) (if head (set *head node:next)))
+      (if node:next (set node:next:previous node:previous)))
+    (define ((pre-concat name -print) head) (void (pre-concat name _t*))
+      (define node (pre-concat name _t*) head)
+      (while node
+        (printf "%p <- %p -> %p\n" (convert-type node:previous void*)
+          (convert-type node void*) (convert-type node:next void*))
+        (set node node:next)))))
+
+(pre-include-guard-end)

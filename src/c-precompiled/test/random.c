@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <inttypes.h>
-#include "./test.c"
+#include <sph/test.h>
 #include <sph/float.h>
 #include <sph/float.c>
 #include <sph/random.h>

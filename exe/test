@@ -5,12 +5,10 @@
 export MALLOC_CHECK_=3
 export LD_LIBRARY_PATH="$PWD/tmp"
 ./tmp/test-spline-path
-./tmp/test-queue
-./tmp/test-arrayn
-./tmp/test-mi-list
 ./tmp/test-quicksort
 ./tmp/test-random
 ./tmp/test-set
 ./tmp/test-hashtable
 ./tmp/test-thread-pool
+./tmp/test-other
 #./tmp/test-ikv
