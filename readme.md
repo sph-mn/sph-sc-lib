@@ -139,7 +139,6 @@ gcc "$c/test/thread-pool.c" -o tmp/test-thread-pool -lpthread -D _DEFAULT_SOURCE
 ```
 
 # hashtable
-
 macro that defines open-addressing hash-table data structures for arbitrary key/value types.
 
 ## implementation
@@ -283,7 +282,6 @@ memreg_free_named(testname);
 functions and macros for dynamic memory allocation and tracked memory management.
 
 ## basic allocation
-
 ```
 status_t sph_memory_malloc(size_t size, void **result);
 status_t sph_memory_malloc_string(size_t length, uint8_t **result);
@@ -299,7 +297,6 @@ status_t sph_memory_realloc(size_t size, void **memory);
 return value: `status_t` (0 on success, error status otherwise)
 
 ## memory tracking
-
 ```
 status_t sph_memory_add_with_handler(sph_memory_t *a, void *address, void (*handler)(void *));
 void sph_memory_destroy(sph_memory_t *a);
@@ -309,7 +306,6 @@ void sph_memory_destroy(sph_memory_t *a);
 * `sph_memory_destroy` calls all registered handlers and clears array
 
 ## convenience macros
-
 ```
 #define sph_malloc(size, result) sph_memory_malloc(size, (void **)(result))
 #define sph_malloc_string(size, result) sph_memory_malloc_string(size, (uint8_t **)(result))
@@ -319,7 +315,6 @@ void sph_memory_destroy(sph_memory_t *a);
 ```
 
 ## example
-
 ```
 #include "sph/memory.h"
 

@@ -1,4 +1,4 @@
-(pre-include "inttypes.h" "sph/test.h")
+(pre-include "inttypes.h" "stdlib.h" "string.h" "sph/test.h")
 (sc-comment "array")
 (pre-include "sph/array.h" "sph/array4.h")
 (pre-define test-element-count 100)
