@@ -12,10 +12,13 @@
   sph-array-growth-factor 2
   (sph-array-default-alloc s es) (malloc (* s es))
   (sph-array-default-realloc d s u n es) (realloc d (* n es))
-  (sph-array-default-alloc-zero s) (calloc 1 s)
-  (sph-array-declare-type-custom name element-type sph-array-alloc sph-array-realloc sph-array-free)
+  (sph-array-default-alloc-zero s es) (calloc s es)
+  (sph-array-default-declare-struct-type name element-type)
+  (declare (pre-concat name _t) (type (struct (size size-t) (used size-t) (data element-type*))))
+  (sph-array-declare-type-custom name element-type
+    sph-array-alloc sph-array-realloc sph-array-free sph-array-declare-struct-type)
   (begin
-    (declare (pre-concat name _t) (type (struct (size size-t) (used size-t) (data element-type*))))
+    (sph-array-declare-struct-type name element-type)
     (define ((pre-concat name _new) size a) (status-t size-t (pre-concat name _t*))
       status-declare
       (define data element-type* (sph-array-alloc size (sizeof element-type)))
@@ -40,10 +43,11 @@
           ((pre-concat name _new) needed a)))))
   (sph-array-declare-type name element-type)
   (sph-array-declare-type-custom name element-type
-    sph-array-default-alloc sph-array-default-realloc free)
+    sph-array-default-alloc sph-array-default-realloc free sph-array-default-declare-struct-type)
   (sph-array-declare-type-zeroed name element-type)
   (sph-array-declare-type-custom name element-type
-    sph-array-default-alloc-zero sph-array-default-realloc-zero free)
+    sph-array-default-alloc-zero sph-array-default-realloc-zero free
+    sph-array-default-declare-struct-type)
   (sph-array-declare a type) (define a type (struct-literal 0 0 0))
   (sph-array-add a value) (begin (set (array-get a.data a.used) value) (set+ a.used 1))
   (sph-array-set-null a) (set a.used 0 a.size 0 a.data 0)

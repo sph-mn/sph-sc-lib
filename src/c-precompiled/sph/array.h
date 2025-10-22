@@ -11,13 +11,15 @@
 #define sph_array_growth_factor 2
 #define sph_array_default_alloc(s, es) malloc((s * es))
 #define sph_array_default_realloc(d, s, u, n, es) realloc(d, (n * es))
-#define sph_array_default_alloc_zero(s) calloc(1, s)
-#define sph_array_declare_type_custom(name, element_type, sph_array_alloc, sph_array_realloc, sph_array_free) \
+#define sph_array_default_alloc_zero(s, es) calloc(s, es)
+#define sph_array_default_declare_struct_type(name, element_type) \
   typedef struct { \
     size_t size; \
     size_t used; \
     element_type* data; \
-  } name##_t; \
+  } name##_t
+#define sph_array_declare_type_custom(name, element_type, sph_array_alloc, sph_array_realloc, sph_array_free, sph_array_declare_struct_type) \
+  sph_array_declare_struct_type(name, element_type); \
   status_t name##_new(size_t size, name##_t* a) { \
     status_declare; \
     element_type* data = sph_array_alloc(size, (sizeof(element_type))); \
@@ -47,8 +49,8 @@
     status_declare; \
     return ((a->data ? (((a->size - a->used) < needed) ? name##_resize(a, (sph_array_growth_factor * a->size)) : status) : name##_new(needed, a))); \
   }
-#define sph_array_declare_type(name, element_type) sph_array_declare_type_custom(name, element_type, sph_array_default_alloc, sph_array_default_realloc, free)
-#define sph_array_declare_type_zeroed(name, element_type) sph_array_declare_type_custom(name, element_type, sph_array_default_alloc_zero, sph_array_default_realloc_zero, free)
+#define sph_array_declare_type(name, element_type) sph_array_declare_type_custom(name, element_type, sph_array_default_alloc, sph_array_default_realloc, free, sph_array_default_declare_struct_type)
+#define sph_array_declare_type_zeroed(name, element_type) sph_array_declare_type_custom(name, element_type, sph_array_default_alloc_zero, sph_array_default_realloc_zero, free, sph_array_default_declare_struct_type)
 #define sph_array_declare(a, type) type a = { 0, 0, 0 }
 #define sph_array_add(a, value) \
   (a.data)[a.used] = value; \
