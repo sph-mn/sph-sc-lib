@@ -55,4 +55,4 @@
   status-declare
   (test-helper-test-one test-sph-set)
   (test-helper-test-one test-sph-set-null)
-  (label exit (test-helper-display-summary) (return status.id)))
+  (label exit test-helper-display-summary (return status.id)))

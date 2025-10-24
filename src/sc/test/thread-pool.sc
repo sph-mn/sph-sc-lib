@@ -29,4 +29,4 @@
   status-declare
   (test-helper-test-one test-futures)
   (test-helper-test-one test-thread-pool)
-  (label exit (test-helper-display-summary) (return status.id)))
+  (label exit test-helper-display-summary (return status.id)))

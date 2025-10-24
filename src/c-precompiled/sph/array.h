@@ -12,6 +12,7 @@
 #define sph_array_default_alloc(s, es) malloc((s * es))
 #define sph_array_default_realloc(d, s, u, n, es) realloc(d, (n * es))
 #define sph_array_default_alloc_zero(s, es) calloc(s, es)
+#define sph_array_declare_no_struct_type(name, element_type)
 #define sph_array_default_declare_struct_type(name, element_type) \
   typedef struct { \
     size_t size; \

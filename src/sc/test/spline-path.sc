@@ -208,4 +208,4 @@
   (test-helper-test-one test-spline-path)
   (test-helper-test-one test-spline-path-bezier-arc)
   (test-helper-test-one test-spline-path-perpendicular-point)
-  (label exit (test-helper-display-summary-id) (return status.id)))
+  (label exit test-helper-display-summary (return status.id)))

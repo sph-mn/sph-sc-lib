@@ -43,6 +43,6 @@ int main() {
   status_declare;
   test_helper_test_one(test_hashtable);
 exit:
-  test_helper_display_summary();
+  test_helper_display_summary;
   return ((status.id));
 }

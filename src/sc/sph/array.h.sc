@@ -13,6 +13,7 @@
   (sph-array-default-alloc s es) (malloc (* s es))
   (sph-array-default-realloc d s u n es) (realloc d (* n es))
   (sph-array-default-alloc-zero s es) (calloc s es)
+  (sph-array-declare-no-struct-type name element-type) (begin)
   (sph-array-default-declare-struct-type name element-type)
   (declare (pre-concat name _t) (type (struct (size size-t) (used size-t) (data element-type*))))
   (sph-array-declare-type-custom name element-type

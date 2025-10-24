@@ -128,4 +128,4 @@
   (test-helper-test-one test-dlist)
   (test-helper-test-one test-arrayn)
   (test-helper-test-one test-queue)
-  (label exit (test-helper-display-summary) (return status.id)))
+  (label exit test-helper-display-summary (return status.id)))

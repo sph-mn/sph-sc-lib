@@ -239,6 +239,6 @@ int main() {
   test_helper_test_one(test_spline_path_bezier_arc);
   test_helper_test_one(test_spline_path_perpendicular_point);
 exit:
-  test_helper_display_summary_id();
+  test_helper_display_summary;
   return ((status.id));
 }

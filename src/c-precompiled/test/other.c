@@ -152,6 +152,6 @@ int main() {
   test_helper_test_one(test_arrayn);
   test_helper_test_one(test_queue);
 exit:
-  test_helper_display_summary();
+  test_helper_display_summary;
   return ((status.id));
 }

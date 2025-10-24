@@ -72,6 +72,6 @@ int main() {
   test_helper_test_one(test_sph_set);
   test_helper_test_one(test_sph_set_null);
 exit:
-  test_helper_display_summary();
+  test_helper_display_summary;
   return ((status.id));
 }

@@ -23,4 +23,4 @@
 (define (main) int
   status-declare
   (test-helper-test-one test-random)
-  (label exit (test-helper-display-summary) (return status.id)))
+  (label exit test-helper-display-summary (return status.id)))

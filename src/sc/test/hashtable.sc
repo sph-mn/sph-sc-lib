@@ -31,4 +31,4 @@
 (define (main) int
   status-declare
   (test-helper-test-one test-hashtable)
-  (label exit (test-helper-display-summary) (return status.id)))
+  (label exit test-helper-display-summary (return status.id)))

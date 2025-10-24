@@ -40,6 +40,6 @@ int main() {
   test_helper_test_one(test_futures);
   test_helper_test_one(test_thread_pool);
 exit:
-  test_helper_display_summary();
+  test_helper_display_summary;
   return ((status.id));
 }

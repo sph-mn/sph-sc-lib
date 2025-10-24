@@ -13,13 +13,13 @@
     printf("%s failed\n", description); \
     status_set_goto("", 1); \
   }
-#define test_helper_display_summary(status_description) \
+#define test_helper_display_summary_description(status_description) \
   if (status_is_success) { \
     printf(("--\ntests finished successfully.\n")); \
   } else { \
     printf(("\ntests failed. %d %s\n"), (status.id), (status_description(status))); \
   }
-#define test_helper_display_summary_id() \
+#define test_helper_display_summary \
   if (status_is_success) { \
     printf(("--\ntests finished successfully.\n")); \
   } else { \
