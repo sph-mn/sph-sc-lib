@@ -2,8 +2,7 @@
 (sc-comment "array")
 (pre-include "sph/array.h" "sph/array4.h")
 (pre-define test-element-count 100)
-(sph-array-declare-type a3u64 uint64-t)
-(array4-declare-type a4u64 uint64-t)
+(sc-no-semicolon (sph-array-declare-type a3u64 uint64-t) (array4-declare-type a4u64 uint64-t))
 
 (define (test-arrayn) status-t
   status-declare
@@ -50,8 +49,9 @@
 
 (sc-comment "list")
 (pre-include "sph/list.h")
-(sph-slist-declare-type slist-u64 uint64-t)
-(sph-dlist-declare-type dlist-u64 uint64-t)
+
+(sc-no-semicolon (sph-slist-declare-type slist-u64 uint64-t)
+  (sph-dlist-declare-type dlist-u64 uint64-t))
 
 (define (test-slist) (status_t)
   status-declare

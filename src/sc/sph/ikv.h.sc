@@ -9,6 +9,8 @@
 
 (pre-define-if-not-defined
   ikv-integer-t uintmax-t
+  ikv-integer-format (pre-string-concat "%" PRIuMAX)
+  ikv-float-format "%f"
   ikv-float-t double
   ikv-string-t uint8-t
   ikv-key-t uint8-t
@@ -27,7 +29,7 @@
   ikv-s-id-memory 2
   ikv-s-id-full 3
   ikv-memory-error (status-set-goto ikv-s-group-ikv ikv-s-id-memory)
-  (ikv-equal a b) (= 0 (strncmp a b ikv-max-keysize))
+  (ikv-equal a b) (= 0 (strncmp (convert-type a char*) (convert-type b char*) ikv-max-keysize))
   (ikv-value-get-string a index) (array-get (convert-type a:data ikv-string-t**) index)
   (ikv-value-get-integer a index) (array-get (convert-type a:data ikv-integer-t*) index)
   (ikv-value-get-float a index) (array-get (convert-type a:data ikv-float-t*) index)
@@ -35,11 +37,11 @@
 
 (define (ikv-hash-64 key size) (uint64-t ikv-key-t* size-t)
   (declare a (array uint64-t 2))
-  (MurmurHash3_x64_128 key (strlen key) 0 a)
+  (MurmurHash3_x64_128 key (strlen (convert-type key (char*))) 0 a)
   (return (array-get a 0)))
 
 (declare ikv-value-t (type (struct (type ikv-type-t) (size ikv-integer-t) (data void*))))
-(sph-hashtable-declare-type ikv ikv-key-t* ikv-value-t ikv-hash-64 ikv-equal 2)
+(sc-no-semicolon (sph-hashtable-declare-type ikv ikv-key-t* ikv-value-t ikv-hash-64 ikv-equal 2))
 
 (declare
   ikv-read-value-t (type (function-pointer status-t char* size-t ikv-value-t*))

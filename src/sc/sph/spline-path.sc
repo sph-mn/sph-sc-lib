@@ -13,18 +13,16 @@
     (convert-type (+ field-offset (convert-type (+ points index) uint8-t*)) spline-path-value-t*)))
 
 (define (spline-path-debug-print path indent) (void spline-path-t* uint8-t)
-  (define type uint8-t* 0)
+  (define type (const char*) 0)
   (declare pad (array uint8-t 32))
   (memset pad #\space (sizeof pad))
   (set (array-get pad (if* (< indent 30) indent 30)) 0)
   (printf "%spath segments: %zu\n" pad (convert-type path:segments-count size-t))
   (for ((define i size-t 0) (< i path:segments-count) (set+ i 1))
     (define
-      s spline-path-segment-t* (address-of (array-get (struct-pointer-get path segments) i))
-      p0 spline-path-point-t* (address-of (array-get (struct-pointer-get s points) 0))
-      p1 spline-path-point-t*
-      (address-of
-        (array-get (struct-pointer-get s points) (- (struct-pointer-get s points-count) 1))))
+      s spline-path-segment-t* (address-of (array-get path:segments i))
+      p0 spline-path-point-t* (address-of (array-get s:points 0))
+      p1 spline-path-point-t* (address-of (array-get s:points (- s:points-count 1))))
     (case = s:generate
       (spline-path-line-generate (set type "line"))
       (spline-path-move-generate (set type "move"))
@@ -35,19 +33,15 @@
       (spline-path-exponential-generate (set type "exponential"))
       (spline-path-path-generate (set type "path"))
       (else (set type "custom")))
-    (printf "%s  %s %.3f %.3f -> %.3f %.3f\n" pad
-      (convert-type type char*) (struct-pointer-get p0 x) (struct-pointer-get p0 y)
-      (struct-pointer-get p1 x) (struct-pointer-get p1 y))
+    (printf "%s  %s %.3f %.3f -> %.3f %.3f\n" pad type p0:x p0:y p1:x p1:y)
     (if (and (= s:generate spline-path-path-generate) s:data)
       (begin
-        (define sub spline-path-t* (convert-type (struct-pointer-get s data) spline-path-t*))
+        (define sub spline-path-t* (convert-type s:data spline-path-t*))
         (spline-path-debug-print sub (+ indent 2)))))
   return)
 
 (define (spline-path-validate path log) (uint8-t spline-path-t* uint8-t)
-  (if
-    (or (not path) (not (struct-pointer-get path segments))
-      (= (struct-pointer-get path segments-count) 0))
+  (if (or (not path) (not path:segments) (= path:segments-count 0))
     (begin
       (if log (fprintf stderr "spline_path_validate: invalid path pointer or empty segment list\n"))
       (return 1)))
@@ -102,8 +96,8 @@
       (< i path:segments-count) (begin (set path:current-segment-index i) (set+ i 1)))
     (set
       s (+ path:segments i)
-      s-start (struct-get (array-get s:points 0) x)
-      s-end (struct-get (array-get s:points (- s:points-count 1)) x)
+      s-start (convert-type (struct-get (array-get s:points 0) x) size-t)
+      s-end (convert-type (struct-get (array-get s:points (- s:points-count 1)) x) size-t)
       path:previous-start start)
     (if (> s-start end) break)
     (if (< s-end start) continue)
@@ -121,9 +115,8 @@
   (return (if* (= spline-path-size-max p.x) (array-get s:points 0) p)))
 
 (define (spline-path-size path) (size-t spline-path-t)
-  (declare p spline-path-point-t)
-  (set p (spline-path-end path))
-  (return p.x))
+  (define p spline-path-point-t (spline-path-end path))
+  (return (convert-type p.x size-t)))
 
 (define (spline-path-path-prepare s) (uint8-t spline-path-segment-t*)
   (define
@@ -256,7 +249,7 @@
     (if (> 2 (- x x-previous)) continue)
     (if (< start x-previous) (set y-previous (array-get out (- x-previous start)))
       (begin
-        (sc-comment "gap at the beginning. find value for x before start")
+        (sc-comment "gap at the beginning. find value before start")
         (set t-prev 0 mt-prev 1)
         (for ((set j i) j (set- j 1))
           (set
@@ -265,8 +258,11 @@
             xj (round (interpolator t mt s:points (offsetof spline-path-point-t x))))
           (if (< xj x) (begin (set x-previous xj t-prev t mt-prev mt) break)))
         (if j
-          (set y-previous (interpolator t-prev mt-prev s:points (offsetof spline-path-point-t y)))
-          (set y-previous p-start.y x-previous p-start.x))))
+          (set
+            y-previous (interpolator t-prev mt-prev s:points (offsetof spline-path-point-t y))
+            y-previous p-start.y
+            x-previous p-start.x)
+          (set y-previous p-start.y))))
     (set j-start 1)
     (if (< (+ x-previous j-start) start) (set j-start (- start x-previous)))
     (for ((set j j-start) (and (< j (- x x-previous)) (< (+ x-previous j) end)) (set+ j 1))
@@ -420,45 +416,17 @@
    distance -1 and 1 are the bounds of a rectangle where p1 and p2 are diagonally opposed edges"
   (declare
     c spline-path-point-t
-    d spline-path-point-t
-    b1 spline-path-point-t
-    b2 spline-path-point-t
-    t1 spline-path-point-t
-    t2 spline-path-point-t
-    i1 spline-path-point-t
-    i2 spline-path-point-t
-    m spline-path-value-t
-    result spline-path-point-t)
-  (sc-comment "center point")
-  (set c.x (/ (+ p1.x p2.x) 2) c.y (/ (+ p1.y p2.y) 2))
-  (if (= 0 distance) (return c))
-  (sc-comment "perpendicular direction vector")
-  (set d.x (* -1 (- p2.y p1.y)) d.y (- p2.x p1.x))
-  (sc-comment "vertical, horizontal or else")
-  (cond
-    ((= 0 d.x) (set i1.x c.x i1.y 0 i2.x c.x i2.y p2.y))
-    ((= 0 d.y) (set i1.x 0 i1.y c.y i2.x p2.x i2.y c.y))
-    (else
-      (sc-comment "border points")
-      (if (> d.x 0) (set b1.x p2.x b2.x p1.x) (set b1.x p1.x b2.x p2.x))
-      (if (> d.y 0) (set b1.y p2.y b2.y p1.y) (set b1.y p1.y b2.y p2.y))
-      (set
-        t1.x (/ (- b1.x c.x) d.x)
-        t1.y (/ (- b1.y c.y) d.y)
-        t2.x (/ (- b2.x c.x) d.x)
-        t2.y (/ (- b2.y c.y) d.y))
-      (if (<= t1.x t1.y) (set i1.x b1.x i1.y (+ c.y (* t1.x d.y)))
-        (set i1.y b1.y i1.x (+ c.x (* t1.y d.x))))
-      (if (>= t2.x t2.y) (set i2.x b2.x i2.y (+ c.y (* t2.x d.y)))
-        (set i2.y b2.y i2.x (+ c.x (* t2.y d.x))))))
-  (sc-comment "normalized direction vector")
+    r spline-path-point-t
+    dx spline-path-value-t
+    dy spline-path-value-t)
+  (set c.x (/ (+ p1.x p2.x) 2.0) c.y (/ (+ p1.y p2.y) 2.0))
+  (if (= distance 0.0) (return c))
   (set
-    m (spline-path-sqrt (+ (* d.x d.x) (* d.y d.y)))
-    d.x (/ (- i2.x i1.x) m)
-    d.y (/ (- i2.y i1.y) m)
-    result.x (+ c.x (* 0.5 distance m d.x))
-    result.y (+ c.y (* 0.5 distance m d.y)))
-  (return result))
+    dx (- p2.x p1.x)
+    dy (- p2.y p1.y)
+    r.x (+ c.x (* 0.5 distance dx))
+    r.y (- c.y (* 0.5 distance dy)))
+  (return r))
 
 (define (spline-path-bezier-arc-prepare s) (uint8-t spline-path-segment-t*)
   (set (array-get s:points 1)
@@ -472,6 +440,5 @@
    a rectangle with the points as diagonally opposing edges.
    interpolates with a quadratic bezier with a midpoint sagitta proportional to chord length"
   (declare s spline-path-segment-t)
-  (if (= 0.0 curvature) (set s (spline-path-line x y))
-    (set s (spline-path-bezier1 0 curvature x y) s.prepare spline-path-bezier-arc-prepare))
+  (set s (spline-path-bezier1 0 curvature x y) s.prepare spline-path-bezier-arc-prepare)
   (return s))

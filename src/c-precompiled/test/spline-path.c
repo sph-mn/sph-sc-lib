@@ -26,7 +26,7 @@ void display_array(spline_path_value_t* a, size_t len) {
   };
   printf("\n");
 }
-status_t test_spline_path() {
+status_t test_spline_path(void) {
   status_declare;
   spline_path_value_t out[test_spline_path_length];
   spline_path_value_t out_new_get[test_spline_path_length];
@@ -104,7 +104,7 @@ status_t test_spline_path() {
 exit:
   status_return;
 }
-status_t test_spline_path_perpendicular_point() {
+status_t test_spline_path_perpendicular_point(void) {
   status_declare;
   uint8_t log_line;
   spline_path_point_t p1;
@@ -133,7 +133,7 @@ status_t test_spline_path_perpendicular_point() {
 exit:
   status_return;
 }
-status_t test_spline_path_bezier_arc() {
+status_t test_spline_path_bezier_arc(void) {
   status_declare;
   spline_path_value_t end_x;
   spline_path_value_t end_y;
@@ -145,7 +145,7 @@ status_t test_spline_path_bezier_arc() {
   log_path_0 = 0;
   end_x = test_spline_path_bezier_length;
   end_y = test_spline_path_bezier_length;
-  memset(out, 0, test_spline_path_bezier_length);
+  memset(out, 0, (sizeof(spline_path_value_t) * test_spline_path_bezier_length));
   segments[0] = spline_path_bezier_arc((end_x / 3), (end_y / 3), 1);
   segments[1] = spline_path_bezier_arc(end_x, end_y, -1);
   spline_path_set((&path), segments, 2);
@@ -158,7 +158,7 @@ status_t test_spline_path_bezier_arc() {
   };
   status_return;
 }
-status_t test_spline_path_power() {
+status_t test_spline_path_power(void) {
   status_declare;
   spline_path_value_t out[11];
   spline_path_t path;
@@ -180,7 +180,7 @@ status_t test_spline_path_power() {
 exit:
   status_return;
 }
-status_t test_spline_path_exponential() {
+status_t test_spline_path_exponential(void) {
   status_declare;
   spline_path_value_t out[11];
   spline_path_t path;
@@ -205,7 +205,7 @@ status_t test_spline_path_exponential() {
 exit:
   status_return;
 }
-status_t test_spline_path_path_segment() {
+status_t test_spline_path_path_segment(void) {
   status_declare;
   spline_path_value_t out[test_spline_path_length];
   spline_path_segment_t inner_segments[2];
@@ -230,14 +230,14 @@ status_t test_spline_path_path_segment() {
 exit:
   status_return;
 }
-int main() {
+int main(void) {
   status_declare;
+  test_helper_test_one(test_spline_path_perpendicular_point);
   test_helper_test_one(test_spline_path_path_segment);
   test_helper_test_one(test_spline_path_power);
   test_helper_test_one(test_spline_path_exponential);
   test_helper_test_one(test_spline_path);
   test_helper_test_one(test_spline_path_bezier_arc);
-  test_helper_test_one(test_spline_path_perpendicular_point);
 exit:
   test_helper_display_summary;
   return ((status.id));

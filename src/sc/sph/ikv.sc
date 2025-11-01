@@ -22,10 +22,12 @@
     (set b (array-get a.values i))
     (case = b.type
       (ikv-type-integers
-        (for ((set j 0) (< j b.size) (set+ j 1)) (fprintf file " %u" (ikv-value-get-integer &b j)))
+        (for ((set j 0) (< j b.size) (set+ j 1))
+          (fprintf file (pre-string-concat " " ikv-integer-format) (ikv-value-get-integer &b j)))
         (fprintf file "\n"))
       (ikv-type-floats
-        (for ((set j 0) (< j b.size) (set+ j 1)) (fprintf file " %f" (ikv-value-get-float &b j)))
+        (for ((set j 0) (< j b.size) (set+ j 1))
+          (fprintf file (pre-string-concat " " ikv-float-format) (ikv-value-get-float &b j)))
         (fprintf file "\n"))
       (ikv-type-strings
         (for ((set j 0) (< j b.size) (set+ j 1)) (fprintf file " %s" (ikv-value-get-string &b j)))
@@ -35,7 +37,7 @@
 
 (define (ikv-write-file a path) (void ikv-t ikv-string-t*)
   (declare file FILE*)
-  (set file (fopen path "w"))
+  (set file (fopen (convert-type path char*) "w"))
   (ikv-write-file-direct a file 0)
   (fclose file))
 
@@ -143,7 +145,7 @@
     nested-keys (array ikv-key-t* ikv-max-nesting)
     nested-ikvs (array ikv-t ikv-max-nesting))
   status-declare
-  (set line 0 (array-get nested-ikvs 0) ikv)
+  (set line 0 (array-get nested-ikvs 0) ikv key 0)
   (while (not (= -1 (getline &line &line-alloc-size file)))
     (set i 0 size (strlen line))
     (if (= 0 size) continue)
@@ -199,7 +201,7 @@
    key s string ..."
   status-declare
   (declare file FILE*)
-  (set file (fopen path "r"))
+  (set file (fopen (convert-type path char*) "r"))
   (if (not file) (status-set-goto ikv-s-group-ikv ikv-s-id-file-open-failed))
   (status-require (ikv-read-indent file ikv-read-value ikv))
   (label exit (if file (fclose file)) status-return))

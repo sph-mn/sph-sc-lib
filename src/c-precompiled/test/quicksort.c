@@ -22,7 +22,7 @@ void uint32_swapper(void* a, ssize_t b, ssize_t c) {
   ((uint32_t*)(a))[b] = ((uint32_t*)(a))[c];
   ((uint32_t*)(a))[c] = d;
 }
-status_t test_quicksort() {
+status_t test_quicksort(void) {
   status_declare;
   uint32_t i;
   test_struct_t struct_element;
@@ -52,7 +52,7 @@ status_t test_quicksort() {
 exit:
   status_return;
 }
-int main() {
+int main(void) {
   status_declare;
   test_helper_test_one(test_quicksort);
 exit:

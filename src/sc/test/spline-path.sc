@@ -113,7 +113,7 @@
     path spline-path-t
     segments (array spline-path-segment-t 2))
   (set log-path-0 #f end-x test-spline-path-bezier-length end-y test-spline-path-bezier-length)
-  (memset out 0 test-spline-path-bezier-length)
+  (memset out 0 (* (sizeof spline-path-value-t) test-spline-path-bezier-length))
   (array-set* segments (spline-path-bezier-arc (/ end-x 3) (/ end-y 3) 1)
     (spline-path-bezier-arc end-x end-y -1))
   (spline-path-set &path segments 2)
@@ -134,9 +134,7 @@
     y spline-path-value-t 20
     gamma spline-path-value-t 2.0
     expected-mid spline-path-value-t (* y (pow 0.5 gamma)))
-  (set
-    (array-get segments 0)
-    (spline-path-power x y gamma))
+  (set (array-get segments 0) (spline-path-power x y gamma))
   (status-i-require (spline-path-set-copy (address-of path) segments segments-count))
   (spline-path-get (address-of path) 0 10 out)
   (test-helper-assert "power start" (feq (array-get out 0) 0.0))
@@ -169,7 +167,7 @@
   (test-helper-assert "exponential start" (feq (array-get out 0) 0.0))
   (test-helper-assert "exponential mid" (feq (array-get out 5) expected-mid))
   (test-helper-assert "exponential end-1" (< (array-get out 8) y))
-  (test-helper-assert "exponential end" (feq (array-get out 9) 15.807178356934809))
+  (test-helper-assert "exponential end" (feq (array-get out 9) 15.80717835693481))
   (spline-path-free path)
   (free (struct-get path segments))
   (label exit status-return))
@@ -202,10 +200,10 @@
 
 (define (main) int
   status-declare
+  (test-helper-test-one test-spline-path-perpendicular-point)
   (test-helper-test-one test-spline-path-path-segment)
   (test-helper-test-one test-spline-path-power)
   (test-helper-test-one test-spline-path-exponential)
   (test-helper-test-one test-spline-path)
   (test-helper-test-one test-spline-path-bezier-arc)
-  (test-helper-test-one test-spline-path-perpendicular-point)
   (label exit test-helper-display-summary (return status.id)))

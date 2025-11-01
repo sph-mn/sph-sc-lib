@@ -6,7 +6,7 @@
 #include <sph/float.c>
 #include <sph/random.h>
 #include <sph/random.c>
-status_t test_random() {
+status_t test_random(void) {
   status_declare;
   sph_random_state_t s;
   double out[200];
@@ -28,7 +28,7 @@ status_t test_random() {
 exit:
   status_return;
 }
-int main() {
+int main(void) {
   status_declare;
   test_helper_test_one(test_random);
 exit:

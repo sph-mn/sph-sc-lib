@@ -8,9 +8,9 @@
 #include <sph/array.h>
 #include <sph/array4.h>
 #define test_element_count 100
-sph_array_declare_type(a3u64, uint64_t);
-array4_declare_type(a4u64, uint64_t);
-status_t test_arrayn() {
+sph_array_declare_type(a3u64, uint64_t)
+  array4_declare_type(a4u64, uint64_t)
+    status_t test_arrayn(void) {
   status_declare;
   size_t i;
   a3u64_t a3;
@@ -41,7 +41,7 @@ typedef struct {
   uint32_t data;
   sph_queue_node_t q;
 } test_element_t;
-status_t test_queue() {
+status_t test_queue(void) {
   status_declare;
   sph_queue_t a;
   test_element_t* e;
@@ -69,9 +69,9 @@ exit:
 
 /* list */
 #include <sph/list.h>
-sph_slist_declare_type(slist_u64, uint64_t);
-sph_dlist_declare_type(dlist_u64, uint64_t);
-status_t test_slist() {
+sph_slist_declare_type(slist_u64, uint64_t)
+  sph_dlist_declare_type(dlist_u64, uint64_t)
+    status_t test_slist(void) {
   status_declare;
   slist_u64_t* head;
   slist_u64_t* node_a;
@@ -102,7 +102,7 @@ status_t test_slist() {
 exit:
   status_return;
 }
-status_t test_dlist() {
+status_t test_dlist(void) {
   status_declare;
   dlist_u64_t* head;
   dlist_u64_t* node1;
@@ -145,7 +145,7 @@ status_t test_dlist() {
 exit:
   status_return;
 }
-int main() {
+int main(void) {
   status_declare;
   test_helper_test_one(test_slist);
   test_helper_test_one(test_dlist);

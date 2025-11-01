@@ -36,12 +36,12 @@ void ikv_write_file_direct(ikv_t a, FILE* file, ikv_nesting_t nesting) {
     b = (a.values)[i];
     if (ikv_type_integers == b.type) {
       for (j = 0; (j < b.size); j += 1) {
-        fprintf(file, " %u", (ikv_value_get_integer((&b), j)));
+        fprintf(file, " " ikv_integer_format, (ikv_value_get_integer((&b), j)));
       };
       fprintf(file, "\n");
     } else if (ikv_type_floats == b.type) {
       for (j = 0; (j < b.size); j += 1) {
-        fprintf(file, " %f", (ikv_value_get_float((&b), j)));
+        fprintf(file, " " ikv_float_format, (ikv_value_get_float((&b), j)));
       };
       fprintf(file, "\n");
     } else if (ikv_type_strings == b.type) {
@@ -57,7 +57,7 @@ void ikv_write_file_direct(ikv_t a, FILE* file, ikv_nesting_t nesting) {
 }
 void ikv_write_file(ikv_t a, ikv_string_t* path) {
   FILE* file;
-  file = fopen(path, "w");
+  file = fopen(((char*)(path)), "w");
   ikv_write_file_direct(a, file, 0);
   fclose(file);
 }
@@ -202,6 +202,7 @@ status_t ikv_read_indent(FILE* file, ikv_read_value_t read_value, ikv_t ikv) {
   status_declare;
   line = 0;
   nested_ikvs[0] = ikv;
+  key = 0;
   while (!(-1 == getline((&line), (&line_alloc_size), file))) {
     i = 0;
     size = strlen(line);
@@ -282,7 +283,7 @@ exit:
 status_t ikv_read_file(ikv_string_t* path, ikv_t ikv) {
   status_declare;
   FILE* file;
-  file = fopen(path, "r");
+  file = fopen(((char*)(path)), "r");
   if (!file) {
     status_set_goto(ikv_s_group_ikv, ikv_s_id_file_open_failed);
   };

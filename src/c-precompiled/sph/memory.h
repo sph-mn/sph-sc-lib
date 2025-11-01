@@ -19,8 +19,8 @@
 #define sph_malloc_string(size, result) sph_memory_malloc_string(size, ((uint8_t**)(result)))
 #define sph_calloc(size, result) sph_memory_calloc(size, ((void**)(result)))
 #define sph_realloc(size, result) sph_memory_realloc(size, ((void**)(result)))
-sph_array_declare_type(sph_memory, memreg2_t);
-uint8_t* sph_memory_status_description(status_t a);
+sph_array_declare_type(sph_memory, memreg2_t)
+  uint8_t* sph_memory_status_description(status_t a);
 uint8_t* sph_memory_status_name(status_t a);
 status_t sph_memory_malloc(size_t size, void** result);
 status_t sph_memory_malloc_string(size_t length, uint8_t** result);

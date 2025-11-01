@@ -4,8 +4,7 @@
 #include <sph/test.h>
 #include <sph/set.h>
 #define test_element_count 10000
-sph_set_declare_type(set64, uint64_t, sph_set_hash_integer, sph_set_equal_integer, 0, 2);
-void print_contents(set64_t a) {
+sph_set_declare_type(set64, uint64_t, sph_set_hash_integer, sph_set_equal_integer, 0, 2) void print_contents(set64_t a) {
   size_t i = 0;
   printf("------\n");
   while ((i < a.size)) {
@@ -13,7 +12,7 @@ void print_contents(set64_t a) {
     i += 1;
   };
 }
-status_t test_sph_set() {
+status_t test_sph_set(void) {
   status_declare;
   set64_t a;
   uint64_t i;
@@ -39,7 +38,7 @@ status_t test_sph_set() {
 exit:
   status_return;
 }
-status_t test_sph_set_null() {
+status_t test_sph_set_null(void) {
   status_declare;
   set64_t a;
   uint64_t* p;
@@ -67,7 +66,7 @@ status_t test_sph_set_null() {
 exit:
   status_return;
 }
-int main() {
+int main(void) {
   status_declare;
   test_helper_test_one(test_sph_set);
   test_helper_test_one(test_sph_set_null);

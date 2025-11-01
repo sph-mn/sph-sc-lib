@@ -31,7 +31,7 @@
 (pre-define-if-not-defined
   spline-path-value-t double
   spline-path-segment-count-t uint16-t
-  spline-path-size-max (/ SIZE_MAX 2)
+  spline-path-size-max 9007199254740992.0
   spline-path-point-max 4
   spline-path-fabs fabs
   spline-path-exp exp
@@ -78,7 +78,7 @@
   (spline-path-point-t spline-path-point-t spline-path-point-t spline-path-value-t)
   (spline-path-move x y) (spline-path-segment-t spline-path-value-t spline-path-value-t)
   (spline-path-line x y) (spline-path-segment-t spline-path-value-t spline-path-value-t)
-  (spline-path-constant) (spline-path-segment-t)
+  (spline-path-constant) (spline-path-segment-t void)
   (spline-path-path path) (spline-path-segment-t spline-path-t)
   (spline-path-bezier1 x1 y1 x2 y2)
   (spline-path-segment-t spline-path-value-t spline-path-value-t

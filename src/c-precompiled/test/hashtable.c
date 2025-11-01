@@ -4,16 +4,15 @@
 #include <sph/test.h>
 #include <sph/hashtable.h>
 #define test_element_count 10000
-sph_hashtable_declare_type(testht, uint64_t, uint64_t, sph_hashtable_hash_integer, sph_hashtable_equal_integer, 2);
-void print_contents(testht_t a) {
+sph_hashtable_declare_type(testht, uint64_t, uint64_t, sph_hashtable_hash_integer, sph_hashtable_equal_integer, 2) void print_contents(testht_t a) {
   size_t i = 0;
   printf("------\n");
   while ((i < a.size)) {
-    printf("%lu\n", ((a.flags)[i]));
+    printf("%u\n", ((a.flags)[i]));
     i += 1;
   };
 }
-status_t test_hashtable() {
+status_t test_hashtable(void) {
   status_declare;
   testht_t a;
   uint64_t i;
@@ -39,7 +38,7 @@ status_t test_hashtable() {
 exit:
   status_return;
 }
-int main() {
+int main(void) {
   status_declare;
   test_helper_test_one(test_hashtable);
 exit:

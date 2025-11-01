@@ -12,6 +12,12 @@ it uses getline which needs #define _GNU_SOURCE before including stdio.h.
 #ifndef ikv_integer_t
 #define ikv_integer_t uintmax_t
 #endif
+#ifndef ikv_integer_format
+#define ikv_integer_format "%" PRIuMAX
+#endif
+#ifndef ikv_float_format
+#define ikv_float_format "%f"
+#endif
 #ifndef ikv_float_t
 #define ikv_float_t double
 #endif
@@ -43,14 +49,14 @@ it uses getline which needs #define _GNU_SOURCE before including stdio.h.
 #define ikv_s_id_memory 2
 #define ikv_s_id_full 3
 #define ikv_memory_error status_set_goto(ikv_s_group_ikv, ikv_s_id_memory)
-#define ikv_equal(a, b) (0 == strncmp(a, b, ikv_max_keysize))
+#define ikv_equal(a, b) (0 == strncmp(((char*)(a)), ((char*)(b)), ikv_max_keysize))
 #define ikv_value_get_string(a, index) ((ikv_string_t**)(a->data))[index]
 #define ikv_value_get_integer(a, index) ((ikv_integer_t*)(a->data))[index]
 #define ikv_value_get_float(a, index) ((ikv_float_t*)(a->data))[index]
 #define ikv_value_get_ikv(a) *((ikv_t*)(a->data))
 uint64_t ikv_hash_64(ikv_key_t* key, size_t size) {
   uint64_t a[2];
-  MurmurHash3_x64_128(key, (strlen(key)), 0, a);
+  MurmurHash3_x64_128(key, (strlen(((char*)(key)))), 0, a);
   return ((a[0]));
 }
 typedef struct {
@@ -58,8 +64,7 @@ typedef struct {
   ikv_integer_t size;
   void* data;
 } ikv_value_t;
-sph_hashtable_declare_type(ikv, ikv_key_t*, ikv_value_t, ikv_hash_64, ikv_equal, 2);
-typedef status_t (*ikv_read_value_t)(char*, size_t, ikv_value_t*);
+sph_hashtable_declare_type(ikv, ikv_key_t*, ikv_value_t, ikv_hash_64, ikv_equal, 2) typedef status_t (*ikv_read_value_t)(char*, size_t, ikv_value_t*);
 void ikv_free_all(ikv_t a);
 void ikv_write_file_direct(ikv_t a, FILE* file, ikv_nesting_t nesting);
 void ikv_write_file(ikv_t a, ikv_string_t* path);

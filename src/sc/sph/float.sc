@@ -9,8 +9,8 @@
   "approximate float comparison. margin is a factor and is low for low accepted differences"
   (return (< (fabs (- a b)) margin)))
 
-(sph-define-float-array-nearly-equal sph-f32 float)
-(sph-define-float-array-nearly-equal sph-f64 double)
-(sph-define-float-sum sph-f32 float)
-(sph-define-float-sum sph-f64 double)
+(sc-no-semicolon (sph-define-float-array-nearly-equal sph-f32 float)
+  (sph-define-float-array-nearly-equal sph-f64 double) (sph-define-float-sum sph-f32 float)
+  (sph-define-float-sum sph-f64 double))
+
 (pre-include-guard-end)

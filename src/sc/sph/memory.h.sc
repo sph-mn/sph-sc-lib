@@ -14,7 +14,7 @@
   (sph-calloc size result) (sph-memory-calloc size (convert-type result void**))
   (sph-realloc size result) (sph-memory-realloc size (convert-type result void**)))
 
-(sph-array-declare-type sph-memory memreg2-t)
+(sc-no-semicolon (sph-array-declare-type sph-memory memreg2-t))
 
 (declare
   (sph-memory-status-description a) (uint8-t* status-t)

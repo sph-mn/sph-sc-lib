@@ -1,13 +1,14 @@
 (pre-include "stdio.h" "inttypes.h" "sph/test.h" "sph/hashtable.h")
 (pre-define test-element-count 10000)
 
-(sph-hashtable-declare-type testht uint64-t
-  uint64-t sph-hashtable-hash-integer sph-hashtable-equal-integer 2)
+(sc-no-semicolon
+  (sph-hashtable-declare-type testht uint64-t
+    uint64-t sph-hashtable-hash-integer sph-hashtable-equal-integer 2))
 
 (define (print-contents a) (void testht-t)
   (define i size-t 0)
   (printf "------\n")
-  (while (< i a.size) (printf "%lu\n" (array-get a.flags i)) (set+ i 1)))
+  (while (< i a.size) (printf "%u\n" (array-get a.flags i)) (set+ i 1)))
 
 (define (test-hashtable) status-t
   status-declare

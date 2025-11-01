@@ -4,18 +4,24 @@ root="$PWD"
 target_dir=tmp
 c=src/c-precompiled
 optimization=3
-warnings="-Wunused-label -Wunused-value -Wunused-variable"
-gcc_options="-std=c17 $warnings -Wfatal-errors -O$optimization -fno-math-errno -I$c"
+
+# minimal diagnostics: keep only clearly useful ones
+warnings="-Wall -Wfatal-errors"
+
+# standard + posix feature test. avoid compiler- or distro-specific extras.
+gcc_options="-std=c17 -pedantic-errors -D_POSIX_C_SOURCE=200809L -D_FILE_OFFSET_BITS=64 \
+  $warnings -funsigned-char -fno-common -fno-math-errno -fPIC -O$optimization \
+  -pthread -I$c"
 
 compile_test_sph_sc_lib() {
-  gcc "$c/test/spline-path.c" -o tmp/test-spline-path $gcc_options -lm
-  gcc "$c/test/quicksort.c" -o tmp/test-quicksort $gcc_options
-  gcc "$c/test/random.c" -o tmp/test-random $gcc_options
-  gcc "$c/test/set.c" -o tmp/test-set $gcc_options
-  gcc "$c/test/hashtable.c" -o tmp/test-hashtable $gcc_options
-  gcc "$c/test/thread-pool.c" -o tmp/test-thread-pool $gcc_options -lpthread -D _DEFAULT_SOURCE
-  gcc "$c/test/ikv.c" -o tmp/test-ikv $gcc_options
-  gcc "$c/test/other.c" -o tmp/test-other $gcc_options
+  gcc $gcc_options "$c/test/spline-path.c" -o "$target_dir/test-spline-path" -lm
+  gcc $gcc_options "$c/test/quicksort.c" -o "$target_dir/test-quicksort"
+  gcc $gcc_options "$c/test/random.c" -o "$target_dir/test-random"
+  gcc $gcc_options "$c/test/set.c" -o "$target_dir/test-set"
+  gcc $gcc_options "$c/test/hashtable.c" -o "$target_dir/test-hashtable"
+  gcc $gcc_options "$c/test/thread-pool.c" -o "$target_dir/test-thread-pool"
+  gcc $gcc_options "$c/test/ikv.c" -o "$target_dir/test-ikv"
+  gcc $gcc_options "$c/test/other.c" -o "$target_dir/test-other"
 }
 
 mkdir -p "$target_dir" &&

@@ -6,7 +6,7 @@
 #include <sph/thread-pool.c>
 #include <sph/futures.h>
 #include <sph/futures.c>
-status_t test_thread_pool() {
+status_t test_thread_pool(void) {
   status_declare;
   sph_thread_pool_t pool;
   test_helper_assert("thread-pool new", (!sph_thread_pool_new(10, (&pool))));
@@ -20,7 +20,7 @@ void* future_work(void* data) {
   *a = (2 + *((uint8_t*)(data)));
   return (a);
 }
-status_t test_futures() {
+status_t test_futures(void) {
   status_declare;
   sph_future_t future;
   uint8_t data;
@@ -35,7 +35,7 @@ status_t test_futures() {
 exit:
   status_return;
 }
-int main() {
+int main(void) {
   status_declare;
   test_helper_test_one(test_futures);
   test_helper_test_one(test_thread_pool);
