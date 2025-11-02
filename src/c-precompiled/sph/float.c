@@ -1,6 +1,6 @@
 
-#ifndef sph_float
-#define sph_float
+#ifndef sph_float_c_included
+#define sph_float_c_included
 
 #include <math.h>
 #include <sph/float.h>

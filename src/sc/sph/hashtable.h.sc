@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-hashtable-h)
+(pre-include-guard-begin sph-hashtable-h-included)
 (pre-include "stdlib.h" "string.h" "inttypes.h")
 
 (pre-if (> SIZE_MAX 0xffffffffu)

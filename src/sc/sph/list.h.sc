@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-list-h)
+(pre-include-guard-begin sph-list-h-included)
 (pre-include "inttypes.h" "stdlib.h" "stdio.h")
 
 (pre-define (sph-slist-declare-type name element-type)

@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-thread-pool-h)
+(pre-include-guard-begin sph-thread-pool-h-included)
 (pre-include "pthread.h" "inttypes.h" "sph/queue.h")
 
 (sc-comment

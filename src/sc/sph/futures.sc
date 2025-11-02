@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-futures)
+(pre-include-guard-begin sph-futures-c-included)
 
 (pre-include "stddef.h" "sph/thread-pool.c")
 (declare sph-futures-pool sph-thread-pool-t)

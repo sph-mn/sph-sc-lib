@@ -1,3 +1,4 @@
+(pre-include-guard-begin sph-types-h-included)
 (sc-comment "shorter type names derived from inttypes.h")
 (pre-include "inttypes.h")
 
@@ -29,3 +30,5 @@
   u64-fast uint-fast64-t
   f32 float
   f64 double)
+
+(pre-include-guard-end)

@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-thread-pool)
+(pre-include-guard-begin sph-thread-pool-c-included)
 (pre-include "errno.h" "stdlib.h" "sph/thread-pool.h")
 
 (define (sph-thread-pool-destroy a) (int sph-thread-pool-t*)
@@ -70,7 +70,7 @@
   (label exit (pthread-attr-destroy &attr) (return error)))
 
 (define (sph-thread-pool-resize a size no-wait discard-queue)
-  (int sph-thread-pool-t* sph-thread-pool-size-t uint8_t uint8_t)
+  (int sph-thread-pool-t* sph-thread-pool-size-t uint8-t uint8-t)
   (declare
     attr pthread-attr-t
     join-value void*

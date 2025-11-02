@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-futures-h)
+(pre-include-guard-begin sph-futures-h-included)
 
 (sc-comment
   "fine-grain parallelism based on sph/thread-pool.c."

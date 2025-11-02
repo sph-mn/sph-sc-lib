@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-ikv-h)
+(pre-include-guard-begin sph-ikv-h-included)
 
 (sc-comment
   "string-array-hash - a file format and hashtable type for named arrays, possibly nested."
@@ -9,7 +9,7 @@
 
 (pre-define-if-not-defined
   ikv-integer-t uintmax-t
-  ikv-integer-format (pre-string-concat "%" PRIuMAX)
+  ikv-integer-format (pre-concat-string "%" PRIuMAX)
   ikv-float-format "%f"
   ikv-float-t double
   ikv-string-t uint8-t

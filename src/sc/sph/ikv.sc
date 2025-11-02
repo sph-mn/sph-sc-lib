@@ -23,11 +23,11 @@
     (case = b.type
       (ikv-type-integers
         (for ((set j 0) (< j b.size) (set+ j 1))
-          (fprintf file (pre-string-concat " " ikv-integer-format) (ikv-value-get-integer &b j)))
+          (fprintf file (pre-concat-string " " ikv-integer-format) (ikv-value-get-integer &b j)))
         (fprintf file "\n"))
       (ikv-type-floats
         (for ((set j 0) (< j b.size) (set+ j 1))
-          (fprintf file (pre-string-concat " " ikv-float-format) (ikv-value-get-float &b j)))
+          (fprintf file (pre-concat-string " " ikv-float-format) (ikv-value-get-float &b j)))
         (fprintf file "\n"))
       (ikv-type-strings
         (for ((set j 0) (< j b.size) (set+ j 1)) (fprintf file " %s" (ikv-value-get-string &b j)))

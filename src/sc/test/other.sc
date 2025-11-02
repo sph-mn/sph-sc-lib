@@ -1,25 +1,16 @@
 (pre-include "inttypes.h" "stdlib.h" "string.h" "sph/test.h")
 (sc-comment "array")
-(pre-include "sph/array.h" "sph/array4.h")
+(pre-include "sph/array.h")
 (pre-define test-element-count 100)
-(sc-no-semicolon (sph-array-declare-type a3u64 uint64-t) (array4-declare-type a4u64 uint64-t))
+(sc-no-semicolon (sph-array-declare-type a3u64 uint64-t))
 
 (define (test-arrayn) status-t
   status-declare
-  (declare i size-t a3 a3u64-t a4 a4u64-t)
+  (declare i size-t a3 a3u64-t)
   (status-require (a3u64-new test-element-count &a3))
-  (test-helper-assert "allocation a4" (not (a4u64-new test-element-count &a4)))
-  (for ((set i 0) (< i test-element-count) (set+ i 1))
-    (sph-array-add a3 (+ 2 i))
-    (array4-add a4 (+ 2 i)))
+  (for ((set i 0) (< i test-element-count) (set+ i 1)) (sph-array-add a3 (+ 2 i)))
   (test-helper-assert "a3 get" (and (= 2 (sph-array-get a3 0)) (= 101 (sph-array-get a3 99))))
-  (test-helper-assert "a4 get 1" (and (= 2 (array4-get a4)) (= 101 (array4-get-at a4 99))))
-  (while (array4-in-range a4) (array4-forward a4))
-  (test-helper-assert "a4 get 2" (= 101 (array4-get-at a4 (- a4.current 1))))
-  (array4-rewind a4)
-  (test-helper-assert "a4 get 3" (= 2 (array4-get a4)))
   (a3u64-free &a3)
-  (array4-free a4)
   (label exit status-return))
 
 (sc-comment "queue")
@@ -129,3 +120,5 @@
   (test-helper-test-one test-arrayn)
   (test-helper-test-one test-queue)
   (label exit test-helper-display-summary (return status.id)))
+
+(pre-include "sph/memory.c")

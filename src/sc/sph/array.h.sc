@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-array-h)
+(pre-include-guard-begin sph-array-h-included)
 
 (sc-comment
   "depends on stdlib.h (malloc/realloc/free) and string.h (memset) for the default allocators")
@@ -7,7 +7,7 @@
 
 (pre-define
   sph-array-status-id-memory 1
-  sph-array-status-group (convert-type "sph" uint8-t*)
+  sph-array-status-group "sph"
   sph-array-memory-error (status-set-goto sph-array-status-group sph-array-status-id-memory)
   sph-array-growth-factor 2
   (sph-array-default-alloc s es) (malloc (* s es))
@@ -56,6 +56,10 @@
   (sph-array-get-pointer a index) (+ a.data index)
   (sph-array-clear a) (set a.used 0)
   (sph-array-remove a) (set- a.used 1)
+  (sph-array-remove-swap a i)
+  (begin
+    (if (< (+ 1 i) a.used) (set (array-get a.data i) (array-get a.data a.used)))
+    (set- a.used 1))
   (sph-array-unused-size a) (- a.size a.used)
   (sph-array-full a) (= a.used a.size)
   (sph-array-not-full a) (< a.used a.size)

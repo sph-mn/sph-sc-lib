@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-status-h)
+(pre-include-guard-begin sph-status-h-included)
 
 (sc-comment
   "return status as integer code with group identifier"
@@ -8,19 +8,18 @@
   "group ids are strings, used to categorise sets of errors codes from different libraries for example")
 
 (pre-include "inttypes.h")
-(declare status-t (type (struct (id int) (group uint8-t*))))
+(declare status-t (type (struct (id int) (group char*))))
 
 (pre-define
   status-id-success 0
-  status-group-undefined (convert-type "" uint8-t*)
+  status-group-undefined ""
   status-declare (define status status-t (struct-literal status-id-success status-group-undefined))
   status-is-success (= status-id-success status.id)
   status-is-failure (not status-is-success)
   status-return (return status)
   status-i-return (return status.id)
   status-goto (goto exit)
-  (status-set group-id status-id)
-  (set status.group (convert-type group-id uint8-t*) status.id status-id)
+  (status-set group-id status-id) (set status.group group-id status.id status-id)
   (status-set-goto group-id status-id) (begin (status-set group-id status-id) status-goto)
   (status-require expression) (begin (set status expression) (if status-is-failure status-goto))
   (status-i-require expression) (begin (set status.id expression) (if status-is-failure status-goto))

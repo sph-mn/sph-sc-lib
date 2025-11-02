@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-set-h)
+(pre-include-guard-begin sph-set-h-included)
 
 (sc-comment
   "a macro that defines set data types and related functions for arbitrary value types.

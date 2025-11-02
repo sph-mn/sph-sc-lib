@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-float)
+(pre-include-guard-begin sph-float-c-included)
 (pre-include "math.h" "sph/float.h")
 
 (define (sph-f64-nearly-equal a b margin) (uint8-t double double double)

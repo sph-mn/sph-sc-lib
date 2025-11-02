@@ -1,15 +1,13 @@
-(pre-include-guard-begin sph-memory)
+(pre-include-guard-begin sph-memory-c-included)
 (pre-include "stdlib.h" "stdio.h" "sph/memory.h")
 
-(define (sph-memory-status-description a) (uint8-t* status-t)
-  (declare b uint8-t*)
+(define (sph-memory-status-description a) (char* status-t)
   (case = a.id
-    (sph-memory-status-id-memory (set b "not enough memory or other memory allocation error"))
-    (else (set b ""))))
+    (sph-memory-status-id-memory (return "not enough memory or other memory allocation error"))
+    (else (return ""))))
 
-(define (sph-memory-status-name a) (uint8-t* status-t)
-  (declare b uint8-t*)
-  (case = a.id (sph-memory-status-id-memory (set b "memory")) (else (set b "unknown"))))
+(define (sph-memory-status-name a) (char* status-t)
+  (case = a.id (sph-memory-status-id-memory (return "memory")) (else (return "unknown"))))
 
 (define (sph-memory-malloc size result) (status-t size-t void**)
   status-declare
@@ -18,10 +16,10 @@
   (if a (set *result a) sph-memory-error)
   (label exit status-return))
 
-(define (sph-memory-malloc-string length result) (status-t size-t uint8-t**)
+(define (sph-memory-malloc-string length result) (status-t size-t char**)
   "like sph_malloc but allocates one extra byte that is set to zero"
   status-declare
-  (declare a uint8-t*)
+  (declare a char*)
   (status-require (sph-malloc (+ 1 length) &a))
   (set (array-get a length) 0 *result a)
   (label exit status-return))

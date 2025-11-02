@@ -1,6 +1,6 @@
 
-#ifndef sph_test_h
-#define sph_test_h
+#ifndef sph_test_h_included
+#define sph_test_h_included
 
 #include <stdio.h>
 #include <sph/status.h>

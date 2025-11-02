@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-float-h)
+(pre-include-guard-begin sph-float-h-included)
 (pre-include "inttypes.h")
 
 (pre-define (sph-define-float-sum prefix type)

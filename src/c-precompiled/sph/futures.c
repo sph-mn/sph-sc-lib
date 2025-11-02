@@ -1,6 +1,6 @@
 
-#ifndef sph_futures
-#define sph_futures
+#ifndef sph_futures_c_included
+#define sph_futures_c_included
 
 #include <stddef.h>
 #include <sph/thread-pool.c>

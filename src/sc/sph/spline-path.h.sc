@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-spline-path-h)
+(pre-include-guard-begin sph-spline-path-h-included)
 
 (sc-comment
   "* spline-path creates discrete 2d paths interpolated between some given points

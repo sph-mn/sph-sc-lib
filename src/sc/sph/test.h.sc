@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-test-h)
+(pre-include-guard-begin sph-test-h-included)
 (pre-include "stdio.h" "sph/status.h")
 
 (pre-define

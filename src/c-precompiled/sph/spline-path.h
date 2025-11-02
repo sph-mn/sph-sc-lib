@@ -1,6 +1,6 @@
 
-#ifndef sph_spline_path_h
-#define sph_spline_path_h
+#ifndef sph_spline_path_h_included
+#define sph_spline_path_h_included
 
 /* * spline-path creates discrete 2d paths interpolated between some given points
  * maps from one independent value to one dependent continuous value

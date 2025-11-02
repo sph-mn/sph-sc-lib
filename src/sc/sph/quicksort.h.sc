@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-quicksort-h)
+(pre-include-guard-begin sph-quicksort-h-included)
 (pre-include "sys/types.h")
 
 (define (quicksort less? swap array left right)

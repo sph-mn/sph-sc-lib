@@ -1,6 +1,6 @@
 
-#ifndef sph_futures_h
-#define sph_futures_h
+#ifndef sph_futures_h_included
+#define sph_futures_h_included
 
 /* fine-grain parallelism based on sph/thread-pool.c.
 provides task objects with functions executed in threads that can be waited for to get a result value.

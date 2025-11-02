@@ -6,7 +6,7 @@
     "writes values with current routine name and line info to standard output.
     example: (debug-log \"%d\" 1)
     otherwise like printf"
-    (fprintf stdout (pre-string-concat "%s:%d " format "\n") __func__ __LINE__ __VA-ARGS__))
+    (fprintf stdout (pre-concat-string "%s:%d " format "\n") __func__ __LINE__ __VA-ARGS__))
   (debug-trace n)
   (begin
     "display current function name and given number.

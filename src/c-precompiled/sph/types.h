@@ -1,4 +1,7 @@
 
+#ifndef sph_types_h_included
+#define sph_types_h_included
+
 /* shorter type names derived from inttypes.h */
 #include <inttypes.h>
 
@@ -29,3 +32,4 @@
 #define u64_fast uint_fast64_t
 #define f32 float
 #define f64 double
+#endif

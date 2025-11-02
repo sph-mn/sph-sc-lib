@@ -1,6 +1,6 @@
 
-#ifndef sph_ikv_h
-#define sph_ikv_h
+#ifndef sph_ikv_h_included
+#define sph_ikv_h_included
 
 /* string-array-hash - a file format and hashtable type for named arrays, possibly nested.
 it uses getline which needs #define _GNU_SOURCE before including stdio.h.

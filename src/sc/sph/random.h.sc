@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-random-h)
+(pre-include-guard-begin sph-random-h-included)
 (pre-include "inttypes.h")
 
 (declare

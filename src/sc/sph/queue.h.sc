@@ -1,4 +1,4 @@
-(pre-include-guard-begin sph-queue-h)
+(pre-include-guard-begin sph-queue-h-included)
 
 (sc-comment
   "a fifo queue with the operations enqueue and dequeue that can enqueue custom struct types and a mix of types.

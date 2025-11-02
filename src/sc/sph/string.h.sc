@@ -1,6 +1,6 @@
 (pre-include "string.h" "stdlib.h" "stdio.h")
 
-(define (ensure-trailing-slash a result) (uint8-t uint8-t* uint8-t**)
+(define (ensure-trailing-slash a result) (uint8-t char* char**)
   "set result to a new string with a trailing slash added, or the given string if it already has a trailing slash.
    returns 0 if result is the given string, 1 if new memory could not be allocated, 2 if result is a new string"
   (define a-len uint32-t (strlen a))
@@ -12,29 +12,28 @@
       (set (array-get new-a a-len) #\/ (array-get new-a (+ a-len 1)) 0 *result new-a)
       (return 2))))
 
-(define (string-append a b) (uint8-t* uint8-t* uint8-t*)
+(define (string-append a b) (char* char* char*)
   "always returns a new string"
   (define a-length size-t (strlen a))
   (define b-length size-t (strlen b))
-  (define result uint8-t* (malloc (+ 1 a-length b-length)))
+  (define result char* (malloc (+ 1 a-length b-length)))
   (if (not result) (return 0))
   (memcpy result a a-length)
   (memcpy (+ result a-length) b (+ 1 b-length))
   (set (array-get result (+ a-length b-length)) 0)
   (return result))
 
-(define (string-clone a) (uint8-t* uint8-t*)
+(define (string-clone a) (char* char*)
   "return a new string with the same contents as the given string. return 0 if the memory allocation failed"
   (define a-size size-t (+ 1 (strlen a)))
-  (define result uint8-t* (malloc a-size))
+  (define result char* (malloc a-size))
   (if result (memcpy result a a-size))
   (return result))
 
-(define (string-join strings strings-len delimiter result-len)
-  (uint8-t* uint8-t** size-t uint8-t* size-t*)
+(define (string-join strings strings-len delimiter result-len) (char* char** size-t char* size-t*)
   "join strings into one string with each input string separated by delimiter.
    zero if strings-len is zero or memory could not be allocated"
-  (declare result uint8-t* cursor uint8-t* total-size size-t part-size size-t delimiter-len size-t)
+  (declare result char* cursor char* total-size size-t part-size size-t delimiter-len size-t)
   (set
     delimiter-len (strlen (convert-type delimiter char*))
     total-size (+ 1 (* delimiter-len (- strings-len 1))))
@@ -60,14 +59,14 @@
     uint8-t 8 (printf "%u" (if* (!= (bit-and (bit-shift-left (convert-type 1 uint8-t) i) a) 0) 1 0))))
 
 (define (sph-display-bits a size) (void void* size-t)
-  (for-each-index i size-t size (sph-display-bits-u8 (array-get (convert-type a uint8-t*) i)))
+  (for-each-index i size-t size (sph-display-bits-u8 (array-get (convert-type a char*) i)))
   (printf "\n"))
 
-(define (sph-helper-uint-to-string a result-len) (uint8-t* uintmax-t size-t*)
-  (declare t uintmax-t digits size-t result uint8-t* p char*)
+(define (sph-helper-uint-to-string a result-len) (char* uintmax-t size-t*)
+  (declare t uintmax-t digits size-t result char* p char*)
   (set t a digits 1)
   (while (>= t 10) (set t (/ t 10) digits (+ digits 1)))
-  (set result (convert-type (malloc (+ digits 1)) uint8-t*))
+  (set result (convert-type (malloc (+ digits 1)) char*))
   (if (not result) (return 0))
   (set p (+ (convert-type result char*) digits) *p 0)
   (do-while (> a 0)
