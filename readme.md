@@ -19,9 +19,8 @@ c code is in src/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions 
 * [test](#test): minimalistic test runner macros
 * [thread-pool](#thread-pool): task queue with pthread threads and wait conditions for pausing inactive threads
 
-## more experimental
+## experimental
 * [ikv](#ikv): file format for nested named arrays, for example for text configuration
-* one: miscellaneous helpers
 * guile: a few helpers for working with guile
 
 # license
@@ -35,7 +34,6 @@ code is under gpl3+, documentation under cc-by-nc.
 macro that defines a generic dynamic array type for arbitrary element types.
 
 ## characteristics
-
 * structure layout: `{ .data, .size, .used }`
 * `.data` points to allocated memory
 * `.size` is the allocated element capacity

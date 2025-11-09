@@ -69,7 +69,7 @@ exit:
 /** event memory addition with automatic array expansion */
 status_t sph_memory_add_with_handler(sph_memory_t* a, void* address, void (*handler)(void*)) {
   status_declare;
-  status_require((sph_memory_ensure(a, 4)));
+  status_require((sph_memory_ensure(4, a)));
   sph_memory_add_directly(a, address, handler);
 exit:
   status_return;

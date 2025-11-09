@@ -8,8 +8,8 @@
 (pre-define
   sph-array-status-id-memory 1
   sph-array-status-group "sph"
-  sph-array-memory-error (status-set-goto sph-array-status-group sph-array-status-id-memory)
   sph-array-growth-factor 2
+  sph-array-memory-error (status-set-goto sph-array-status-group sph-array-status-id-memory)
   (sph-array-default-alloc s es) (malloc (* s es))
   (sph-array-default-realloc d s u n es) (realloc d (* n es))
   (sph-array-default-alloc-zero s es) (calloc s es)
@@ -34,12 +34,12 @@
       (set a:data data a:size new-size a:used (if* (< new-size a:used) new-size a:used))
       (label exit status-return))
     (define ((pre-concat name _free) a) (void (pre-concat name _t*)) (sph-array-free a:data))
-    (define ((pre-concat name _ensure) a needed) (status-t (pre-concat name _t*) size-t)
+    (define ((pre-concat name _ensure) needed a) (status-t size-t (pre-concat name _t*))
       status-declare
       (return
         (if* a:data
           (if* (< (- a:size a:used) needed)
-            ((pre-concat name _resize) a (* sph-array-growth-factor a:size))
+            ((pre-concat name _resize) a (+ needed (* sph-array-growth-factor a:size)))
             status)
           ((pre-concat name _new) needed a)))))
   (sph-array-declare-type name element-type)

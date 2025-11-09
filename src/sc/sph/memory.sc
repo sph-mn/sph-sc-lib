@@ -41,7 +41,7 @@
   (status-t sph-memory-t* void* (function-pointer void void*))
   "event memory addition with automatic array expansion"
   status-declare
-  (status-require (sph-memory-ensure a 4))
+  (status-require (sph-memory-ensure 4 a))
   (sph-memory-add-directly a address handler)
   (label exit status-return))
 
