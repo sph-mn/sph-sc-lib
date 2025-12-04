@@ -1,7 +1,6 @@
 # sph-sc-lib
 
-various small standalone c utility libraries.
-c code is in src/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions are in src/sc. the libraries are developed in sc and then translated to normal, readable c, formatted with clang-format
+various small standalone c utility libraries. the code is under `src/c-precompiled/sph/`.
 
 # included libraries
 * [array](#array): structs for arrays that include size or a count of used content
@@ -26,9 +25,9 @@ c code is in src/c-precompiled. [sc](https://github.com/sph-mn/sph-sc) versions 
 # license
 code is under gpl3+, documentation under cc-by-nc.
 
-# compilation
-* include "sph/library_name.h" (if exists) if the .c file is included in a shared library being used
-* include "sph/library_name.c" for the rest of the code
+# usage
+* include "sph/library_name.h" for headers
+* include "sph/library_name.c" for implementations
 
 # array
 macro that defines a generic dynamic array type for arbitrary element types.
